@@ -57,20 +57,3 @@ Options:
 
 `)
 }
-
-// Stubs — will be implemented in separate files.
-
-func runSend(args []string) int {
-	fmt.Fprintln(os.Stderr, "send: not yet implemented")
-	return 1
-}
-
-func runIdle(args []string) int {
-	fmt.Fprintln(os.Stderr, "idle: not yet implemented")
-	return 1
-}
-
-func runWaitAndSend(args []string) int {
-	fmt.Fprintln(os.Stderr, "wait-and-send: not yet implemented")
-	return 1
-}

@@ -399,7 +399,19 @@ These tests start a real tmux session, send messages, and verify delivery.
 8. Two concurrent `whisper send` to the same target produce non-garbled output
 9. `whisper send --self "test"` works from within a tmux session
 10. `tmux-claude-send` can be replaced with `whisper send` as a drop-in (same args pattern for basic usage)
-11. Integration tests pass in CI (tmux available in test environment)
+11. Integration tests pass locally (`make test` with tmux available)
+
+---
+
+## Git Workflow
+
+Push directly to master. No pull requests, no CI infrastructure. GitHub is backup, not a gate.
+
+```bash
+git push origin master
+```
+
+`make check` (fmt + vet + lint + test) is the quality gate — run it locally before pushing.
 
 ---
 
@@ -428,9 +440,9 @@ When whisper is complete, review:
 - [ ] Update `specs/athanor/gastown-tmux-protocols.md` — note gap closure
 
 ### Workflow Improvements
-- [ ] Create Go CLI development skill if patterns emerge worth capturing
 - [ ] Assess whether Gastown's Go project structure is a good template for future tools
 
 ### Knowledge Capture
 - [ ] Document any tmux quirks discovered during implementation
 - [ ] Note any protocol deviations from Gastown (and why)
+- [ ] **Update `~/.claude/skills/gastown-reference/SKILL.md`** with lessons learned — what general Go patterns to follow vs leave behind from Gastown, critical processes (test running, linting, build), any gotchas. This is our first project using the gastown-reference skill; feed back what worked and what was missing.
