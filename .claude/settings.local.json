@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(update-config)",
+      "Bash(/tmp/whisper:*)",
+      "Bash(make:*)",
+      "Bash(go:*)",
+      "Bash(gofmt:*)",
+      "Bash(goimports:*)",
+      "Bash(golangci-lint:*)",
+      "Bash(staticcheck:*)",
+      "Bash(ls:*)",
+      "Bash(which:*)",
+      "Bash(test:*)",
+      "Bash(cat:*)",
+      "Bash(mkdir:*)",
+      "Bash(install:*)",
+      "Bash(tmux:*)",
+      "Bash(git:*)",
+      "Bash(zsh -c 'echo $PATH')",
+      "Bash(zsh -c 'echo \"interactive: $-\"'kkjkkkkj)",
+      "Bash(zsh -l -c 'echo $PATH' > /tmp/gopath-login.txt)",
+      "Bash(PATH=\"$HOME/go/bin:$PATH\" make check 2>&1)"
+    ]
+  }
+}

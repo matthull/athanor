@@ -317,6 +317,47 @@ func TestConcurrentSends(t *testing.T) {
 	}
 }
 
+func TestSendSelf(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test")
+	}
+	r := newTestRunner(t)
+	session := createTestSession(t, r)
+	waitForShellReady(t, r, session)
+
+	// Resolve the pane ID (e.g. %5) — this simulates --self targeting by pane
+	paneID, err := r.DisplayMessage(session, "#{pane_id}")
+	if err != nil {
+		t.Fatalf("DisplayMessage: %v", err)
+	}
+	paneID = strings.TrimSpace(paneID)
+	if paneID == "" {
+		t.Fatal("got empty pane_id")
+	}
+
+	marker := fmt.Sprintf("SELF-%d", time.Now().UnixNano())
+	opts := SendOpts{Timeout: 10 * time.Second, SkipEscape: true}
+	if err := r.Send(paneID, "echo "+marker, opts); err != nil {
+		t.Fatalf("Send to pane %s: %v", paneID, err)
+	}
+
+	// Poll for the marker in captured output
+	deadline := time.Now().Add(5 * time.Second)
+	for time.Now().Before(deadline) {
+		lines, err := r.CapturePaneLines(paneID, 20)
+		if err != nil {
+			t.Fatalf("CapturePaneLines: %v", err)
+		}
+		for _, line := range lines {
+			if strings.Contains(line, marker) {
+				return // success
+			}
+		}
+		time.Sleep(200 * time.Millisecond)
+	}
+	t.Errorf("marker %q not found when sending to pane %s", marker, paneID)
+}
+
 func TestSendSessionNotFound(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping integration test")
