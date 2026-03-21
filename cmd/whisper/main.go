@@ -4,7 +4,7 @@ package main
 import (
 	"os"
 
-	"github.com/mattcollier/whisper/internal/cli"
+	"github.com/matthull/whisper/internal/cli"
 )
 
 func main() {
