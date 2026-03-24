@@ -79,6 +79,9 @@ Implement the whisper CLI: a standalone Go binary that reliably delivers message
 - Pushes to master (no branch, no PR — per project workflow)
 - Runs `make check` one final time after commit to confirm clean state
 - Completion: changes on master at origin, `make check` green
+- **Produced:** Commit 6c4a8f9 pushed to master. 30 files, 3818 insertions.
+- **Confidence:** `make check` passed before commit. Push succeeded.
+- **Gate outcome:** skipped (autonomous)
 
 ### 5. RETROSPECTIVE — Update gastown-reference skill
 
@@ -88,6 +91,23 @@ Implement the whisper CLI: a standalone Go binary that reliably delivers message
 - Updates `~/.claude/skills/gastown-reference/SKILL.md` with findings
 - Completion: skill file modified with concrete lessons from this implementation
 - Notify operator via Telegram: done, summary of what was built, what to smoke test
+- **Produced:** Skill updated from 129 to 360 lines. Added: Runner struct pattern, channel semaphore, sentinel errors, one-file-per-concern, make check gate, TestMain pattern, server exit race gotcha, shell readiness wait, .zshenv PATH gotcha, CLI arg parsing pattern.
+- **Confidence:** File exists and was modified (verified by agent report).
+- **Gate outcome:** skipped (autonomous)
+
+## Outstanding Work (QA Handoff)
+
+See `specs/tasks/qa-handoff.md`. Remaining items:
+- AC 9: TestSendSelf integration test (agent-owned, blocked by stale PATH in this session)
+- AC 7: Manual idle detection smoke test (operator-owned)
+- AC 11: `make install` verification (operator-owned)
+- Commit: settings.local.json + AC 9 test
+
+## Process Issues Identified
+
+1. **Verification strategy not enforced end-to-end.** The task plan's verification strategy table mapped all 12 ACs to verification methods, but Phase 3 VERIFY only ran `make check`. No phase walked the full table and produced per-criterion verdicts. ACs 7, 9, 11, 12 fell through.
+2. **Stale PATH from session inheritance.** Claude Code inherits PATH from its parent process. .zshenv modifications require session restart to take effect. Agents worked around this instead of escalating — should be documented as a known environment gotcha.
+3. **Agents should escalate environment issues, not workaround.** Multiple agents silently prepended PATH workarounds. The standard agent directives say to escalate, but agents didn't follow this for PATH issues.
 
 ## Autonomy Profile
 
