@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/matthull/whisper/internal/tmux"
+	"github.com/matthull/athanor/internal/tmux"
 )
 
 func runIdle(args []string) int {

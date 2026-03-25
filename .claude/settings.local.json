@@ -20,7 +20,11 @@
       "Bash(zsh -c 'echo $PATH')",
       "Bash(zsh -c 'echo \"interactive: $-\"'kkjkkkkj)",
       "Bash(zsh -l -c 'echo $PATH' > /tmp/gopath-login.txt)",
-      "Bash(PATH=\"$HOME/go/bin:$PATH\" make check 2>&1)"
+      "Bash(PATH=\"$HOME/go/bin:$PATH\" make check 2>&1)",
+      "Bash(ath version:*)",
+      "Bash(ath help:*)",
+      "Bash(ath whisper:*)",
+      "Bash(tmux list-windows:*)"
     ]
   }
 }

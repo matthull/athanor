@@ -1,4 +1,4 @@
-// Package cli provides the command-line interface for whisper.
+// Package cli provides the command-line interface for the athanor system.
 package cli
 
 import (
@@ -21,14 +21,28 @@ func Execute() int {
 	}
 
 	switch os.Args[1] {
-	case "send":
-		return runSend(os.Args[2:])
-	case "idle":
-		return runIdle(os.Args[2:])
-	case "wait-and-send":
-		return runWaitAndSend(os.Args[2:])
+	case "whisper":
+		return runWhisper(os.Args[2:])
+	case "init":
+		return runInit(os.Args[2:])
+	case "kindle":
+		return runKindle(os.Args[2:])
+	case "muster":
+		return runMuster(os.Args[2:])
+	case "status":
+		return runStatus(os.Args[2:])
+	case "reforge":
+		return runReforge(os.Args[2:])
+	case "cleanup":
+		return runCleanup(os.Args[2:])
+	case "quiesce":
+		return runQuiesce(os.Args[2:])
+	case "opera":
+		return runOpera(os.Args[2:])
+	case "completion":
+		return runCompletion(os.Args[2:])
 	case "version":
-		fmt.Printf("whisper %s (commit: %s, built: %s)\n", Version, Commit, BuildTime)
+		fmt.Printf("ath %s (commit: %s, built: %s)\n", Version, Commit, BuildTime)
 		return 0
 	case "--help", "-h", "help":
 		printUsage()
@@ -41,19 +55,24 @@ func Execute() int {
 }
 
 func printUsage() {
-	fmt.Fprintf(os.Stderr, `whisper — reliable message delivery to tmux sessions
+	fmt.Fprintf(os.Stderr, `ath — athanor agent orchestration CLI
 
 Usage:
-  whisper send <target> <message>       Send a message to a tmux target
-  whisper send <target> -f <file>       Send file contents to a tmux target
-  whisper send --self <message>         Send to own pane ($TMUX_PANE)
-  whisper idle <target>                 Wait for target to become idle
-  whisper wait-and-send <target> <msg>  Wait for idle, then send
-  whisper version                       Print version info
+  ath init <name> [--project <path>]     Create a new athanor instance
+  ath kindle <name>                       Launch a marut for an athanor
+  ath reforge <name>                      Kill and relaunch a marut
+  ath muster <opus-file> [--dir <path>]   Launch an azer for an opus
+  ath cleanup <crucible>                  Clean up after a discharged opus
+  ath quiesce <name>                      Graceful shutdown of an athanor
+  ath status [<name>]                     Show athanor health
+  ath opera [<name>]                      List opera with status
 
-Options:
-  --skip-escape     Omit Escape keystroke (for non-Claude agents)
-  --timeout <dur>   Max wait time (default: 15s)
+  ath whisper send <target> <message>     Send a message to a tmux target
+  ath whisper idle <target>               Wait for target to become idle
+  ath whisper wait-and-send <target> <msg> Wait for idle, then send
+
+  ath completion zsh                      Generate zsh completion script
+  ath version                             Print version info
 
 `)
 }

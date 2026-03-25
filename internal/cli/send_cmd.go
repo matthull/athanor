@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/matthull/whisper/internal/tmux"
+	"github.com/matthull/athanor/internal/tmux"
 )
 
 // sendArgs holds parsed send command arguments.

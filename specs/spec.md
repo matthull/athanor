@@ -155,18 +155,18 @@ The athanor uses distinctive names because precise names create precise meanings
 | **Magnum Opus** | Alchemical | Top-level goal container. Task-based (has completion criteria) or state-based (maintained continuously). |
 | **Opus** | Alchemical | A single unit of work. Goal + geas + context. Charged to an agent, discharged when geas is met. |
 | **Geas** | D&D / Celtic | Binding behavioral compulsion. Frames completion as obligation; makes escalation an equally valid fulfillment. |
-| **Materia** | Alchemical | Mise en place — specs, skills, context, test infrastructure. What you work WITH, not what you're trying to DO. |
-| **Crucible** | Alchemical | The tmux window where an agent session runs. Persists across session restarts. |
-| **Whisper** | D&D / IM | Inter-crucible communication. The Go CLI tool for reliable delivery. |
+| **Materia** | Alchemical | Anything in the world an agent can access via tool use — files, Slack threads, Linear tickets, meeting transcripts, specs, web pages. Materia exists outside the agent and has potential charge (relevance/value). Tool use is the alchemizing process that extracts charge from materia into the crucible. |
+| **Crucible** | Alchemical | The agent's context window — a receptacle of pure energy where tokens combine and recombine. Also physically: the tmux window where an agent session runs (persists across session restarts). Adding materia to the crucible transforms the whole, for better or worse, through the complex interplay of every token. |
+| **Whisper** | D&D / IM | Inter-crucible communication. Subcommand of the `ath` CLI (`ath whisper send/idle/wait-and-send`). |
 | **Trail** | Common | The sequence of discharged opera under a Magnum Opus. The authoritative record. |
 | **Assay** | Alchemical | Dynamic dependency confirmation before executing an opus. "Do I have the materia to do this well? What's missing?" Gaps become opera or escalations. No assumptions — confirm everything, hardcode nothing. |
-| **Athanor** | Alchemical | The furnace. A materialized instance of the system, scoped to a domain. Generally one per repo. |
+| **Athanor** | Alchemical | The furnace. A materialized instance of the system, scoped to a domain. Instances live at `~/athanor/athanors/<name>/`. |
 | **Quiescence** | Alchemical | The furnace at rest — lit but idle. All MOs healthy, no urgent opera. |
 | **Witness** | Alchemical | One who observes the transmutation and attests to its completion. People, teams, or channels who need to see, react to, or be consulted about the work. |
 
 **Naming philosophy.** Distinctive names create precise meanings. "Azer" has less ambiguity than "worker"; "geas" less than "acceptance criteria"; "opus" less than "task." The goal is good metaphors, not maximum weirdness — names range from mundane to deep cut, and what matters is that each name fits, is unambiguous, and carries the right connotation. "Session" and "sandbox" are fine as-is. "Azer" and "geas" earn their weirdness by being more precise than their normie equivalents. Two loose registers: **monster manual** for agents (creatures with purpose, will, and behavior) and **alchemical/esoteric** for infrastructure, process, and materials. Mixed freely.
 
-**Verbs:** "inscribe an opus" (create), "charge the azer" (assign), "discharge the geas" (fulfill), "gather materia" (mise en place), "transmute" (transform materia into output), "kindle a Magnum Opus" (establish a new top-level goal), "reforge" (kill a session and spawn fresh in the same crucible — the crucible endures, the session is reforged), "muster" (dispatch azers for discovered opera), "assay" (assess readiness before executing).
+**Verbs:** "inscribe an opus" (create), "charge the azer" (assign), "discharge the geas" (fulfill), "sublimatio" (extract charge from materia into the crucible via tool use — reading files, querying APIs, searching Slack), "transmutatio" (transform accumulated charge into output — code, PRs, messages, specs), "kindle a Magnum Opus" (establish a new top-level goal), "reforge" (kill a session and spawn fresh in the same crucible — the crucible endures, the session is reforged), "muster" (dispatch azers for discovered opera), "assay" (assess readiness before executing).
 
 **Weirdness boundary.** The vocabulary is for athanor infrastructure — skills, hooks, session injection, internal docs. External output (Linear tickets, PR descriptions, Slack messages, commit messages) uses normie language. A beholder inscribes an opus internally; the Linear ticket says "Fix NoMethodError in ProofRecommendationService."
 
@@ -275,7 +275,7 @@ Artifex (human) = Primus, the Forge Lord
 
 ### Infrastructure
 
-**Whisper** — Go CLI for reliable inter-crucible communication. Core capabilities: `whisper send` (reliable message delivery to a crucible), `whisper idle` (wait-for-idle with 2-check confirmation), per-crucible send locks (no concurrent garbling). Built and operational. Every automated interaction in the athanor goes through whisper — if whispers are flaky, everything is flaky.
+**Whisper** — Reliable inter-crucible communication, now part of the `ath` CLI (`ath whisper send/idle/wait-and-send`). Core capabilities: `ath whisper send` (reliable message delivery to a crucible), `ath whisper idle` (wait-for-idle with 2-check confirmation), `ath whisper wait-and-send` (idle + send in one command), per-crucible send locks (no concurrent garbling). Built and operational. Every automated interaction in the athanor goes through whisper — if whispers are flaky, everything is flaky.
 
 **Context Budget Guard** — Shell script + hook. Advisory warnings at 75/85/92% context usage. Fail-open. Prevents silent context degradation across all sessions.
 
@@ -288,8 +288,8 @@ Artifex (human) = Primus, the Forge Lord
 These are locked architectural decisions. Changing them requires explicit artifex approval.
 
 - **No agent may run `/orchestrate`** — its long-lived coordinator model conflicts with the opera/trail model
-- **No agent may read `specs/athanor/`** — the blueprint is the artifex's working space, not the materialized system
-- **No agent may modify shared materia** (`specs/athanors/shared/`) — agents read these files but never write to them. The athanor does not understand itself well enough to self-modify. System changes are the artifex's domain.
+- **No agent may read the system blueprint** — this spec and related design docs are the artifex's working space, not the materialized system
+- **No agent may modify the athanor's shared components** (`~/athanor/shared/` — agent roles, protocols, opus lifecycle) — agents read these files but never write to them. The athanor does not understand itself well enough to self-modify. System changes are the artifex's domain.
 - **The artifex is Primus, the Forge Lord for now** — manually launching, monitoring, restarting. No automated primus until there are multiple Magna Opera to supervise
 - **Plans are optional context, not first-order** — goals + geas are the success guarantee. Many planning styles can succeed with clear goals
 - **Provide minimal materia, test escalation** — the first test is whether the marut escalates cleanly when it hits gaps vs. guessing/hallucinating
@@ -335,7 +335,7 @@ The trail is walked one grounded step at a time. Each step is taken with evidenc
 ### What an Athanor Instance Contains
 
 ```
-specs/athanors/<name>/
+~/athanor/athanors/<name>/
 ├── AGENTS.md          ← core vocabulary, geas, constraints (all agents read)
 ├── magnum-opus.md     ← goal + abundant satisfaction + getting-started pointer
 ├── marut.md           ← supervisor role
@@ -346,16 +346,18 @@ specs/athanors/<name>/
     └── YYYY-MM-DD-<descriptive-name>.md   ← all opera, YAML frontmatter for status
 ```
 
-Shared files (`AGENTS.md`, role files, `opus.md`, `muster.md`) are symlinked from `specs/athanors/shared/`. The `magnum-opus.md` is the only file authored per-instance.
+Shared files (`AGENTS.md`, role files, `opus.md`, `muster.md`) are symlinked from `~/athanor/shared/`. The `magnum-opus.md` is the only file authored per-instance.
 
 ### What Agents See vs. What the Artifex Sees
 
-Agents read the materialized instance (`specs/athanors/<name>/`). They do not read:
-- `specs/athanor/` — the system blueprint (this document)
+Agents read the materialized instance (`~/athanor/athanors/<name>/`). They do not read:
+- `~/athanor/specs/` — the system blueprint (this document)
 - `kadmon.md` — project planning and operational notes
 - Historical analysis docs
 
 ### Active Instances
+
+All instances live at `~/athanor/athanors/<name>/`.
 
 | Instance | Type | Goal |
 |----------|------|------|
@@ -376,7 +378,7 @@ Agents read the materialized instance (`specs/athanors/<name>/`). They do not re
 
 4. **Conservation of operator attention.** Every design decision asks: does this reduce or increase the operator's attentional load? Intelligent escalation > noise.
 
-5. **Reliable delivery is infrastructure.** Every automated interaction goes through whisper (the Go tmux utility). If delivery is flaky, everything built on top is flaky.
+5. **Reliable delivery is infrastructure.** Every automated interaction goes through whisper (`ath whisper`). If delivery is flaky, everything built on top is flaky.
 
 6. **Incremental, not revolutionary.** Every piece ships independently. No big-bang migrations.
 
@@ -417,8 +419,8 @@ Built, fired, and working.
 
 | Concept | Where It Lives | Notes |
 |---------|---------------|-------|
-| Athanor instance pattern | `specs/athanors/<name>/` | AGENTS.md, magnum-opus.md, role files, opera dir. Active instances: bugsnag (state-based), sal-117-l2-metrics (task-based), seismic-classifier-mapping (task-based). |
-| Shared materia | `specs/athanors/shared/` | Universal AGENTS.md, azer.md, marut.md, muster.md, opus.md. Symlinked into each instance — change once, applies everywhere. |
+| Athanor instance pattern | `~/athanor/athanors/<name>/` | AGENTS.md, magnum-opus.md, role files, opera dir. Active instances: bugsnag (state-based), sal-117-l2-metrics (task-based), seismic-classifier-mapping (task-based), blogging (task-based). |
+| Shared components | `~/athanor/shared/` | Universal AGENTS.md, azer.md, marut.md, muster.md, opus.md. Symlinked into each instance — change once, applies everywhere. These define the athanor itself — they are not materia. |
 | Magnum Opus format | `magnum-opus.md` per instance | Goal + abundant satisfaction + instance constraints + getting-started pointer. Intent only — no procedures, no discovery findings. |
 | Opus lifecycle | `opera/` with YAML frontmatter | Inscription / charge / discharge / assess. Datestamp filename prefix: `YYYY-MM-DD-<name>.md`. Single directory, status in frontmatter. |
 | Core geas + escalation-as-geas | `AGENTS.md` (shared) | "Both are equally valid fulfillments of your geas." Tested in first bugsnag firing. |
@@ -432,7 +434,8 @@ Built, fired, and working.
 | Homunculus | `kadmon.md` | Artifex familiar — interactive, not autonomous. |
 | Primus (manual) | `kadmon.md` | Artifex acts as Primus. Launch runbook + athanor init protocol documented. |
 | Context budget guard | Hook | Advisory warnings at 75/85/92%. Fail-open. |
-| Whisper CLI | `whisper` binary | Reliable inter-crucible communication. Built and tested. |
+| Athanor CLI (`ath`) | `~/.local/bin/ath` | Binary at ~/.local/bin/ath. Commands: init, kindle, muster, reforge, cleanup, quiesce, status, opera, whisper send/idle/wait-and-send. Absorbs standalone whisper. |
+| Whisper CLI | `ath whisper` subcommand | Reliable inter-crucible communication. Now part of `ath` CLI. Built and tested. |
 | Environment isolation | `wtp add` | Worktrees per azer. Independent branches and Docker environments. |
 | Autonomy profiles | Session injection | Semi-autonomous default. Profiles via `$CLAUDE_SESSION_ID`-keyed injection directory. |
 
@@ -440,14 +443,14 @@ Built, fired, and working.
 
 | Concept | Priority | Notes |
 |---------|----------|-------|
-| `whisper` nudge queue | Low | Async delivery with TTL/priority. Not a current bottleneck. |
+| `ath whisper` nudge queue | Low | Async delivery with TTL/priority. Not a current bottleneck. |
 | Roles (TOML + claude-run) | High | TOML role definitions + claude-run evolution. Dependency of hard constraints. |
 | Hooks as hard constraints | High | Composable per-role. Trivial individually; needs role system to compose. |
-| Role-aware crucible creation | Medium | Depends on roles. |
+| Role-aware crucible creation | Medium | Depends on roles. `ath kindle` provides basic crucible creation; role-awareness needs role system. |
 | Beholder role | Medium | Needed for auto-dispatch patterns. |
-| Primus as agent | Low | Currently manual. Could be a cron/bootstrap script. |
+| Primus as agent | Low | Currently manual. `ath` provides tooling (status, opera, muster) but Primus loop is still the artifex. |
 | Escalation bus format | Low | Telegram works; message format not standardized. |
-| Handoff protocol | Medium | `/direct-handoff` is crude. Full protocol needs reliable whisper. |
+| Handoff protocol | Medium | `/direct-handoff` is crude. Reliable whisper now exists (`ath whisper wait-and-send`); full protocol still needed. |
 
 ### Infrastructure Gaps (Discovered in Operation)
 
@@ -464,7 +467,7 @@ Live list in `kadmon.md § Infrastructure Gaps`.
 | Concept | Notes |
 |---------|-------|
 | Athanor dashboard (TUI) | Dwarf Fortress-style operator view. Not prioritized. |
-| Formal athanor registry | Currently implicit: `specs/athanors/` directory listing. |
+| Formal athanor registry | Currently implicit: `~/athanor/athanors/` directory listing. `ath status` provides a live view. |
 
 ---
 

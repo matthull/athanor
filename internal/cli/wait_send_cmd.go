@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/matthull/whisper/internal/tmux"
+	"github.com/matthull/athanor/internal/tmux"
 )
 
 func runWaitAndSend(args []string) int {

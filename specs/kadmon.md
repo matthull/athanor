@@ -16,7 +16,7 @@
 - **Review PRs #4353 and #4354.** Two azer PRs from the first firing await review/merge.
 - **Clean up stale worktrees.** `fix-missing-size-group-column` and `fix-rag-sync-race-condition` can be removed (`wtp remove`).
 - **Launch second marut.** One charged opus remains (`fix-nomethoderror-asset-list-searcher`). Docker optimizations in progress — test them with this firing.
-- **Test materia updates in practice.** Azer discharge now includes specs push, PR body-file guidance, and permission-manager has dynamic pane discovery note. Observe whether these changes land.
+- **Test agent role updates in practice.** Azer discharge now includes specs push, PR body-file guidance, and permission-manager has dynamic pane discovery note. Observe whether these changes land.
 - **Add stakeholder personas to bugsnag magnum-opus.md.** Before next firing: name the real people who care about #bugsnag channel health — Slack handles, GitHub usernames, org roles, why they care, what satisfaction looks like from their perspective. This expands the product lens and enables direct communication (agents can tag people in PRs, post to relevant channels). See spec.md § Magnum Opus for the full stakeholder persona guidance.
 
 ### Current Phase: Bootstrap (Adam Kadmon)
@@ -108,7 +108,7 @@ claude --model sonnet --permission-mode auto "Read $ATHANOR/AGENTS.md, then read
 
 Then use /config to enable autocompact, since we don't have an automated primus to spawn maruts yet.
 
-That's it. The marut reads its materia and begins.
+That's it. The marut reads its role docs and begins.
 
 ### Reforging a Marut
 
@@ -141,7 +141,7 @@ The artifex is not just Primus (launching maruts). Primus is a duty the artifex 
 
 **Review code.** PRs created by azers need human review. This is not just quality control — it's the primary feedback channel for whether the geas produced the right work. A bad PR means a bad geas, not a bad azer.
 
-**Tend the materia — but with the right lens.** Agent reflections will suggest fixes ("update azer.md to say X"). Don't be kneejerk about these. The marut and azers by design don't understand the overall system architecture — they see their own context and extrapolate. A azer that struggled with permissions will say "add guidance to azer.md" when the real fix is a CLAUDE.md update, a hook, or a skill change. Apply `/agentic-architecture` and `/agentic-dev` thinking: where does this fix actually belong in the system? The materia (agent specs) is one layer. CLAUDE.md, hooks, skills, and infrastructure are others. The agent sees the symptom; the artifex sees the system.
+**Tend the athanor — but with the right lens.** Agent reflections will suggest fixes ("update azer.md to say X"). Don't be kneejerk about these. The marut and azers by design don't understand the overall system architecture — they see their own context and extrapolate. An azer that struggled with permissions will say "add guidance to azer.md" when the real fix is a CLAUDE.md update, a hook, or a skill change. Apply `/agentic-architecture` and `/agentic-dev` thinking: where does this fix actually belong in the system? The agent roles are one layer. CLAUDE.md, hooks, skills, and infrastructure are others. The agent sees the symptom; the artifex sees the system.
 
 ### What Only the Artifex Can See
 
@@ -152,7 +152,7 @@ The artifex is not just Primus (launching maruts). Primus is a duty the artifex 
 
 ### Protocols
 
-**Hot-patching agent materia.** When you update a live agent's spec (e.g., marut.md), notify the running session of the change. Either whisper it directly or tell it to re-read the relevant section. Agents don't watch their own files for changes — they read them once at boot.
+**Hot-patching agent roles.** When you update a live agent's role file (e.g., marut.md), notify the running session of the change. Either whisper it directly or tell it to re-read the relevant section. Agents don't watch their own files for changes — they read them once at boot.
 
 ### Homunculus (Artifex Familiar)
 
@@ -160,8 +160,8 @@ The artifex familiar is a Claude Code session (typically in the `athanor` tmux w
 
 **What the familiar does:**
 - Monitor marut and azer tmux panes on request (`tmux capture-pane`)
-- Help update agent materia (marut.md, azer.md, muster.md, etc.)
-- Notify live agents when their materia changes (whisper or direct message)
+- Help update agent roles (marut.md, azer.md, muster.md, etc.)
+- Notify live agents when their role files change (whisper or direct message)
 - Track observations and decisions in the session log
 - Help walk the fool's path — read discharged opera, surface patterns
 - Draft kadmon.md updates as the system evolves

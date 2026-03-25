@@ -151,3 +151,34 @@ func (r *Runner) InCopyMode(target string) (bool, error) {
 	}
 	return strings.TrimSpace(out) == "1", nil
 }
+
+// NewWindow creates a new tmux window with the given name and working directory.
+func (r *Runner) NewWindow(name, dir string) error {
+	args := []string{"new-window", "-n", name}
+	if dir != "" {
+		args = append(args, "-c", dir)
+	}
+	_, err := r.run(args...)
+	return err
+}
+
+// KillWindow kills a tmux window by name. Idempotent — returns nil if window doesn't exist.
+func (r *Runner) KillWindow(name string) error {
+	_, err := r.run("kill-window", "-t", name)
+	if err != nil && (strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "can't find")) {
+		return nil // idempotent
+	}
+	return err
+}
+
+// ListWindows returns the names of all tmux windows across all sessions.
+func (r *Runner) ListWindows() ([]string, error) {
+	out, err := r.run("list-windows", "-a", "-F", "#{window_name}")
+	if err != nil {
+		return nil, err
+	}
+	if out == "" {
+		return nil, nil
+	}
+	return strings.Split(out, "\n"), nil
+}

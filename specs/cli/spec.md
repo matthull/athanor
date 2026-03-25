@@ -40,9 +40,9 @@ The athanor CLI (`ath`) is the operational backbone of the athanor system. It re
 
 | Term | Definition |
 |------|-----------|
-| **Athanor home** | `~/athanor/` (or `$ATH_HOME`). Root directory for all athanor state — shared materia, instance directories, global config. Lives outside any project repo. |
-| **Instance** | A single athanor scoped to one Magnum Opus. Directory at `~/athanor/athanors/<name>/`. Contains config, opera, and symlinked shared materia. |
-| **Shared materia** | Role files, geas, protocols shared across all instances. Live at `~/athanor/shared/` and are symlinked into each instance. |
+| **Athanor home** | `~/athanor/` (or `$ATH_HOME`). Root directory for all athanor state — shared components, instance directories, global config. Lives outside any project repo. |
+| **Instance** | A single athanor scoped to one Magnum Opus. Directory at `~/athanor/athanors/<name>/`. Contains config, opera, and symlinked shared components. |
+| **Shared components** | Role files, geas, protocols shared across all instances. Live at `~/athanor/shared/` and are symlinked into each instance. |
 | **Crucible** | A tmux window where an agent session runs. Named `marut-<athanor>` or `azer-<opus>`. |
 | **Kindle** | Launch a marut for an athanor — create crucible, start session. |
 | **Muster** | Launch an azer for an opus — create crucible, start session, verify. |
@@ -56,7 +56,7 @@ The athanor CLI (`ath`) is the operational backbone of the athanor system. It re
 ```
 ~/athanor/                          # ATH_HOME
 ├── config.yml                      # Global config (defaults, preferences)
-├── shared/                         # Shared materia (symlinked into instances)
+├── shared/                         # Shared components (symlinked into instances)
 │   ├── AGENTS.md
 │   ├── azer.md
 │   ├── marut.md
@@ -78,7 +78,7 @@ The athanor CLI (`ath`) is the operational backbone of the athanor system. It re
 
 **Key change from current system:** Athanors move from `specs/athanors/<name>/` (inside a project's specs repo) to `~/athanor/athanors/<name>/` (standalone). This eliminates the cross-worktree sync problem — all agents access the same filesystem path regardless of which worktree they run in. No more `git -C specs pull/push` dance. `[O:observation]` `[S:kadmon.md]`
 
-**The athanor home is a git repository.** Trail durability is a core principle — opera, discharge records, and shared materia changes are version-controlled. `[S:spec.md]`
+**The athanor home is a git repository.** Trail durability is a core principle — opera, discharge records, and shared components changes are version-controlled. `[S:spec.md]`
 
 ---
 
@@ -89,7 +89,7 @@ The athanor CLI (`ath`) is the operational backbone of the athanor system. It re
 ```
 ath init myproject --project ~/code/myproject
   → creates ~/athanor/athanors/myproject/
-  → symlinks shared materia
+  → symlinks shared components
   → creates opera/ directory
   → writes template athanor.yml and magnum-opus.md
 
@@ -145,7 +145,7 @@ Model defaults: marut=sonnet, azer=opus. Override per-instance when needed. `[D:
 
 ```yaml
 home: ~/athanor                      # Redundant but explicit
-shared: ~/athanor/shared             # Shared materia location
+shared: ~/athanor/shared             # Shared components location
 defaults:
   marut_model: sonnet
   azer_model: opus
@@ -164,7 +164,7 @@ Create a new athanor instance.
 **What it does:**
 1. Creates `~/athanor/athanors/<name>/`
 2. Creates `opera/` subdirectory
-3. Symlinks all shared materia from `~/athanor/shared/`
+3. Symlinks all shared components from `~/athanor/shared/`
 4. Writes `athanor.yml` with name and project path (if provided)
 5. Writes template `magnum-opus.md` with placeholder sections
 6. Prints: "Athanor initialized. Edit magnum-opus.md, then `ath kindle <name>`."
@@ -448,7 +448,7 @@ File path permissions are a foundational operational concern for the athanor sys
 When `ath init` creates a new instance (or when `ath kindle` launches a session), the CLI should **verify and report** whether the required paths are accessible in the user's Claude Code settings. It does not modify settings autonomously — it tells the artifex what to add.
 
 **Paths that must be readable/writable by all athanor agents:**
-- `~/athanor/` — the athanor home (opera, shared materia, config)
+- `~/athanor/` — the athanor home (opera, shared components, config)
 - `/tmp/` — scratch space for message files, temp artifacts
 - Each project path referenced by an athanor's `athanor.yml → project`
 
@@ -582,7 +582,7 @@ The current athanor structure is ad-hoc — built for experimentation during boo
 - **What's the right split between CLI and materia?** Boot prompts are moving into the CLI (prompt-as-infrastructure). What else should migrate from markdown specs to code?
 - **Instance config vs. global config vs. embedded defaults?** Currently three layers (global config.yml, instance athanor.yml, CLI defaults). Is this the right layering?
 - **Opera storage and trail management.** Flat directory + YAML frontmatter works. Does it scale? Do we need indexing, search, archival?
-- **Shared materia versioning.** Currently symlinked and identical across all instances. When do instances need to diverge? How do we handle that?
+- **Shared components versioning.** Currently symlinked and identical across all instances. When do instances need to diverge? How do we handle that?
 
 This is a separate spec effort — not part of the CLI Phase 1. But the CLI should be designed with awareness that the underlying structure will evolve. Keep the CLI's assumptions about directory layout isolated so they're easy to change.
 

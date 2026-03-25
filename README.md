@@ -32,19 +32,95 @@ The athanor makes progress **inevitable** — not through individual agent relia
 ## Repository Structure
 
 ```
+cmd/ath/             -- CLI entry point
+internal/
+  cli/               -- command implementations
+  athanor/           -- home directory, instance, config logic
+  tmux/              -- tmux interaction library
 specs/
-  spec.md          -- full system specification (start here)
-  kadmon.md        -- operational runbook and bootstrap procedures
-  issues.md        -- known issues discovered in operation
-  whisper/         -- whisper CLI spec (inter-agent communication tool)
-  cli/             -- ath CLI spec (athanor management tool)
+  spec.md            -- system specification (start here)
+  cli/spec.md        -- ath CLI specification
+  kadmon.md          -- operational runbook (first athanor instance)
+  issues.md          -- known issues discovered in operation
 ```
+
+The athanor home (`~/athanor/`) lives outside this repo — it contains shared materia and all athanor instances. This repo is the CLI source and system spec.
 
 The system spec at [`specs/spec.md`](specs/spec.md) is the canonical reference for principles, architecture, vocabulary, and design decisions.
 
-## Also in This Repo
+## The `ath` CLI
 
-**Whisper** — A Go CLI for reliable inter-agent communication via tmux. Three commands: `whisper send` (8-step delivery protocol), `whisper idle` (2-check idle detection), `whisper wait-and-send` (combined). Built and operational.
+The `ath` binary is the operational backbone. Install with `make install` (puts it at `~/.local/bin/ath`).
+
+### Setup
+
+```bash
+# One-time: create the athanor home and populate shared materia
+mkdir -p ~/athanor/shared ~/athanor/athanors
+# Copy role files (AGENTS.md, marut.md, azer.md, muster.md, opus.md) into ~/athanor/shared/
+
+# Optional: install zsh completions
+ath completion zsh > ~/.zsh/completions/_ath
+```
+
+### Workflow: Spin up a new athanor
+
+```bash
+# 1. Create the instance
+ath init bugsnag --project ~/code/musashi
+
+# 2. Edit the magnum opus — define the goal, witnesses, and context
+vim ~/athanor/athanors/bugsnag/magnum-opus.md
+
+# 3. Kindle the marut — it reads its materia and starts the operational loop
+ath kindle bugsnag
+
+# 4. Check on it
+ath status
+ath status bugsnag
+```
+
+### Workflow: Marut musters an azer
+
+From within a running marut session (or manually):
+
+```bash
+# Muster an azer for a charged opus
+ath muster 2026-03-25-fix-nil-error.md --athanor bugsnag --dir ~/code/musashi-worktree
+
+# Check opera status
+ath opera bugsnag
+
+# Clean up after the azer finishes
+ath cleanup azer-fix-nil-error
+```
+
+### Workflow: Communication between agents
+
+```bash
+# Send a message to a crucible
+ath whisper send marut-bugsnag "Status check — are you making progress?"
+
+# Wait for an agent to be idle, then send
+ath whisper wait-and-send azer-fix-nil-error "Your opus has been updated" --timeout 60s
+```
+
+### Workflow: Lifecycle management
+
+```bash
+# Reforge a crashed/exhausted marut (kills session, relaunches fresh)
+ath reforge bugsnag
+
+# Graceful shutdown
+ath quiesce bugsnag
+
+# Force shutdown (even with active azers)
+ath quiesce bugsnag --force
+```
+
+### All commands
+
+Run `ath help` for the full command list, or `ath whisper help` for whisper subcommands.
 
 ## Status
 
