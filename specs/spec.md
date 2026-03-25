@@ -148,11 +148,11 @@ The athanor uses distinctive names because precise names create precise meanings
 |------|----------|---------|
 | **Artifex** | Alchemical/Latin | The craftsman. The human who directs the athanor — sets goals, makes judgment calls. The one the system serves. |
 | **Azer** | Monster manual | Worker. Skilled, bounded, exists to execute. Charged with an opus, operates in its own environment. |
-| **Marut** | Monster manual | Supervisor. One per Magnum Opus. Relentlessly ensures its goal advances — agent health AND goal progress. Dispatcher and cleanup. |
+| **Marut** | Monster manual | Supervisor. One per Magnum Opus — multiple maruts per athanor when multiple MOs exist. Relentlessly ensures its goal advances — agent health AND goal progress. Dispatcher and cleanup. |
 | **Beholder** | Monster manual | Watcher. Scans channels and conditions, inscribes opera when it finds work. |
 | **Primus, the Forge Lord** | Monster manual | Athanor-level supervisor. Ensures each MO has its marut, keeps the furnace lit. Currently: the artifex fills this role. |
 | **Homunculus** | Alchemical | The artifex's familiar. An interactive Claude Code session that assists the artifex — not autonomous. |
-| **Magnum Opus** | Alchemical | Top-level goal container. Task-based (has completion criteria) or state-based (maintained continuously). |
+| **Magnum Opus** | Alchemical | Top-level goal container. Task-based (has completion criteria) or state-based (maintained continuously). One or more per athanor instance, in `magna-opera/`. |
 | **Opus** | Alchemical | A single unit of work. Goal + geas + context. Charged to an agent, discharged when geas is met. |
 | **Geas** | D&D / Celtic | Binding behavioral compulsion. Frames completion as obligation; makes escalation an equally valid fulfillment. |
 | **Materia** | Alchemical | Anything in the world an agent can access via tool use — files, Slack threads, Linear tickets, meeting transcripts, specs, web pages. Materia exists outside the agent and has potential charge (relevance/value). Tool use is the alchemizing process that extracts charge from materia into the crucible. |
@@ -234,6 +234,7 @@ Opus lifecycle uses YAML frontmatter:
 ---
 status: charged      # charged | discharged | assessed
 inscribed: 2026-03-23
+magnum_opus: <mo-name>   # which MO this opus serves
 discharged: 2026-03-23   # added at discharge
 claude_code_session_id: <id>  # added at discharge, for resurrection
 assessed: 2026-03-23     # added at assessment
@@ -255,8 +256,11 @@ Opera already marked `assessed` are skipped.
 
 ```
 Artifex (human) = Primus, the Forge Lord
-  └── Marut (one per Magnum Opus)
-        └── Azers (one per opus, in own environment)
+  └── Athanor instance
+        ├── Marut (one per MO, crucible: marut-<athanor>-<mo>)
+        │     └── Azers (one per opus, in own environment)
+        └── Marut (another MO)
+              └── Azers
 ```
 
 **The marut is dispatcher and cleanup** — not a decision-maker. It keeps the operational loop turning: check opera, muster azers for charged opera, monitor progress, clean up after discharge. It inscribes assessment opera when the queue is empty. It escalates when mechanical duties fail. Only the artifex has final authority.
@@ -337,7 +341,9 @@ The trail is walked one grounded step at a time. Each step is taken with evidenc
 ```
 ~/athanor/athanors/<name>/
 ├── AGENTS.md          ← core vocabulary, geas, constraints (all agents read)
-├── magnum-opus.md     ← goal + abundant satisfaction + getting-started pointer
+├── magna-opera/       ← one or more magnum opus files
+│   ├── bugsnag.md
+│   └── slack-monitoring.md
 ├── marut.md           ← supervisor role
 ├── azer.md            ← worker role
 ├── opus.md            ← lifecycle, inscription/discharge protocol
@@ -346,7 +352,7 @@ The trail is walked one grounded step at a time. Each step is taken with evidenc
     └── YYYY-MM-DD-<descriptive-name>.md   ← all opera, YAML frontmatter for status
 ```
 
-Shared files (`AGENTS.md`, role files, `opus.md`, `muster.md`) are symlinked from `~/athanor/shared/`. The `magnum-opus.md` is the only file authored per-instance.
+Shared files (`AGENTS.md`, role files, `opus.md`, `muster.md`) are symlinked from `~/athanor/shared/`. The `magna-opera/` directory contains one or more Magnum Opus files, each authored per-instance. Each MO gets its own marut. Legacy instances with a single `magnum-opus.md` are still supported.
 
 ### What Agents See vs. What the Artifex Sees
 
@@ -419,9 +425,9 @@ Built, fired, and working.
 
 | Concept | Where It Lives | Notes |
 |---------|---------------|-------|
-| Athanor instance pattern | `~/athanor/athanors/<name>/` | AGENTS.md, magnum-opus.md, role files, opera dir. Active instances: bugsnag (state-based), sal-117-l2-metrics (task-based), seismic-classifier-mapping (task-based), blogging (task-based). |
+| Athanor instance pattern | `~/athanor/athanors/<name>/` | AGENTS.md, magna-opera/, role files, opera dir. Multiple MOs per instance supported. Active instances: bugsnag, sal-117-l2-metrics, seismic-classifier-mapping, blogging. |
 | Shared components | `~/athanor/shared/` | Universal AGENTS.md, azer.md, marut.md, muster.md, opus.md. Symlinked into each instance — change once, applies everywhere. These define the athanor itself — they are not materia. |
-| Magnum Opus format | `magnum-opus.md` per instance | Goal + abundant satisfaction + instance constraints + getting-started pointer. Intent only — no procedures, no discovery findings. |
+| Magnum Opus format | `magna-opera/<name>.md` per instance | One or more MO files per instance. Goal + abundant satisfaction + witnesses + getting-started pointer. Intent only — no procedures, no discovery findings. Legacy `magnum-opus.md` backward compat. |
 | Opus lifecycle | `opera/` with YAML frontmatter | Inscription / charge / discharge / assess. Datestamp filename prefix: `YYYY-MM-DD-<name>.md`. Single directory, status in frontmatter. |
 | Core geas + escalation-as-geas | `AGENTS.md` (shared) | "Both are equally valid fulfillments of your geas." Tested in first bugsnag firing. |
 | Azer role | `azer.md` (shared) | Verification-first (three questions before mise), mise en place, context management, proof of fulfillment at discharge. |

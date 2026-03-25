@@ -17,7 +17,7 @@
 - **Clean up stale worktrees.** `fix-missing-size-group-column` and `fix-rag-sync-race-condition` can be removed (`wtp remove`).
 - **Launch second marut.** One charged opus remains (`fix-nomethoderror-asset-list-searcher`). Docker optimizations in progress — test them with this firing.
 - **Test agent role updates in practice.** Azer discharge now includes specs push, PR body-file guidance, and permission-manager has dynamic pane discovery note. Observe whether these changes land.
-- **Add stakeholder personas to bugsnag magnum-opus.md.** Before next firing: name the real people who care about #bugsnag channel health — Slack handles, GitHub usernames, org roles, why they care, what satisfaction looks like from their perspective. This expands the product lens and enables direct communication (agents can tag people in PRs, post to relevant channels). See spec.md § Magnum Opus for the full stakeholder persona guidance.
+- **Add stakeholder personas to bugsnag magna-opera.** Before next firing: name the real people who care about #bugsnag channel health — Slack handles, GitHub usernames, org roles, why they care, what satisfaction looks like from their perspective. This expands the product lens and enables direct communication (agents can tag people in PRs, post to relevant channels). See spec.md § Magnum Opus for the full stakeholder persona guidance.
 
 ### Current Phase: Bootstrap (Adam Kadmon)
 
@@ -29,7 +29,7 @@ The #bugsnag athanor is the first test bed. The goal is NOT a fully autonomous e
 
 | Item | Status | Notes |
 |------|--------|-------|
-| Materialized instance pattern | Done | AGENTS.md, magnum-opus.md, marut.md, azer.md, opus.md, muster.md — symlinked from shared/ |
+| Materialized instance pattern | Done | AGENTS.md, magna-opera/, marut.md, azer.md, opus.md, muster.md — shared files symlinked, magna-opera authored per instance |
 | `claude-run` on PATH | Done | Headless + passthrough modes, system prompt injection |
 | `wtp` for sandboxes | Done | Worktree isolation for azers |
 | `whisper` CLI | Done | Reliable inter-crucible communication |
@@ -68,7 +68,7 @@ ln -s ../shared/muster.md specs/athanors/$ATHANOR/muster.md
 ln -s ../shared/opus.md specs/athanors/$ATHANOR/opus.md
 ```
 
-**3. Write `magnum-opus.md`** — the only file you author from scratch. Required sections:
+**3. Create magna opera** — write MO files in `magna-opera/`. Required sections per MO:
 - **Goal** — what the athanor is pursuing
 - **Athanor Structure** — copy the directory tree block from another MO, update the path
 - **Pre-loaded Context** — anything the first azer needs to not start from scratch: discovery findings, references, known open questions, relevant services/files
@@ -103,7 +103,7 @@ Babysits permission prompts across all athanor panes. Kill when done supervising
 
 ```bash
 # From the marut's crucible (~/code/musashi):
-claude --model sonnet --permission-mode auto "Read $ATHANOR/AGENTS.md, then read $ATHANOR/magnum-opus.md, then read $ATHANOR/marut.md, then read $ATHANOR/muster.md. You are the marut for this athanor. Start /loop 5m and begin your operational cycle."
+claude --model sonnet --permission-mode auto "Read $ATHANOR/AGENTS.md, then read $ATHANOR/magna-opera/<mo-name>.md, then read $ATHANOR/marut.md, then read $ATHANOR/muster.md. You are the marut for this athanor. Start /loop 5m and begin your operational cycle."
 ```
 
 Then use /config to enable autocompact, since we don't have an automated primus to spawn maruts yet.
@@ -116,7 +116,7 @@ When the marut session dies (context exhaustion, crash, drift):
 
 ```bash
 # In the marut's crucible (~/code/musashi) — kill the old session, start fresh:
-claude --model sonnet --permission-mode auto "Read $ATHANOR/AGENTS.md, then read $ATHANOR/magnum-opus.md, then read $ATHANOR/marut.md, then read $ATHANOR/muster.md. You are the marut for this athanor. Check opera/ for in-progress work and the trail. Start /loop 5m and resume your operational cycle."
+claude --model sonnet --permission-mode auto "Read $ATHANOR/AGENTS.md, then read $ATHANOR/magna-opera/<mo-name>.md, then read $ATHANOR/marut.md, then read $ATHANOR/muster.md. You are the marut for this athanor. Check opera/ for in-progress work and the trail. Start /loop 5m and resume your operational cycle."
 ```
 
 The crucible endures. The session is reforged. Durable state lives in the opera files.
@@ -237,7 +237,7 @@ Track whether geas are well-crafted or cause problems. The spec warns: "a poorly
 ```
 specs/athanors/<name>/
 ├── AGENTS.md          ← core vocab, geas, constraints (all agents)
-├── magnum-opus.md     ← goal + witnesses (marut entry point)
+├── magna-opera/       ← one or more MO files (marut entry point)
 ├── marut.md           ← supervisor role + geas addenda
 ├── azer.md            ← worker role + geas addenda
 ├── opus.md            ← opus lifecycle, inscription/discharge protocol
