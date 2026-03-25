@@ -58,14 +58,14 @@ func printUsage() {
 	fmt.Fprintf(os.Stderr, `ath — athanor agent orchestration CLI
 
 Usage:
-  ath init <name> [--project <path>]     Create a new athanor instance
-  ath kindle <name>                       Launch a marut for an athanor
-  ath reforge <name>                      Kill and relaunch a marut
-  ath muster <opus-file> [--dir <path>]   Launch an azer for an opus
-  ath cleanup <crucible>                  Clean up after a discharged opus
-  ath quiesce <name>                      Graceful shutdown of an athanor
-  ath status [<name>]                     Show athanor health
-  ath opera [<name>]                      List opera with status
+  ath init <name> [--project <path>]        Create a new athanor instance
+  ath kindle <name> [<mo-name>]            Launch a marut for a magnum opus
+  ath reforge <name> [<mo-name>]           Kill and relaunch a marut
+  ath muster <opus-file> [--dir <path>]    Launch an azer for an opus
+  ath cleanup <crucible>                   Clean up after a discharged opus
+  ath quiesce <name> [<mo-name>] [--force] Graceful shutdown
+  ath status [<name>]                      Show athanor health
+  ath opera [<name>] [--mo <mo-name>]      List opera with status
 
   ath whisper send <target> <message>     Send a message to a tmux target
   ath whisper idle <target>               Wait for target to become idle

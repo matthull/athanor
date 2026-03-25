@@ -25,9 +25,9 @@ The athanor makes progress **inevitable** — not through individual agent relia
 
 **The Trail** — The sequence of discharged opera. The authoritative record of what actually happened, not what was planned. Status, precedent, and learning all come from the trail.
 
-**Adaptability through essentialism** — The athanor carries only principles, never procedures. Procedures belong in the environment (CLAUDE.md, CI, hooks). This means the athanor can interface with any project without conflicting with existing workflows.
+**Adaptability through essentialism** — The athanor carries primarily principles, not procedures. Procedures belong in the environment (CLAUDE.md, CI, hooks). This means the athanor can interface with any project without conflicting with existing workflows. Procedures baked into the athanor are minimal and need strong justification to exist.
 
-**Abundant satisfaction** — The completion standard is "would the operator feel this is completely handled?" not "were the requirements technically met?" Agents close the tail — coordination, communication, documentation — so the operator engages only where genuine human judgment is required.
+**Abundant satisfaction** — The completion standard is "would the witnesses feel this is completely handled?" not "were the requirements technically met?" Agents close the tail — coordination, communication, documentation — so the operator engages only where genuine human judgment is required.
 
 ## Repository Structure
 
@@ -44,7 +44,7 @@ specs/
   issues.md          -- known issues discovered in operation
 ```
 
-The athanor home (`~/athanor/`) lives outside this repo — it contains shared materia and all athanor instances. This repo is the CLI source and system spec.
+The athanor home (`~/athanor/`) lives outside this repo — it contains shared components and all athanor instances. This repo is the CLI source and system spec.
 
 The system spec at [`specs/spec.md`](specs/spec.md) is the canonical reference for principles, architecture, vocabulary, and design decisions.
 
@@ -70,11 +70,11 @@ ath completion zsh > ~/.zsh/completions/_ath
 # 1. Create the instance
 ath init bugsnag --project ~/code/musashi
 
-# 2. Edit the magnum opus — define the goal, witnesses, and context
-vim ~/athanor/athanors/bugsnag/magnum-opus.md
+# 2. Create a magnum opus — define the goal, witnesses, and context
+vim ~/athanor/athanors/bugsnag/magna-opera/slack-monitoring.md
 
-# 3. Kindle the marut — it reads its role docs and starts the operational loop
-ath kindle bugsnag
+# 3. Kindle the marut for that MO
+ath kindle bugsnag slack-monitoring
 
 # 4. Check on it
 ath status

@@ -99,20 +99,115 @@ func InitInstance(home, name, project string) error {
 		return fmt.Errorf("writing config: %w", err)
 	}
 
-	// Write template magnum-opus.md
-	if err := writeMagnumOpusTemplate(instDir, name); err != nil {
-		return fmt.Errorf("writing magnum-opus template: %w", err)
+	// Create magna-opera directory
+	if err := os.MkdirAll(filepath.Join(instDir, MagnaOperaDir), 0755); err != nil {
+		return fmt.Errorf("creating magna-opera directory: %w", err)
 	}
 
 	return nil
 }
 
-func writeMagnumOpusTemplate(instDir, name string) error {
+// ValidateMagnumOpus checks the legacy magnum-opus.md. Deprecated: use ValidateMO.
+func ValidateMagnumOpus(instanceDir string) error {
+	return ValidateMO(instanceDir, filepath.Base(instanceDir))
+}
+
+// ValidateMO checks that a specific magnum opus exists and has real content.
+func ValidateMO(instanceDir, moName string) error {
+	path := MagnumOpusPath(instanceDir, moName)
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return fmt.Errorf("magnum opus %q not found at %s", moName, path)
+		}
+		return fmt.Errorf("reading magnum opus %q: %w", moName, err)
+	}
+
+	content := string(data)
+	if strings.Contains(content, "[TODO]") {
+		return fmt.Errorf("magnum opus %q still has [TODO] placeholders — fill them in before kindling", moName)
+	}
+
+	return nil
+}
+
+// HasLegacyMagnumOpus returns true if the instance uses the old single-file format.
+func HasLegacyMagnumOpus(instanceDir string) bool {
+	moDir := filepath.Join(instanceDir, MagnaOperaDir)
+	if _, err := os.Stat(moDir); err == nil {
+		return false // magna-opera/ exists, not legacy
+	}
+	legacyPath := filepath.Join(instanceDir, "magnum-opus.md")
+	_, err := os.Stat(legacyPath)
+	return err == nil
+}
+
+// MagnumOpusPath returns the filesystem path to a specific MO file.
+// For legacy instances (no magna-opera/ dir), returns magnum-opus.md.
+// For multi-MO instances, returns magna-opera/<moName>.md.
+func MagnumOpusPath(instanceDir, moName string) string {
+	if HasLegacyMagnumOpus(instanceDir) {
+		return filepath.Join(instanceDir, "magnum-opus.md")
+	}
+	return filepath.Join(instanceDir, MagnaOperaDir, moName+".md")
+}
+
+// ListMagnaOpera returns the names of all magna opera in an instance.
+// For legacy instances, returns a single-element list with the instance name.
+func ListMagnaOpera(instanceDir string) ([]string, error) {
+	moDir := filepath.Join(instanceDir, MagnaOperaDir)
+	entries, err := os.ReadDir(moDir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			// Check for legacy magnum-opus.md
+			if HasLegacyMagnumOpus(instanceDir) {
+				return []string{filepath.Base(instanceDir)}, nil
+			}
+			return nil, nil
+		}
+		return nil, fmt.Errorf("listing magna opera: %w", err)
+	}
+
+	var names []string
+	for _, e := range entries {
+		if !e.IsDir() && strings.HasSuffix(e.Name(), ".md") {
+			names = append(names, strings.TrimSuffix(e.Name(), ".md"))
+		}
+	}
+	return names, nil
+}
+
+// ReadOpusMO reads the magnum_opus field from an opus file's YAML frontmatter.
+func ReadOpusMO(path string) string {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return ""
+	}
+	content := string(data)
+	if !strings.HasPrefix(content, "---") {
+		return ""
+	}
+	end := strings.Index(content[3:], "---")
+	if end < 0 {
+		return ""
+	}
+	frontmatter := content[3 : 3+end]
+	for _, line := range strings.Split(frontmatter, "\n") {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "magnum_opus:") {
+			return strings.TrimSpace(strings.TrimPrefix(line, "magnum_opus:"))
+		}
+	}
+	return ""
+}
+
+// WriteMOTemplate writes a template magnum opus file to magna-opera/<moName>.md.
+func WriteMOTemplate(instanceDir, moName string) error {
 	content := fmt.Sprintf(`# %s — Magnum Opus
 
 ## Goal
 
-[TODO] What is this athanor pursuing? Be specific about the desired end state.
+[TODO] What is this magnum opus pursuing? Be specific about the desired end state.
 
 ## Abundant Satisfaction
 
@@ -125,42 +220,21 @@ func writeMagnumOpusTemplate(instDir, name string) error {
 ## Pre-loaded Context
 
 [TODO] What does the first azer need to not start from scratch? Discovery findings, references, known open questions, relevant services/files.
+`, moName)
 
-## Athanor Structure
-
-`+"```"+`
-~/athanor/athanors/%s/
-├── AGENTS.md          ← core vocabulary, geas, constraints (all agents read)
-├── magnum-opus.md     ← this file
-├── marut.md           ← supervisor role
-├── azer.md            ← worker role
-├── opus.md            ← lifecycle, inscription/discharge protocol
-├── muster.md          ← crucible kindling, reforging, monitoring
-├── athanor.yml        ← instance configuration
-└── opera/
-    └── YYYY-MM-DD-<descriptive-name>.md
-`+"```"+`
-`, name, name)
-
-	return os.WriteFile(filepath.Join(instDir, "magnum-opus.md"), []byte(content), 0644)
+	moDir := filepath.Join(instanceDir, MagnaOperaDir)
+	if err := os.MkdirAll(moDir, 0755); err != nil {
+		return fmt.Errorf("creating magna-opera directory: %w", err)
+	}
+	return os.WriteFile(filepath.Join(moDir, moName+".md"), []byte(content), 0644)
 }
 
-// ValidateMagnumOpus checks that the magnum-opus.md exists and has real content.
-// Returns nil if valid, an error describing the issue otherwise.
-func ValidateMagnumOpus(instanceDir string) error {
-	path := filepath.Join(instanceDir, "magnum-opus.md")
-	data, err := os.ReadFile(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return fmt.Errorf("magnum-opus.md not found — create it before kindling")
-		}
-		return fmt.Errorf("reading magnum-opus.md: %w", err)
+// MarutCrucibleName returns the crucible name for a marut.
+// For legacy (single MO), pass empty moName to get "marut-<athanor>".
+// For multi-MO, pass the MO name to get "marut-<athanor>-<mo>".
+func MarutCrucibleName(athanorName, moName string) string {
+	if moName == "" {
+		return fmt.Sprintf("marut-%s", athanorName)
 	}
-
-	content := string(data)
-	if strings.Contains(content, "[TODO]") {
-		return fmt.Errorf("magnum-opus.md still has [TODO] placeholders — fill them in before kindling")
-	}
-
-	return nil
+	return fmt.Sprintf("marut-%s-%s", athanorName, moName)
 }

@@ -46,24 +46,47 @@ func showAllStatus(home string) int {
 	}
 
 	r := tmux.NewRunner()
-	fmt.Printf("%-20s %-8s %-6s %s\n", "ATHANOR", "MARUT", "AZERS", "OPERA (C/D)")
+	fmt.Printf("%-20s %-24s %-8s %-6s %s\n", "ATHANOR", "MAGNUM OPUS", "MARUT", "AZERS", "OPERA (C/D)")
 	for _, name := range instances {
 		instDir := athanor.InstanceDir(home, name)
 
-		// Check marut crucible
-		marutStatus := "-"
-		crucible := fmt.Sprintf("marut-%s", name)
-		if windowExists(r, crucible) {
-			marutStatus = "active"
+		mos, _ := athanor.ListMagnaOpera(instDir)
+		if len(mos) == 0 {
+			// No MOs at all
+			azerCount := countAzerWindows(r, name)
+			charged, discharged := countOpera(instDir)
+			fmt.Printf("%-20s %-24s %-8s %-6d %d/%d\n", name, "(none)", "-", azerCount, charged, discharged)
+			continue
 		}
 
-		// Count azer crucibles
+		legacy := athanor.HasLegacyMagnumOpus(instDir)
 		azerCount := countAzerWindows(r, name)
-
-		// Count opera by status
 		charged, discharged := countOpera(instDir)
 
-		fmt.Printf("%-20s %-8s %-6d %d/%d\n", name, marutStatus, azerCount, charged, discharged)
+		for i, mo := range mos {
+			var crucible string
+			if legacy {
+				crucible = athanor.MarutCrucibleName(name, "")
+			} else {
+				crucible = athanor.MarutCrucibleName(name, mo)
+			}
+			marutStatus := "-"
+			if windowExists(r, crucible) {
+				marutStatus = "active"
+			}
+
+			moLabel := mo
+			if legacy {
+				moLabel = "(legacy)"
+			}
+
+			// Show athanor name and opera counts only on first row
+			if i == 0 {
+				fmt.Printf("%-20s %-24s %-8s %-6d %d/%d\n", name, moLabel, marutStatus, azerCount, charged, discharged)
+			} else {
+				fmt.Printf("%-20s %-24s %-8s\n", "", moLabel, marutStatus)
+			}
+		}
 	}
 
 	return 0
@@ -85,12 +108,30 @@ func showInstanceStatus(home, name string) int {
 		fmt.Printf("Project: %s\n", cfg.Project)
 	}
 
-	// Marut status
-	crucible := fmt.Sprintf("marut-%s", name)
-	if windowExists(r, crucible) {
-		fmt.Printf("Marut: active (%s)\n", crucible)
+	// List magna opera and their marut status
+	mos, _ := athanor.ListMagnaOpera(instDir)
+	legacy := athanor.HasLegacyMagnumOpus(instDir)
+	if len(mos) > 0 {
+		fmt.Println("Magna Opera:")
+		for _, mo := range mos {
+			var crucible string
+			if legacy {
+				crucible = athanor.MarutCrucibleName(name, "")
+			} else {
+				crucible = athanor.MarutCrucibleName(name, mo)
+			}
+			status := "-"
+			if windowExists(r, crucible) {
+				status = fmt.Sprintf("active (%s)", crucible)
+			}
+			label := mo
+			if legacy {
+				label = fmt.Sprintf("%s (legacy)", mo)
+			}
+			fmt.Printf("  %s — marut: %s\n", label, status)
+		}
 	} else {
-		fmt.Println("Marut: -")
+		fmt.Println("Magna Opera: (none)")
 	}
 
 	// List opera

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/matthull/athanor/internal/athanor"
@@ -21,7 +22,7 @@ func runReforge(args []string) int {
 
 	if len(remaining) < 1 {
 		fmt.Fprintln(os.Stderr, "error: athanor name required")
-		fmt.Fprintln(os.Stderr, "usage: ath reforge <name>")
+		fmt.Fprintln(os.Stderr, "usage: ath reforge <name> [<mo-name>]")
 		return 2
 	}
 	name := remaining[0]
@@ -39,17 +40,40 @@ func runReforge(args []string) int {
 		return 1
 	}
 
-	crucible := fmt.Sprintf("marut-%s", name)
+	// Resolve MO name (same logic as kindle)
+	legacy := athanor.HasLegacyMagnumOpus(instDir)
+	var moName string
+	if len(remaining) >= 2 {
+		moName = remaining[1]
+	} else if legacy {
+		moName = name
+	} else {
+		mos, _ := athanor.ListMagnaOpera(instDir)
+		if len(mos) == 0 {
+			fmt.Fprintln(os.Stderr, "error: no magna opera found")
+			return 1
+		}
+		fmt.Fprintln(os.Stderr, "error: mo-name required for multi-MO athanor")
+		fmt.Fprintf(os.Stderr, "usage: ath reforge %s <mo-name>\n", name)
+		fmt.Fprintf(os.Stderr, "available: %s\n", strings.Join(mos, ", "))
+		return 2
+	}
+
+	var crucible string
+	if legacy {
+		crucible = athanor.MarutCrucibleName(name, "")
+	} else {
+		crucible = athanor.MarutCrucibleName(name, moName)
+	}
+
 	r := tmux.NewRunner()
 
-	// Kill old session: send Ctrl-C then exit
+	// Kill old session
 	_ = r.SendKeys(crucible, "C-c")
 	time.Sleep(500 * time.Millisecond)
 	_ = r.SendKeysLiteral(crucible, "exit")
 	_ = r.SendKeys(crucible, "Enter")
 	time.Sleep(1 * time.Second)
-
-	// Kill the window if still alive and recreate
 	_ = r.KillWindow(crucible)
 
 	workDir := cfg.Project
@@ -59,10 +83,10 @@ func runReforge(args []string) int {
 	}
 	model := cfg.EffectiveMarutModel()
 
-	// Build the reforge prompt
+	moPath := athanor.MagnumOpusPath(instDir, moName)
 	reforgePrompt := fmt.Sprintf(
-		"Read %s/AGENTS.md, then read %s/magnum-opus.md, then read %s/marut.md, then read %s/muster.md. You are the marut for this athanor. Check opera/ for in-progress work and the trail. Start /loop 5m and resume your operational cycle.",
-		instDir, instDir, instDir, instDir,
+		"Read %s/AGENTS.md, then read %s, then read %s/marut.md, then read %s/muster.md. You are the marut for this athanor. Check opera/ for in-progress work and the trail. Start /loop 5m and resume your operational cycle.",
+		instDir, moPath, instDir, instDir,
 	)
 
 	claudeArgs := fmt.Sprintf(
@@ -84,7 +108,7 @@ func runReforge(args []string) int {
 		return 1
 	}
 
-	fmt.Printf("Marut reforged in crucible %q\n", crucible)
+	fmt.Printf("Marut reforged for %q in crucible %q\n", moName, crucible)
 
 	return 0
 }

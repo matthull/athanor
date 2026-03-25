@@ -57,7 +57,7 @@ func runInit(args []string) int {
 
 	instDir := athanor.InstanceDir(home, name)
 	fmt.Printf("Athanor %q initialized at %s\n", name, instDir)
-	fmt.Printf("Edit magnum-opus.md, then `ath kindle %s`.\n", name)
+	fmt.Printf("Create a magnum opus in magna-opera/, then `ath kindle %s <mo-name>`.\n", name)
 
 	return 0
 }

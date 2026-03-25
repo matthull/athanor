@@ -91,7 +91,7 @@ func TestATHFullLifecycle(t *testing.T) {
 			instDir,
 			filepath.Join(instDir, "opera"),
 			filepath.Join(instDir, "athanor.yml"),
-			filepath.Join(instDir, "magnum-opus.md"),
+			filepath.Join(instDir, "magna-opera"),
 		} {
 			if _, err := os.Stat(path); err != nil {
 				t.Errorf("expected %s to exist: %v", filepath.Base(path), err)
@@ -132,11 +132,11 @@ func TestATHFullLifecycle(t *testing.T) {
 		}
 	})
 
-	// ─── Phase 2: Fill in magnum-opus ────────────────────────────────
+	// ─── Phase 2: Create a magnum opus ──────────────────────────────
 
 	instDir := athanor.InstanceDir(tmpHome, "qa-test")
-	moPath := filepath.Join(instDir, "magnum-opus.md")
-	moContent := `# qa-test — Magnum Opus
+	moPath := filepath.Join(instDir, "magna-opera", "qa-goal.md")
+	moContent := `# qa-goal — Magnum Opus
 
 ## Goal
 
@@ -182,8 +182,8 @@ This is an automated test. No prior context needed.
 		if !strings.Contains(out, "Athanor: qa-test") {
 			t.Errorf("expected detail header, got: %s", out)
 		}
-		if !strings.Contains(out, "Marut: -") {
-			t.Errorf("expected Marut: -, got: %s", out)
+		if !strings.Contains(out, "marut: -") {
+			t.Errorf("expected marut: -, got: %s", out)
 		}
 	})
 
@@ -193,6 +193,7 @@ This is an automated test. No prior context needed.
 	opusContent := `---
 status: charged
 inscribed: 2026-03-25
+magnum_opus: qa-goal
 ---
 # Fix Something for QA
 
@@ -245,13 +246,13 @@ This is a test opus created by the QA harness.
 			t.Fatalf("writing config: %v", err)
 		}
 
-		out, err := runAth("kindle", "qa-test")
+		out, err := runAth("kindle", "qa-test", "qa-goal")
 		if err != nil {
 			t.Fatalf("ath kindle failed: %v\n%s", err, out)
 		}
-		trackWindow("marut-qa-test")
+		trackWindow("marut-qa-test-qa-goal")
 
-		if !strings.Contains(out, "marut-qa-test") {
+		if !strings.Contains(out, "marut-qa-test-qa-goal") {
 			t.Errorf("expected crucible name in output, got: %s", out)
 		}
 
@@ -260,12 +261,12 @@ This is a test opus created by the QA harness.
 
 		// Verify window exists
 		windows := listTmuxWindows(t)
-		if !containsExact(windows, "marut-qa-test") {
-			t.Errorf("expected tmux window 'marut-qa-test', got windows: %v", windows)
+		if !containsExact(windows, "marut-qa-test-qa-goal") {
+			t.Errorf("expected tmux window 'marut-qa-test-qa-goal', got windows: %v", windows)
 		}
 
 		// Verify the command sent to the window contains claude and the boot prompt
-		paneContent := capturePaneContent(t, "marut-qa-test", 20)
+		paneContent := capturePaneContent(t, "marut-qa-test-qa-goal", 20)
 		if !strings.Contains(paneContent, "claude") || !strings.Contains(paneContent, "AGENTS.md") {
 			t.Logf("pane content: %s", paneContent)
 			// Not a hard failure — pane capture can be timing-sensitive
@@ -366,7 +367,7 @@ This is a test opus created by the QA harness.
 	// ─── Phase 11: ath reforge ───────────────────────────────────────
 
 	t.Run("reforge kills and recreates marut", func(t *testing.T) {
-		out, err := runAth("reforge", "qa-test")
+		out, err := runAth("reforge", "qa-test", "qa-goal")
 		if err != nil {
 			t.Fatalf("ath reforge failed: %v\n%s", err, out)
 		}
@@ -377,7 +378,7 @@ This is a test opus created by the QA harness.
 
 		time.Sleep(500 * time.Millisecond)
 		windows := listTmuxWindows(t)
-		if !containsExact(windows, "marut-qa-test") {
+		if !containsExact(windows, "marut-qa-test-qa-goal") {
 			t.Errorf("expected marut window to exist after reforge, got: %v", windows)
 		}
 	})
@@ -415,7 +416,7 @@ This is a test opus created by the QA harness.
 
 		time.Sleep(300 * time.Millisecond)
 		windows := listTmuxWindows(t)
-		if containsExact(windows, "marut-qa-test") {
+		if containsExact(windows, "marut-qa-test-qa-goal") {
 			t.Error("expected marut window to be killed after quiesce")
 		}
 	})
@@ -423,14 +424,29 @@ This is a test opus created by the QA harness.
 	// ─── Phase 14: Error cases ───────────────────────────────────────
 
 	t.Run("kindle warns on TODO magnum-opus", func(t *testing.T) {
-		// Create another instance with template content
+		// Create another instance and add a template MO with TODOs
 		_, _ = runAth("init", "qa-warn-test")
-		out, err := runAth("kindle", "qa-warn-test")
+		warnDir := athanor.InstanceDir(tmpHome, "qa-warn-test")
+		if err := athanor.WriteMOTemplate(warnDir, "warn-goal"); err != nil {
+			t.Fatal(err)
+		}
+		out, err := runAth("kindle", "qa-warn-test", "warn-goal")
 		// Should warn but not necessarily fail hard
 		_ = err
-		trackWindow("marut-qa-warn-test")
+		trackWindow("marut-qa-warn-test-warn-goal")
 		if !strings.Contains(out, "TODO") && !strings.Contains(out, "warning") {
 			t.Logf("expected warning about TODO placeholders, got: %s", out)
+		}
+	})
+
+	t.Run("kindle without mo-name on multi-MO errors", func(t *testing.T) {
+		// qa-warn-test is a multi-MO instance (has magna-opera/ dir)
+		out, err := runAth("kindle", "qa-warn-test")
+		if err == nil {
+			t.Fatal("expected error when mo-name not provided for multi-MO instance")
+		}
+		if !strings.Contains(out, "mo-name required") {
+			t.Errorf("expected 'mo-name required' error, got: %s", out)
 		}
 	})
 

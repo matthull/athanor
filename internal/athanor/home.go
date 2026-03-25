@@ -17,6 +17,9 @@ const (
 	// SharedDir is the subdirectory containing shared components (agent roles, protocols).
 	SharedDir = "shared"
 
+	// MagnaOperaDir is the subdirectory containing magna opera (top-level goals).
+	MagnaOperaDir = "magna-opera"
+
 	// OperaDir is the subdirectory within each instance containing opera.
 	OperaDir = "opera"
 )

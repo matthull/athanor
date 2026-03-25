@@ -17,10 +17,14 @@ func runQuiesce(args []string) int {
 
 	if len(positional) < 1 {
 		fmt.Fprintln(os.Stderr, "error: athanor name required")
-		fmt.Fprintln(os.Stderr, "usage: ath quiesce <name> [--force]")
+		fmt.Fprintln(os.Stderr, "usage: ath quiesce <name> [<mo-name>] [--force]")
 		return 2
 	}
 	name := positional[0]
+	var moName string
+	if len(positional) >= 2 {
+		moName = positional[1]
+	}
 
 	fs := flag.NewFlagSet("quiesce", flag.ContinueOnError)
 	fs.BoolVar(&force, "force", false, "force shutdown even with active azers")
@@ -59,9 +63,20 @@ func runQuiesce(args []string) int {
 		return 2
 	}
 
-	// Kill marut crucible
-	crucible := fmt.Sprintf("marut-%s", name)
-	_ = r.KillWindow(crucible)
+	// Kill marut crucible(s)
+	if moName != "" {
+		// Kill specific MO's marut
+		crucible := athanor.MarutCrucibleName(name, moName)
+		_ = r.KillWindow(crucible)
+		fmt.Printf("Marut for %q quiesced.\n", moName)
+	} else {
+		// Kill all maruts for this athanor (both legacy and multi-MO patterns)
+		_ = r.KillWindow(athanor.MarutCrucibleName(name, "")) // legacy
+		mos, _ := athanor.ListMagnaOpera(instDir)
+		for _, mo := range mos {
+			_ = r.KillWindow(athanor.MarutCrucibleName(name, mo))
+		}
+	}
 
 	// Kill azers if forced
 	if force {

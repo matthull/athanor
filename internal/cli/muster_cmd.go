@@ -96,11 +96,21 @@ func runMuster(args []string) int {
 		model = cfg.EffectiveAzerModel()
 	}
 
-	// Build the azer boot prompt
-	bootPrompt := fmt.Sprintf(
-		"Read %s/AGENTS.md, then read %s/azer.md. Your opus is at %s. Read it and execute.",
-		instDir, instDir, opusPath,
-	)
+	// Build the azer boot prompt — include MO context if available
+	moName := athanor.ReadOpusMO(opusPath)
+	var bootPrompt string
+	if moName != "" {
+		moPath := athanor.MagnumOpusPath(instDir, moName)
+		bootPrompt = fmt.Sprintf(
+			"Read %s/AGENTS.md, then read %s, then read %s/azer.md. Your opus is at %s. Read it and execute.",
+			instDir, moPath, instDir, opusPath,
+		)
+	} else {
+		bootPrompt = fmt.Sprintf(
+			"Read %s/AGENTS.md, then read %s/azer.md. Your opus is at %s. Read it and execute.",
+			instDir, instDir, opusPath,
+		)
+	}
 
 	claudeArgs := fmt.Sprintf(
 		"cd %s && ATHANOR=%s claude --model %s --permission-mode auto %q",

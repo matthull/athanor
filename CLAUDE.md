@@ -56,7 +56,7 @@ internal/tmux/        # Tmux interaction library (from whisper)
 
 `~/athanor/` (or `$ATHANOR_HOME`) contains all athanor state:
 - `shared/` — role files symlinked into each instance
-- `athanors/<name>/` — per-instance directories with config, magnum-opus, opera
+- `athanors/<name>/` — per-instance directories with config, magna-opera, opera
 - Initialized as a git repo for trail durability
 
 ## CLI Spec

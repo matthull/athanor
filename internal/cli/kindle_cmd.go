@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/matthull/athanor/internal/athanor"
 	"github.com/matthull/athanor/internal/tmux"
@@ -20,7 +21,7 @@ func runKindle(args []string) int {
 
 	if len(remaining) < 1 {
 		fmt.Fprintln(os.Stderr, "error: athanor name required")
-		fmt.Fprintln(os.Stderr, "usage: ath kindle <name>")
+		fmt.Fprintln(os.Stderr, "usage: ath kindle <name> [<mo-name>]")
 		return 2
 	}
 	name := remaining[0]
@@ -38,13 +39,39 @@ func runKindle(args []string) int {
 		return 1
 	}
 
-	// Validate magnum-opus.md has real content
-	if err := athanor.ValidateMagnumOpus(instDir); err != nil {
-		fmt.Fprintf(os.Stderr, "warning: %v\n", err)
-		// Warn but don't block — artifex may be testing
+	// Resolve MO name
+	legacy := athanor.HasLegacyMagnumOpus(instDir)
+	var moName string
+	if len(remaining) >= 2 {
+		moName = remaining[1]
+	} else if legacy {
+		moName = name // legacy: use athanor name
+	} else {
+		// Multi-MO: mo-name required
+		mos, _ := athanor.ListMagnaOpera(instDir)
+		if len(mos) == 0 {
+			fmt.Fprintln(os.Stderr, "error: no magna opera found — create one in magna-opera/")
+			return 1
+		}
+		fmt.Fprintln(os.Stderr, "error: mo-name required for multi-MO athanor")
+		fmt.Fprintf(os.Stderr, "usage: ath kindle %s <mo-name>\n", name)
+		fmt.Fprintf(os.Stderr, "available: %s\n", strings.Join(mos, ", "))
+		return 2
 	}
 
-	crucible := fmt.Sprintf("marut-%s", name)
+	// Validate MO has real content
+	if err := athanor.ValidateMO(instDir, moName); err != nil {
+		fmt.Fprintf(os.Stderr, "warning: %v\n", err)
+	}
+
+	// Crucible naming: legacy = marut-<name>, multi-MO = marut-<name>-<mo>
+	var crucible string
+	if legacy {
+		crucible = athanor.MarutCrucibleName(name, "")
+	} else {
+		crucible = athanor.MarutCrucibleName(name, moName)
+	}
+
 	workDir := cfg.Project
 	if workDir == "" {
 		h, _ := os.UserHomeDir()
@@ -52,26 +79,24 @@ func runKindle(args []string) int {
 	}
 	model := cfg.EffectiveMarutModel()
 
-	// Build the marut boot prompt
+	// Build the marut boot prompt — reference specific MO
+	moPath := athanor.MagnumOpusPath(instDir, moName)
 	bootPrompt := fmt.Sprintf(
-		"Read %s/AGENTS.md, then read %s/magnum-opus.md, then read %s/marut.md, then read %s/muster.md. You are the marut for this athanor. Start /loop 5m and begin your operational cycle.",
-		instDir, instDir, instDir, instDir,
+		"Read %s/AGENTS.md, then read %s, then read %s/marut.md, then read %s/muster.md. You are the marut for this athanor. Start /loop 5m and begin your operational cycle.",
+		instDir, moPath, instDir, instDir,
 	)
 
-	// Build the claude command
 	claudeArgs := fmt.Sprintf(
 		"cd %s && ATHANOR=%s claude --model %s --permission-mode auto %q",
 		workDir, instDir, model, bootPrompt,
 	)
 
-	// Create tmux window and launch
 	r := tmux.NewRunner()
 	if err := r.NewWindow(crucible, workDir); err != nil {
 		fmt.Fprintf(os.Stderr, "error creating crucible: %v\n", err)
 		return 1
 	}
 
-	// Send the claude launch command to the new window
 	if err := r.SendKeysLiteral(crucible, claudeArgs); err != nil {
 		fmt.Fprintf(os.Stderr, "error launching marut: %v\n", err)
 		return 1
@@ -81,7 +106,7 @@ func runKindle(args []string) int {
 		return 1
 	}
 
-	fmt.Printf("Marut kindled in crucible %q\n", crucible)
+	fmt.Printf("Marut kindled for %q in crucible %q\n", moName, crucible)
 	fmt.Printf("  Model: %s\n", model)
 	fmt.Printf("  Working dir: %s\n", workDir)
 	fmt.Printf("  Instance: %s\n", instDir)

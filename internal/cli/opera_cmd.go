@@ -12,20 +12,23 @@ import (
 
 func runOpera(args []string) int {
 	var athName string
+	var moFilter string
+
+	positional, flagArgs := splitArgs(args)
 
 	fs := flag.NewFlagSet("opera", flag.ContinueOnError)
 	fs.StringVar(&athName, "athanor", "", "athanor name (if $ATHANOR not set)")
+	fs.StringVar(&moFilter, "mo", "", "filter by magnum opus name")
 	fs.SetOutput(os.Stderr)
 
-	if err := fs.Parse(args); err != nil {
+	if err := fs.Parse(flagArgs); err != nil {
 		return 2
 	}
-	remaining := fs.Args()
 
 	// Resolve instance directory
 	var instDir string
-	if len(remaining) > 0 {
-		athName = remaining[0]
+	if len(positional) > 0 {
+		athName = positional[0]
 	}
 	if athName != "" {
 		home, err := athanor.Home()
@@ -40,7 +43,7 @@ func runOpera(args []string) int {
 
 	if instDir == "" {
 		fmt.Fprintln(os.Stderr, "error: provide athanor name or set $ATHANOR")
-		fmt.Fprintln(os.Stderr, "usage: ath opera [<name>]")
+		fmt.Fprintln(os.Stderr, "usage: ath opera [<name>] [--mo <mo-name>]")
 		return 2
 	}
 
@@ -56,13 +59,24 @@ func runOpera(args []string) int {
 	}
 
 	hasOpera := false
-	fmt.Printf("%-12s %-12s %s\n", "STATUS", "DATE", "OPUS")
+	fmt.Printf("%-12s %-12s %-20s %s\n", "STATUS", "DATE", "MO", "OPUS")
 	for _, e := range entries {
 		if !strings.HasSuffix(e.Name(), ".md") {
 			continue
 		}
+		opusPath := filepath.Join(operaDir, e.Name())
+		mo := athanor.ReadOpusMO(opusPath)
+		if mo == "" {
+			mo = "-"
+		}
+
+		// Apply MO filter
+		if moFilter != "" && mo != moFilter {
+			continue
+		}
+
 		hasOpera = true
-		status := readOpusStatus(filepath.Join(operaDir, e.Name()))
+		status := readOpusStatus(opusPath)
 		if status == "" {
 			status = "unknown"
 		}
@@ -75,7 +89,7 @@ func runOpera(args []string) int {
 			opusName = opusName[11:] // Strip date prefix
 		}
 
-		fmt.Printf("%-12s %-12s %s\n", status, date, opusName)
+		fmt.Printf("%-12s %-12s %-20s %s\n", status, date, mo, opusName)
 	}
 
 	if !hasOpera {

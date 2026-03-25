@@ -57,6 +57,18 @@ _ath_tmux_azer_windows() {
     compadd -- "${windows[@]}"
 }
 
+_ath_mo_names() {
+    local athanor_name="$1"
+    local -a names
+    # Multi-MO: list files from magna-opera/
+    names=( ${(f)"$(ls ~/athanor/athanors/$athanor_name/magna-opera/*.md 2>/dev/null | xargs -I{} basename {} .md)"} )
+    if [[ ${#names[@]} -eq 0 ]]; then
+        # Legacy: no completion needed (mo-name is optional)
+        return
+    fi
+    compadd -- "${names[@]}"
+}
+
 _ath() {
     local -a commands
     commands=(
@@ -79,7 +91,14 @@ _ath() {
     fi
 
     case "${words[2]}" in
-        kindle|reforge|quiesce|status|opera)
+        kindle|reforge|quiesce)
+            if (( CURRENT == 3 )); then
+                _ath_athanor_names
+            elif (( CURRENT == 4 )); then
+                _ath_mo_names "${words[3]}"
+            fi
+            ;;
+        status|opera)
             if (( CURRENT == 3 )); then
                 _ath_athanor_names
             fi
