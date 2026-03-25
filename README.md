@@ -55,11 +55,12 @@ The `ath` binary is the operational backbone. Install with `make install` (puts 
 ### Setup
 
 ```bash
-# One-time: create the athanor home and populate shared materia
+# One-time: create the athanor home and populate shared components
 mkdir -p ~/athanor/shared ~/athanor/athanors
 # Copy role files (AGENTS.md, marut.md, azer.md, muster.md, opus.md) into ~/athanor/shared/
 
-# Optional: install zsh completions
+# Optional: install zsh completions (add fpath=(~/.zsh/completions $fpath) to .zshrc before oh-my-zsh)
+mkdir -p ~/.zsh/completions
 ath completion zsh > ~/.zsh/completions/_ath
 ```
 
@@ -72,7 +73,7 @@ ath init bugsnag --project ~/code/musashi
 # 2. Edit the magnum opus — define the goal, witnesses, and context
 vim ~/athanor/athanors/bugsnag/magnum-opus.md
 
-# 3. Kindle the marut — it reads its materia and starts the operational loop
+# 3. Kindle the marut — it reads its role docs and starts the operational loop
 ath kindle bugsnag
 
 # 4. Check on it
