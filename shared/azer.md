@@ -163,7 +163,7 @@ When your opus is done — or when you've determined it can't be done as inscrib
 
 **After discharge, notify the marut** so it knows to check the trail and continue the operational loop:
 ```bash
-whisper send marut "Opus <opus-name> discharged. Check opera/ for outcome and any follow-up opera inscribed."
+ath whisper send marut-<athanor> "Opus <opus-name> discharged. Check opera/ for outcome and any follow-up opera inscribed."
 ```
 
 After notification, your work is done. The marut handles cleanup.

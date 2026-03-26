@@ -65,16 +65,18 @@ When no opera exist, inscribe an assessment opus using the template in `AGENTS.m
 
 Once an azer is mustered:
 
-**Check for activity** — scan the crucible's tmux pane for recent output. An azer should produce visible activity every few minutes.
+**Check for activity** — run `ath check azer-<opus-name>` to get the crucible's current state. An azer should produce visible activity every few minutes.
 
-**Stall detection:**
-- Silence > 10 minutes → likely stuck
-- Repeated error messages → likely looping
-- Permission prompt visible → blocked, needs approval
-- Context limit message → session exhausted, needs reforging
+**`ath check` return values:**
+- `active` — azer is producing output, working normally
+- `idle` — no recent output, may be stuck or thinking
+- `stalled` — extended silence, likely stuck
+- `permission` — blocked on a permission prompt, needs approval
+- `exhausted` — context limit hit, needs reforging
+- `dead` — session is gone, needs reforging
 
 **When stalled:**
-1. **Nudge** via whisper: `whisper send azer-<opus-name> "Status check — are you making progress? If stuck, escalate."`
+1. **Nudge** via whisper: `ath whisper send azer-<opus-name> "Status check — are you making progress? If stuck, escalate."`
 2. **If nudge doesn't unstick** → escalate to the artifex
 3. **If session is dead** → reforge (see `muster.md`)
 
@@ -82,16 +84,11 @@ Once an azer is mustered:
 
 ## Permissions Watcher
 
-Azers will hit permission prompts that block their progress. A `/permission-manager` session runs in the `perms` tmux window to auto-resolve these. If it's not running, azers will stall silently.
+Azers will hit permission prompts that block their progress. `ath check` detects `permission` state directly — when you see it, the azer is blocked and needs approval.
 
-**Check health:** Verify the `perms` window has an active claude session. If it's dead or missing, start it:
+**Check for permission blocks** as part of your normal monitoring pass. Any crucible returning `permission` from `ath check` needs immediate attention — either approve the action or escalate to the artifex.
 
-```bash
-tmux new-window -n perms
-tmux send-keys -t perms "cd ~/code/musashi && claude --model sonnet \"/permission-manager scan every two minutes until i say stop\"" Enter
-```
-
-This is part of athanor health — check it when you check azers.
+A dedicated beholder daemon is planned to replace manual permissions management. Until then, permission monitoring is part of your furnace duties on each loop pass.
 
 ---
 
@@ -119,18 +116,14 @@ inscribed: YYYY-MM-DD
 
 This is not an assessment opus (which asks "what's next"). This is a context dump — waste nothing.
 
-**2. Rename your window so the new marut can claim the name:**
+**2. Reforge.** Once the discharge opus is inscribed, run:
 ```bash
-tmux rename-window marut-exhausted
+ath reforge <athanor> [<mo-name>]
 ```
 
-**3. Create a new marut window and launch the replacement:**
-```bash
-tmux new-window -n marut
-tmux send-keys -t marut "cd ~/code/musashi && claude --model sonnet \"Read $ATHANOR/AGENTS.md, then read $ATHANOR/magnum-opus.md, then read $ATHANOR/marut.md, then read $ATHANOR/muster.md. You are the marut for this athanor. A previous marut session hit context limits. Check opera/ for in-progress work and the trail. Resume your operational cycle. Also: kill the old marut window when you're ready: tmux kill-window -t marut-exhausted\"" Enter
-```
+This handles the window rename, new session launch, and handoff. Your replacement will pick up the discharge opus and resume the operational cycle.
 
-**4. Terminate.** Your replacement is running. Exit your session — the new marut will clean up your window.
+**3. Terminate.** Your replacement is running. Exit your session — the new marut will clean up your old window.
 
 ---
 
@@ -140,9 +133,9 @@ tmux send-keys -t marut "cd ~/code/musashi && claude --model sonnet \"Read $ATHA
 
 - Pull specs, check opera status via `rg`
 - Muster azers (create worktrees, kindle crucibles, launch sessions)
-- Monitor azers (tmux capture, whisper nudge, stall detection)
+- Monitor azers (`ath check`, `ath whisper` nudge, stall detection)
 - Clean up after discharged opera (kill crucibles, shut down Docker, remove worktrees)
-- Start/check the permissions watcher
+- Check for permission-blocked crucibles via `ath check`
 - Inscribe opera — assessment opera are the default when the queue is empty, but you are free to inscribe any opus your context supports. You accumulate real observations (azer patterns, trail health, gaps, opportunities). Waste nothing — if you see work that needs doing, inscribe it.
 - Reforge dead sessions
 

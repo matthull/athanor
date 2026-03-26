@@ -8,58 +8,43 @@ These are core marut responsibilities — not operator tasks. The marut manages 
 
 ---
 
-## Kindling a Crucible (launching a azer)
+## Kindling a Crucible (launching an azer)
 
 When the marut has a charged opus that needs execution:
 
-**1. Create a sandbox (if needed)** — a sandbox isolates code changes. If the opus involves code changes to this repo, create one:
-
-```bash
-wtp add <branch-name>
-```
-
-This creates a worktree with its own branch, Docker environment, and ports. Note the worktree path from the output.
+**1. Create a sandbox (if needed)** — a sandbox isolates code changes. If the opus involves code changes to this repo, create one per the project's environment conventions (e.g. `wtp add <branch-name>`). Note the worktree path from the output.
 
 **Skip the sandbox** if the opus is research, investigation, assessment, or work that doesn't modify this repo's code. The azer runs from the main repo directory instead. Not every opus needs code isolation — apply judgment.
 
-**2. Create the crucible** — a tmux window for the azer:
+**2. Muster the azer:**
 
 ```bash
-tmux new-window -n azer-<opus-name>
+ath muster <opus-file> --dir <worktree-path> --athanor <name>
 ```
 
-**3. Launch the session** — send the claude command to the fresh crucible:
+This creates the crucible (tmux window) and launches Claude with the correct boot prompt, model, and role files. If `--dir` is omitted, uses the project directory from athanor config.
+
+**3. Verify launch:**
 
 ```bash
-tmux send-keys -t azer-<opus-name> "cd <worktree-path> && claude --model opus --permission-mode auto \"Read $ATHANOR/AGENTS.md, then read $ATHANOR/azer.md. Your opus is at $ATHANOR/opera/<opus-file>.md. Read it and execute.\"" Enter
+ath check azer-<opus-name>
 ```
 
-**4. Verify launch** — check the crucible has an active session:
+Should return `active` or `idle`. If it returns `dead`, the launch failed — escalate.
 
-```bash
-whisper idle azer-<opus-name>
-```
-
-If `wtp` or `whisper` behave unexpectedly, escalate. Do not improvise workarounds.
+If `ath muster` or `ath check` behave unexpectedly, escalate. Do not improvise workarounds.
 
 ---
 
 ## Reforging (session restart)
 
-When a azer session dies (context exhaustion, crash, unrecoverable drift), reforge it — kill the session and spawn fresh in the same crucible. The crucible endures; the session is reforged.
+When an azer session dies (context exhaustion, crash, unrecoverable drift), reforge it — kill the session and spawn fresh in the same crucible. The crucible endures; the session is reforged.
 
-**1. Kill the dead session:**
-
-```bash
-tmux send-keys -t azer-<opus-name> C-c C-c
-# Wait briefly, then:
-tmux send-keys -t azer-<opus-name> 'exit' Enter
-```
-
-**2. Re-launch with context about prior state:**
+For marut reforging, use `ath reforge <athanor> [<mo-name>]`. For azer reforging, kill the crucible and re-muster:
 
 ```bash
-tmux send-keys -t azer-<opus-name> "cd <worktree-path> && claude --model opus --permission-mode auto \"Read $ATHANOR/AGENTS.md, then read $ATHANOR/azer.md. Your opus is at $ATHANOR/opera/<opus-file>.md. A previous session was working on this but died. Check git log and git status for progress. Resume execution.\"" Enter
+ath cleanup azer-<opus-name>
+ath muster <opus-file> --dir <worktree-path> --athanor <name>
 ```
 
 The new session inherits all durable state (sandbox commits, staged changes, opus file notes) but starts with a clean context window.
@@ -68,24 +53,31 @@ The new session inherits all durable state (sandbox commits, staged changes, opu
 
 ## Monitoring
 
-Once a azer is charged:
+Once an azer is charged, check its state each loop pass:
 
-**Check for activity** — scan the crucible's tmux pane for recent output. A azer should produce visible activity (tool calls, edits, test runs) every few minutes.
+```bash
+ath check azer-<opus-name>
+```
 
-**Stall detection:**
-- Silence > 10 minutes with no output → likely stuck
-- Repeated error messages → likely looping
-- Permission prompt visible → blocked, needs approval
-- Context limit message → session exhausted, needs reforging
+Returns one of:
+- `active` — tool call in progress, working normally
+- `idle` — waiting for input (may be thinking or may be stalled)
+- `permission` — blocked on a permission prompt, needs approval
+- `exhausted` — context limit reached, needs reforging
+- `dead` — crucible not found, session died
 
-**When stalled:**
+**When `idle` persists across multiple passes** (> 10 minutes) → likely stalled. Nudge:
+```bash
+ath whisper send azer-<opus-name> "Status check — are you making progress on your opus? If stuck, escalate."
+```
 
-1. **Nudge** — whisper a message asking for status or suggesting a path forward:
-   ```bash
-   whisper send azer-<opus-name> "Status check — are you making progress on your opus? If stuck, escalate."
-   ```
-2. **If nudge doesn't unstick** — escalate to the artifex with what you observed
-3. **If session is dead** — reforge (see above)
+**When `permission`** → approve the prompt or escalate to the artifex.
+
+**When `exhausted`** → reforge (see above).
+
+**When `dead`** → the session died. Check if the opus was discharged. If not, reforge or escalate.
+
+**If nudge doesn't unstick** → escalate to the artifex with what you observed.
 
 ---
 
@@ -108,17 +100,9 @@ The azer should exit its own session after discharge. The marut is responsible f
 
 1. **Kill the crucible** if still open:
    ```bash
-   tmux kill-window -t azer-<opus-name>
+   ath cleanup azer-<opus-name>
    ```
 
-2. **Shut down the Docker env:**
-   ```bash
-   ~/code/musashi/scripts/wtp-cleanup-env.sh <worktree-path>
-   ```
+2. **Clean up the sandbox** per the project's environment conventions (e.g. shut down Docker env, remove worktree).
 
-3. **Remove the worktree:**
-   ```bash
-   wtp remove <worktree-name>
-   ```
-
-Don't clean up until the opus is confirmed discharged and any follow-up opera are inscribed. Cleanup is not optional — each worktree consumes disk and Docker resources.
+Don't clean up until the opus is confirmed discharged and any follow-up opera are inscribed.
