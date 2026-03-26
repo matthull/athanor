@@ -217,6 +217,10 @@ func WriteMOTemplate(instanceDir, moName string) error {
 
 [TODO] Who are the stakeholders? What does success look like from their perspective?
 
+## Marut Directives
+
+(Leave empty for default behavior — the marut pursues the goal without constraints. Add directives to scope what the marut focuses on, avoids, or stops at.)
+
 ## Pre-loaded Context
 
 [TODO] What does the first azer need to not start from scratch? Discovery findings, references, known open questions, relevant services/files.
