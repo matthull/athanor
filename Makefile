@@ -3,6 +3,8 @@
 BINARY := ath
 BUILD_DIR := .
 INSTALL_DIR := $(HOME)/.local/bin
+ATHANOR_HOME := $(or $(ATHANOR_HOME),$(HOME)/athanor)
+SHARED_FILES := AGENTS.md azer.md marut.md muster.md opus.md
 
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
@@ -17,6 +19,13 @@ build:
 
 install: build
 	install -m 755 $(BUILD_DIR)/$(BINARY) $(INSTALL_DIR)/$(BINARY)
+	@mkdir -p $(ATHANOR_HOME)/shared
+	@for f in $(SHARED_FILES); do \
+		if [ ! -e $(ATHANOR_HOME)/shared/$$f ]; then \
+			ln -s $(CURDIR)/shared/$$f $(ATHANOR_HOME)/shared/$$f; \
+			echo "Symlinked shared/$$f -> $(ATHANOR_HOME)/shared/$$f"; \
+		fi; \
+	done
 	@echo "Installed $(BINARY) to $(INSTALL_DIR)/$(BINARY)"
 
 clean:

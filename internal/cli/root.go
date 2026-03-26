@@ -35,6 +35,8 @@ func Execute() int {
 		return runStatus(os.Args[2:])
 	case "reforge":
 		return runReforge(os.Args[2:])
+	case "check":
+		return runCheck(os.Args[2:])
 	case "cleanup":
 		return runCleanup(os.Args[2:])
 	case "quiesce":
@@ -65,6 +67,7 @@ Usage:
   ath reforge <name> [<mo-name>]           Kill and relaunch a marut
   ath muster <opus-file> [--dir <path>]    Launch an azer for an opus
   ath craft <athanor> <name> [<mo>]        Interactive session with the artifex
+  ath check <crucible>                      Check crucible health
   ath cleanup <crucible>                   Clean up after a discharged opus
   ath quiesce <name> [<mo-name>] [--force] Graceful shutdown
   ath status [<name>]                      Show athanor health

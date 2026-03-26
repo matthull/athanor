@@ -77,6 +77,7 @@ _ath() {
         'kindle:Launch a marut for an athanor'
         'reforge:Kill and relaunch a marut'
         'muster:Launch an azer for an opus'
+        'check:Check crucible health'
         'cleanup:Clean up after a discharged opus'
         'quiesce:Graceful shutdown of an athanor'
         'status:Show athanor health'
@@ -124,6 +125,11 @@ _ath() {
         muster)
             if (( CURRENT == 3 )); then
                 _ath_opus_files
+            fi
+            ;;
+        check)
+            if (( CURRENT == 3 )); then
+                _ath_tmux_windows
             fi
             ;;
         cleanup)

@@ -286,6 +286,55 @@ This is a test opus created by the QA harness.
 		}
 	})
 
+	// ─── Phase 7b: ath check ────────────────────────────────────────
+
+	t.Run("check reports state for existing crucible", func(t *testing.T) {
+		out, err := runAth("check", "marut-qa-test-qa-goal")
+		// Exit code 0 or 1 are both valid — depends on what claude is doing
+		if err != nil {
+			// check returns exit 1 for permission/exhausted, 2 for dead/error
+			if exitErr, ok := err.(*exec.ExitError); ok && exitErr.ExitCode() == 2 {
+				t.Fatalf("ath check returned exit 2 (dead/error): %s", out)
+			}
+		}
+		// Output should contain one of the valid states
+		validStates := []string{"active", "idle", "permission", "exhausted"}
+		found := false
+		for _, s := range validStates {
+			if strings.Contains(out, s) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("expected one of %v in output, got: %s", validStates, out)
+		}
+	})
+
+	t.Run("check reports dead for nonexistent crucible", func(t *testing.T) {
+		out, err := runAth("check", "nonexistent-crucible-xyz")
+		if err == nil {
+			t.Fatal("expected non-zero exit for dead crucible")
+		}
+		exitErr, ok := err.(*exec.ExitError)
+		if !ok {
+			t.Fatalf("expected ExitError, got: %v", err)
+		}
+		if exitErr.ExitCode() != 2 {
+			t.Errorf("expected exit code 2, got %d", exitErr.ExitCode())
+		}
+		if !strings.Contains(out, "dead") {
+			t.Errorf("expected 'dead' in output, got: %s", out)
+		}
+	})
+
+	t.Run("check without args returns exit 2", func(t *testing.T) {
+		_, err := runAth("check")
+		if err == nil {
+			t.Fatal("expected error when no crucible name given")
+		}
+	})
+
 	// ─── Phase 8: ath muster (creates azer window) ───────────────────
 
 	t.Run("muster creates azer crucible", func(t *testing.T) {
