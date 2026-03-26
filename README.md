@@ -64,6 +64,17 @@ mkdir -p ~/.zsh/completions
 ath completion zsh > ~/.zsh/completions/_ath
 ```
 
+**Claude Code permissions:** Add `ath:*` to your global allowlist so Claude can run `ath` commands without prompting:
+
+```jsonc
+// ~/.claude/settings.json
+{
+  "permissions": {
+    "allow": ["ath:*"]
+  }
+}
+```
+
 ### Workflow: Spin up a new athanor
 
 ```bash
