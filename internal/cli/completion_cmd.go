@@ -73,6 +73,7 @@ _ath() {
     local -a commands
     commands=(
         'init:Create a new athanor instance'
+        'craft:Interactive session with the artifex'
         'kindle:Launch a marut for an athanor'
         'reforge:Kill and relaunch a marut'
         'muster:Launch an azer for an opus'
@@ -91,6 +92,15 @@ _ath() {
     fi
 
     case "${words[2]}" in
+        craft)
+            if (( CURRENT == 3 )); then
+                _ath_athanor_names
+            elif (( CURRENT == 4 )); then
+                _message 'session name'
+            elif (( CURRENT == 5 )); then
+                _ath_mo_names "${words[3]}"
+            fi
+            ;;
         kindle|reforge|quiesce)
             if (( CURRENT == 3 )); then
                 _ath_athanor_names

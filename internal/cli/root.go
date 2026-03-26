@@ -29,6 +29,8 @@ func Execute() int {
 		return runKindle(os.Args[2:])
 	case "muster":
 		return runMuster(os.Args[2:])
+	case "craft":
+		return runCraft(os.Args[2:])
 	case "status":
 		return runStatus(os.Args[2:])
 	case "reforge":
@@ -62,6 +64,7 @@ Usage:
   ath kindle <name> [<mo-name>]            Launch a marut for a magnum opus
   ath reforge <name> [<mo-name>]           Kill and relaunch a marut
   ath muster <opus-file> [--dir <path>]    Launch an azer for an opus
+  ath craft <athanor> <name> [<mo>]        Interactive session with the artifex
   ath cleanup <crucible>                   Clean up after a discharged opus
   ath quiesce <name> [<mo-name>] [--force] Graceful shutdown
   ath status [<name>]                      Show athanor health
