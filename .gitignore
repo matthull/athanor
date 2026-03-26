@@ -1,4 +1,5 @@
-# Binary (only the root-level compiled binary, not cmd/whisper/ source)
+# Binaries (only root-level compiled binaries, not source)
+/ath
 /whisper
 
 # IDE
