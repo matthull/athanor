@@ -221,6 +221,10 @@ func WriteMOTemplate(instanceDir, moName string) error {
 
 (Leave empty for default behavior — the marut pursues the goal without constraints. Add directives to scope what the marut focuses on, avoids, or stops at.)
 
+## Tempering
+
+(Empty by default. Transient guidance — "the weather today." Updated by the marut during artifex conversation. Always timestamped.)
+
 ## Pre-loaded Context
 
 [TODO] What does the first azer need to not start from scratch? Discovery findings, references, known open questions, relevant services/files.

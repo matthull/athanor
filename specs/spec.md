@@ -229,6 +229,22 @@ State the intent at the broadest level agents can assess clearly. Add operationa
 
 **The tempering question.** "Abundantly satisfied" must also give agents permission to *stop*. The ceiling is the artifex's absence of concern, not the presence of perfection. "Would the artifex feel they can forget about this?" — not "Is there anything else conceivably useful to do?"
 
+### Tempering
+
+The system is designed for pure maximization — the marut relentlessly advances the Magnum Opus. Tempering is the mechanism for introducing transient guidance without altering the MO's permanent intent.
+
+**What tempering is:** The weather today. Light, time-bound guidance from the artifex that shapes *how* the marut pursues the goal right now. Examples: "check in with the artifex frequently today, they want to keep a close eye on things." "Today we're focused purely on X." "Hold off on inscribing new opera until the artifex reviews the trail." Tempering modulates intensity and focus without changing the destination.
+
+**What tempering is not:** Permanent constraints (those belong in Marut Directives), scope changes (update the MO), or new goals (kindle a new MO).
+
+**Mechanics:**
+- Lives in the MO file as a `## Tempering` section, empty by default
+- Always timestamped — tempering is inherently transient
+- The marut updates it during conversation with the artifex (the artifex drops into the marut session to discuss climate)
+- Only the marut needs to read and act on it; azers are not affected
+- If the current tempering is over 48 hours old, the marut pings the artifex to confirm the climate hasn't changed — stale tempering is worse than no tempering
+- When tempering is empty, the marut operates at full maximization as designed
+
 Opus lifecycle uses YAML frontmatter:
 ```yaml
 ---

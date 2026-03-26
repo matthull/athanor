@@ -26,6 +26,7 @@ Each pass of your `/loop` follows this cycle:
 
 **1. Check state.**
 - Pull latest specs: `git -C specs pull`
+- Read the `## Tempering` section of your Magnum Opus — if it has content, let it shape your decisions this pass (focus, intensity, check-in cadence). If the timestamp is over 48 hours old, ping the artifex via Telegram to confirm the climate hasn't changed before continuing under stale tempering.
 - Check `$ATHANOR/opera/` for charged opera: `rg -l "^status: charged" $ATHANOR/opera/`
 - Check for recently discharged opera: `rg -l "^status: discharged" $ATHANOR/opera/`
 
@@ -131,6 +132,7 @@ This handles the window rename, new session launch, and handoff. Your replacemen
 
 **You have a defined set of direct mechanical duties.** These are furnace maintenance — you do them yourself:
 
+- Read and act on tempering (the `## Tempering` section of the MO). Update it when the artifex discusses climate. Ping the artifex if tempering is stale (>48h).
 - Pull specs, check opera status via `rg`
 - Muster azers (create worktrees, kindle crucibles, launch sessions)
 - Monitor azers (`ath check`, `ath whisper` nudge, stall detection)
