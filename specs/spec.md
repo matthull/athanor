@@ -245,6 +245,32 @@ The system is designed for pure maximization — the marut relentlessly advances
 - If the current tempering is over 48 hours old, the marut pings the artifex to confirm the climate hasn't changed — stale tempering is worse than no tempering
 - When tempering is empty, the marut operates at full maximization as designed
 
+### The Workshop Model
+
+The athanor is a workshop, not a dark factory. The artifex walks in and out freely, and the system supports this as a core design requirement — not a workaround or edge case. Maximum autonomy is the default, but it is one position on a continuous throttle. The system must never force the artifex to leave the athanor to do hands-on work.
+
+**The spectrum:**
+
+| Position | Artifex | How It Works |
+|----------|---------|--------------|
+| **Full autonomy** | Away | Marut drives. Azers execute. Dashboard + dispatches for observability. |
+| **Guided** | Monitoring | Tempering active. Marut adjusts cadence and focus per artifex guidance. |
+| **Collaborative** | At the bench | Artifex works directly with an azer or marut. Same agent, same geas — the artifex provides judgment interactively instead of through escalation. |
+| **Manual** | Running the forge | Artifex directs everything, using athanor infrastructure (opera, trail, geas) as scaffolding. |
+
+**Transitions are fluid and require no ceremony.** The artifex walks into a marut session and says "I need to investigate this stuck PR" — the marut inscribes an opus and musters an azer. The artifex switches to the azer's crucible and works collaboratively. Mid-session, the artifex says "fire up an autonomous azer to monitor that CI pipeline" — the collaborative azer runs `ath muster`. When the analysis is done, the artifex says "discharge this" and walks away. The marut resumes autonomous operation.
+
+**The core requirement:** any work the artifex does must be capturable by the athanor's infrastructure — opera, trail, geas, supervision, dashboard visibility. If the artifex is doing hands-on work in a raw Claude Code session outside any athanor, the system has failed. That work is invisible: no trail, no opera, no supervision, no dashboard presence.
+
+**Collaborative azers are not a new role.** A collaborative azer is the same agent with the same geas and the same opus. Only the autonomy level differs — the artifex is present and providing judgment interactively. This is operating principle #3: "Autonomy is orthogonal to role."
+
+**Entry points:**
+- `ath craft <athanor> <name> [<mo>]` — creates a lightweight opus and kindles an interactive crucible in one motion. The fast path for ad hoc collaborative work.
+- Walk up to any marut and direct it — the marut already inscribes opera and musters azers. Telling the marut what you need is the natural entry when the work relates to an active MO.
+- Switch to any existing azer's tmux window and start talking — every crucible is interactive. The artifex can sit down at any bench at any time.
+
+**The homunculus** is the artifex's default workbench — a persistent session not bound to a specific opus, available for supervision, system improvement, and ad hoc tasks. Collaborative azers are the specialized fixtures for opus-bound work. Both are workshop sessions; they differ only in scope.
+
 Opus lifecycle uses YAML frontmatter:
 ```yaml
 ---
@@ -460,6 +486,9 @@ Built, fired, and working.
 | Whisper CLI | `ath whisper` subcommand | Reliable inter-crucible communication. Now part of `ath` CLI. Built and tested. |
 | Environment isolation | `wtp add` | Worktrees per azer. Independent branches and Docker environments. |
 | Autonomy profiles | Session injection | Semi-autonomous default. Profiles via `$CLAUDE_SESSION_ID`-keyed injection directory. |
+| Dashboard | `ath dashboard` | At-a-glance system observability: MO goals, in-flight/waiting/recent opera, crucible states. `--watch` for auto-refresh, `--json` for machine-readable output. |
+| Craft (collaborative azer) | `ath craft` | Workshop entry point: auto-inscribes a lightweight opus, kindles an interactive crucible. No `--permission-mode auto` — normal Claude Code session. The artifex sits down at the bench. |
+| Workshop model | Spec + existing tooling | The full spectrum (autonomous → collaborative → manual) is already supported: `ath kindle`/`ath muster` for autonomous, `ath craft` for collaborative, walk up to any marut and direct it for manual. No special modes needed — the marut already inscribes opera and musters azers on request. |
 
 ### Designed, Not Built
 
@@ -488,7 +517,6 @@ Live list in `kadmon.md § Infrastructure Gaps`.
 
 | Concept | Notes |
 |---------|-------|
-| Athanor dashboard (TUI) | Dwarf Fortress-style operator view. Not prioritized. |
 | Formal athanor registry | Currently implicit: `~/athanor/athanors/` directory listing. `ath status` provides a live view. |
 
 ---

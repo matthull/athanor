@@ -59,6 +59,24 @@ internal/tmux/        # Tmux interaction library (from whisper)
 - `athanors/<name>/` — per-instance directories with config, magna-opera, opera
 - Initialized as a git repo for trail durability
 
+## The Workshop Model
+
+The athanor is a workshop, not a dark factory. The artifex walks in and out freely. The system supports a full spectrum from autonomous to hands-on — this is a core design requirement, not an edge case.
+
+**How the artifex enters the workshop:**
+
+- **Talk to the marut.** Switch to any marut's tmux window and direct it: "I need to investigate this stuck PR." The marut inscribes an opus and musters an azer. This is the natural entry when the work relates to an active MO.
+- **`ath craft <athanor> <name> [<mo>]`** — Creates a lightweight opus and kindles an interactive crucible in one motion. The fast path for ad hoc collaborative work.
+- **Walk up to any azer.** Switch to any azer's tmux window and start talking. Every crucible is interactive. The artifex can sit down at any bench at any time.
+
+**How the artifex leaves:**
+
+- Tell the azer to discharge the opus (outcome, reflection, proof captured to the trail).
+- Or tell it to continue autonomously — the marut resumes supervision.
+- Or just leave — the marut monitors for stalls and handles cleanup.
+
+**The rule:** any work the artifex does should be inside an athanor, not in a raw Claude Code session. Raw sessions are invisible — no trail, no opera, no dashboard presence. If you find yourself opening a standalone Claude session for project work, that's a signal to use `ath craft` or talk to a marut instead.
+
 ## CLI Spec
 
 The full CLI specification is at `specs/cli/spec.md`. The system spec is at `specs/spec.md`. Operations runbook is at `specs/kadmon.md`.
