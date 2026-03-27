@@ -8,6 +8,7 @@ Go CLI for the athanor agent orchestration system. Binary: `ath`, module: `githu
 |-----------------|------------|
 | Implementing Go code, extracting patterns from Gastown | `/go-cli` |
 | Writing or reviewing tests | `/go-cli` (testing strategy section) + `/unit-testing` |
+| Modifying shared agent files (AGENTS.md, azer.md, marut.md, spec) | `/athanor-agents` |
 | Working on Claude Code infrastructure (hooks, skills, settings) | `/agentic-dev` |
 | Designing athanor system architecture | `/agentic-architecture` |
 
