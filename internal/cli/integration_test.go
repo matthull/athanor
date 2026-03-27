@@ -232,6 +232,37 @@ This is a test opus created by the QA harness.
 		}
 	})
 
+	// ─── Phase 5b: ath dashboard ────────────────────────────────────
+
+	t.Run("dashboard shows overview with charged opus", func(t *testing.T) {
+		out, err := runAth("dashboard")
+		if err != nil {
+			t.Fatalf("ath dashboard failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "ATH DASHBOARD") {
+			t.Errorf("expected dashboard header, got: %s", out)
+		}
+		if !strings.Contains(out, "qa-test") || !strings.Contains(out, "qa-goal") {
+			t.Errorf("expected instance and MO name, got: %s", out)
+		}
+		if !strings.Contains(out, "QA testing athanor") {
+			t.Errorf("expected MO goal in dashboard, got: %s", out)
+		}
+	})
+
+	t.Run("dashboard json output", func(t *testing.T) {
+		out, err := runAth("dashboard", "--json")
+		if err != nil {
+			t.Fatalf("ath dashboard --json failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "\"timestamp\"") {
+			t.Errorf("expected JSON with timestamp, got: %s", out)
+		}
+		if !strings.Contains(out, "\"qa-test\"") {
+			t.Errorf("expected instance name in JSON, got: %s", out)
+		}
+	})
+
 	// ─── Phase 6: ath kindle (creates tmux window) ───────────────────
 	// kindle will try to launch 'claude' which may not be interactive here.
 	// We test that the tmux window is created with the right name.

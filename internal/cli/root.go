@@ -43,6 +43,8 @@ func Execute() int {
 		return runQuiesce(os.Args[2:])
 	case "opera":
 		return runOpera(os.Args[2:])
+	case "dashboard":
+		return runDashboard(os.Args[2:])
 	case "completion":
 		return runCompletion(os.Args[2:])
 	case "version":
@@ -72,6 +74,7 @@ Usage:
   ath quiesce <name> [<mo-name>] [--force] Graceful shutdown
   ath status [<name>]                      Show athanor health
   ath opera [<name>] [--mo <mo-name>]      List opera with status
+  ath dashboard [--watch] [--json]        At-a-glance system overview
 
   ath whisper send <target> <message>     Send a message to a tmux target
   ath whisper idle <target>               Wait for target to become idle
