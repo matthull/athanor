@@ -143,6 +143,7 @@ What this means in practice:
 - **Use external tools for their purpose** — e.g., Linear for tickets, Slack for communication, wikis for knowledge. The athanor is not a replacement for these.
 - **Opera are a refined tool for driving work** — the trail of what was done, what was learned, what comes next. Not a dumping ground for project knowledge.
 - **Creating structure is valid work** — if there's no clear place for valuable information, creating that place (a new doc, a new directory, a new convention) is a real contribution. Don't let the absence of structure prevent you from capturing information; build the structure.
+- **Map the environment as you work.** As you investigate, you discover places — files, services, endpoints, channels, dashboards, documentation, tools, people. When a place is relevant to the Magnum Opus and not already recorded in the project's corpus, note it where it will be found. Look for how the environment already organizes information — footnotes, citations, breadcrumbs, reference sections, CLAUDE.md entries — and follow those conventions. The principle: no relevant discovery should exist only in your context window. The next agent should be able to find what you found without repeating your investigation.
 
 ---
 
