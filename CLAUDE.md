@@ -14,7 +14,7 @@ Go CLI for the athanor agent orchestration system. Binary: `ath`, module: `githu
 
 ## Workflow
 
-When `make check` passes, commit and push to master. No branches, no PRs — this is a single-developer project. Don't hold changes.
+Commit and push freely as you go. For code changes, run `make check` first. For spec/doc-only changes, commit directly. No branches, no PRs — this is a single-developer project. Don't hold changes.
 
 ## Build and Test
 

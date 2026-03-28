@@ -167,7 +167,7 @@ The athanor uses distinctive names because precise names create precise meanings
 
 **Naming philosophy.** Distinctive names create precise meanings. "Azer" has less ambiguity than "worker"; "geas" less than "acceptance criteria"; "opus" less than "task." The goal is good metaphors, not maximum weirdness — names range from mundane to deep cut, and what matters is that each name fits, is unambiguous, and carries the right connotation. "Session" and "sandbox" are fine as-is. "Azer" and "geas" earn their weirdness by being more precise than their normie equivalents. Two loose registers: **monster manual** for agents (creatures with purpose, will, and behavior) and **alchemical/esoteric** for infrastructure, process, and materials. Mixed freely.
 
-**Verbs:** "inscribe an opus" (create), "charge the azer" (assign), "discharge the geas" (fulfill), "transmutatio" (all transformation of potential — the genus), "sublimatio" (transmutatio toward the crucible — materia entering context, an opus being read, any movement toward fluidity), "fixatio" (transmutatio toward Assiyah — charge becoming artifact, charge becoming tincture, any movement toward materiality), "kindle a Magnum Opus" (establish a new top-level goal), "reforge" (kill a session and spawn fresh in the same crucible — the crucible endures, the session is reforged), "muster" (dispatch azers for discovered opera), "assay" (assess readiness before executing).
+**Verbs:** "inscribe an opus" (create), "charge the azer" (assign), "discharge the geas" (fulfill), "transmutatio" (all transformation of potential — the genus), "sublimatio" (transmutatio toward the crucible — materia entering context, an opus being read, any movement toward fluidity), "fixatio" (transmutatio toward Assiyah — charge becoming artifact, charge becoming tincture, any movement toward materiality), "kindle a Magnum Opus" (establish a new top-level goal), "reforge" (kill a marut session and spawn fresh in the same crucible — the crucible endures, the session is reforged. Applies to maruts only; azers are not reforged, they discharge and the trail drives what comes next), "muster" (dispatch azers for discovered opera), "assay" (assess readiness before executing).
 
 **Weirdness boundary.** The vocabulary is for athanor infrastructure — skills, hooks, session injection, internal docs. External output (Linear tickets, PR descriptions, Slack messages, commit messages) uses normie language. A beholder inscribes an opus internally; the Linear ticket says "Fix NoMethodError in ProofRecommendationService."
 
@@ -240,10 +240,10 @@ The system is designed for pure maximization — the marut relentlessly advances
 
 **Mechanics:**
 - Lives in the MO file as a `## Tempering` section, empty by default
-- Always timestamped — tempering is inherently transient
-- The marut updates it during conversation with the artifex (the artifex drops into the marut session to discuss climate)
+- Tempering is weather, not climate — transient by nature, increasingly obsolete as days pass
+- The marut updates it during conversation with the artifex (the artifex drops into the marut session to discuss weather)
 - Only the marut needs to read and act on it; azers are not affected
-- If the current tempering is over 48 hours old, the marut pings the artifex to confirm the climate hasn't changed — stale tempering is worse than no tempering
+- If tempering feels stale, the marut pings the artifex to confirm — stale tempering is worse than no tempering
 - When tempering is empty, the marut operates at full maximization as designed
 
 ### The Workshop Model
@@ -326,9 +326,9 @@ Artifex (human) = Primus, the Forge Lord
 
 **Context Budget Guard** — Shell script + hook. Advisory warnings at 75/85/92% context usage. Fail-open. Prevents silent context degradation across all sessions.
 
-**Hooks as Hard Constraints** — PreToolUse hooks that block dangerous operations based on role. Examples: `no-push-to-master.sh`, `no-merge-pr.sh`, `bounded-scope.sh` (no edits outside working directory). Hooks are small, single-purpose scripts. Roles compose them. Designed, partially built — the system is the composability (role → hook selection → installation).
+**Hooks as Hard Constraints** — PreToolUse hooks that block dangerous operations based on role. Examples: `no-push-to-master.sh`, `no-merge-pr.sh`, `bounded-scope.sh` (no edits outside working directory). Hooks are small, single-purpose scripts. Roles compose them. **Important context:** most behavioral enforcement lives at the *project* level (CLAUDE.md, CI hooks, project settings), not the athanor level. The athanor operates *within* environments that already enforce their own constraints. Athanor-level hooks would only cover athanor-specific boundaries (e.g., "maruts don't write code," "azers don't modify shared components"). No clear application has arisen yet — signal will emerge from operation.
 
-**Escalation Bus** — Routing alerts from any agent to the operator through a consistent channel. Currently: Telegram via `mcp__telegram-mcp__notify`. Needs standardized format: `[{source}:{role}:{crucible}] {severity} — {description} — {suggested action}`.
+**Escalation Bus** — Routing alerts from any agent to the operator through a consistent channel. Currently: Telegram via `mcp__telegram-mcp__notify`
 
 ### Key Decisions
 
@@ -374,6 +374,8 @@ The trail is walked one grounded step at a time. Each step is taken with evidenc
 **Success is the best next step from where you are.** Past and future are irrelevant to what "success" means right now. A Magnum Opus that has been one long chain of fuckups — if right now the agent takes the best available action to improve the situation, that is 100% success. Escalating to the artifex after hours of thrashing is 100% success. This eliminates sunk cost: an agent never needs to "recover" from a bad trail. It just takes the best next step.
 
 **The only failure is failure to discharge properly.** An agent that escalates has discharged. An agent that inscribes a corrected opus has discharged. An agent that declares the MO satisfied has discharged. All of these are valid outcomes — the trail captures what happened and the system advances. The actual failure mode is an agent that spins without discharging: no context captured, no next step inscribed, session dies with the knowledge in it. The marut monitors for this — sessions that are churning without precipitating anything back to the trail.
+
+**The lightning path.** The trail is only legible in hindsight. Looking forward, there is no trail — only the path of least resistance toward the ground (MO goals, witness abundant satisfaction). A lightning bolt originating from the same point would take a completely different path but still reach the ground. This means there is no imperative to resume interrupted work. An opus that was "almost done" has no special claim on the system's next step. The marut reads the trail and the MO goals, assesses the current state, and inscribes whatever opus the evidence points to — which may resemble the interrupted work, or may be something entirely different. Both are equally valid. If the system is not reaching ground, that's a systemic issue regardless of which path it took. Treating any specific interrupted path as privileged is a sunk cost fallacy.
 
 ---
 
@@ -485,7 +487,7 @@ Built, fired, and working.
 | Context budget guard | Hook | Advisory warnings at 75/85/92%. Fail-open. |
 | Athanor CLI (`ath`) | `~/.local/bin/ath` | Binary at ~/.local/bin/ath. Commands: init, kindle, muster, reforge, cleanup, quiesce, status, opera, whisper send/idle/wait-and-send. Absorbs standalone whisper. |
 | Whisper CLI | `ath whisper` subcommand | Reliable inter-crucible communication. Now part of `ath` CLI. Built and tested. |
-| Environment isolation | `wtp add` | Worktrees per azer. Independent branches and Docker environments. |
+| Environment isolation | Project-level tooling (`wtp`, worktrees, Docker) | Not athanor infrastructure — projects provide their own isolation. Some azers use worktrees (e.g., PR workflows), others push directly. |
 | Autonomy profiles | Session injection | Semi-autonomous default. Profiles via `$CLAUDE_SESSION_ID`-keyed injection directory. |
 | Dashboard | `ath dashboard` | At-a-glance system observability: MO goals, in-flight/waiting/recent opera, crucible states. `--watch` for auto-refresh, `--json` for machine-readable output. |
 | Craft (collaborative azer) | `ath craft` | Workshop entry point: auto-inscribes a lightweight opus, kindles an interactive crucible. No `--permission-mode auto` — normal Claude Code session. The artifex sits down at the bench. |
@@ -496,13 +498,13 @@ Built, fired, and working.
 | Concept | Priority | Notes |
 |---------|----------|-------|
 | `ath whisper` nudge queue | Low | Async delivery with TTL/priority. Not a current bottleneck. |
-| Roles (TOML + claude-run) | High | TOML role definitions + claude-run evolution. Dependency of hard constraints. |
-| Hooks as hard constraints | High | Composable per-role. Trivial individually; needs role system to compose. |
-| Role-aware crucible creation | Medium | Depends on roles. `ath kindle` provides basic crucible creation; role-awareness needs role system. |
+| Roles (TOML + claude-run) | Low | TOML role definitions + claude-run evolution. Good idea without a clear application — most behavioral enforcement lives at the project level (CLAUDE.md, CI, hooks), not the athanor. Signal will arise when needed. |
+| Hooks as hard constraints | Low | Composable per-role. Athanor-scoped constraints (not project constraints) — no signal yet that these are needed. |
+| Role-aware crucible creation | Low | Depends on roles. `ath kindle` provides basic crucible creation; role-awareness needs role system. |
 | Beholder role | Medium | Needed for auto-dispatch patterns. |
 | Primus as agent | Low | Currently manual. `ath` provides tooling (status, opera, muster) but Primus loop is still the artifex. |
 | Escalation bus format | Low | Telegram works; message format not standardized. |
-| Handoff protocol | Medium | `/direct-handoff` is crude. Reliable whisper now exists (`ath whisper wait-and-send`); full protocol still needed. |
+| Forced discharge on context exhaustion | Medium | Protocol exists (azer self-discharges on budget guard warning, marut cleans up and reads trail on `exhausted`/`dead`). Gap: discharge is advisory — azer can ignore the warning and die with unreleased context. Discharge is non-deterministic so forcing it is non-trivial. |
 
 ### Infrastructure Gaps (Discovered in Operation)
 
@@ -512,7 +514,6 @@ Live list in `kadmon.md § Infrastructure Gaps`.
 |-----|--------|
 | No production DB access | Azers can't diagnose production-data errors. Frequent escalation. Read-only SQL user needed. |
 | No auto-merge gate | Azers create PRs but can't merge. Artifex bottleneck for high-volume work. |
-| Worktree cleanup not automated | Each azer creates a worktree. Manual cleanup accumulates. `wtp remove` should be in post-discharge flow. |
 
 ### Deferred / Conceptual
 

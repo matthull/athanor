@@ -36,18 +36,17 @@ If `ath muster` or `ath check` behave unexpectedly, escalate. Do not improvise w
 
 ---
 
-## Reforging (session restart)
+## Reforging (marut session restart)
 
-When an azer session dies (context exhaustion, crash, unrecoverable drift), reforge it — kill the session and spawn fresh in the same crucible. The crucible endures; the session is reforged.
-
-For marut reforging, use `ath reforge <athanor> [<mo-name>]`. For azer reforging, kill the crucible and re-muster:
+When the marut's own session dies (context exhaustion, crash), reforge it:
 
 ```bash
-ath cleanup azer-<opus-name>
-ath muster <opus-file> --dir <worktree-path> --athanor <name>
+ath reforge <athanor> [<mo-name>]
 ```
 
-The new session inherits all durable state (sandbox commits, staged changes, opus file notes) but starts with a clean context window.
+This kills the marut session and spawns fresh in the same crucible. The marut is a long-lived loop — reforging restarts the loop with a clean context window while preserving the crucible.
+
+**Azers are not reforged.** When an azer dies or exhausts context, the marut cleans up the crucible. If the opus is still `charged` (azer died without discharging), the marut's normal loop handles it: charged opus exists → muster an azer. If the azer discharged, the marut reads the trail and inscribes the next opus as usual. There is no special recovery path — a dead azer is just another state the marut's operational loop handles.
 
 ---
 
@@ -63,7 +62,7 @@ Returns one of:
 - `active` — tool call in progress, working normally
 - `idle` — waiting for input (may be thinking or may be stalled)
 - `permission` — blocked on a permission prompt, needs approval
-- `exhausted` — context limit reached, needs reforging
+- `exhausted` — context limit reached, session is done
 - `dead` — crucible not found, session died
 
 **When `idle` persists across multiple passes** (> 10 minutes) → likely stalled. Nudge:
@@ -73,9 +72,7 @@ ath whisper send azer-<opus-name> "Status check — are you making progress on y
 
 **When `permission`** → approve the prompt or escalate to the artifex.
 
-**When `exhausted`** → reforge (see above).
-
-**When `dead`** → the session died. Check if the opus was discharged. If not, reforge or escalate.
+**When `exhausted` or `dead`** → clean up the crucible (`ath cleanup`). The opus is either discharged (trail has it) or still charged (azer died mid-work). Either way, the normal operational loop handles it — charged opera get mustered, discharged opera get assessed.
 
 **If nudge doesn't unstick** → escalate to the artifex with what you observed.
 
