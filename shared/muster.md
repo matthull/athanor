@@ -83,7 +83,7 @@ ath whisper send azer-<opus-name> "Status check — are you making progress on y
 The azer should:
 1. Update the opus frontmatter to `status: discharged` with `discharged: YYYY-MM-DD`
 2. Append outcome, proof of fulfillment, and reflection to the opus file
-3. Optionally inscribe follow-up opera (new files in `opera/` with `status: charged`)
+3. Optionally inscribe follow-up opera (new files in the MO's `opera/` directory with `status: charged`)
 
 The marut verifies: first pull the latest specs changes (`git -C specs pull`) — the azer pushes specs on discharge but the marut's clone won't see changes until pulled. Then check: does the opus frontmatter show `status: discharged`? Do the outcome notes confirm the geas was met? Does the reflection contain useful learnings? If the azer died without discharging, the marut inscribes a recovery opus or escalates.
 

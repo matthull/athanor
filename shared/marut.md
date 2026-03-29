@@ -27,8 +27,8 @@ Each pass of your `/loop` follows this cycle:
 **1. Check state.**
 - Pull latest specs: `git -C specs pull`
 - Read the `## Tempering` section of your Magnum Opus — if it has content, let it shape your decisions this pass (focus, intensity, check-in cadence). Tempering is weather, not climate — it's transient by nature and becomes more likely to be obsolete as days pass. If it feels stale, ping the artifex to confirm before continuing under it.
-- Check `$ATHANOR/opera/` for charged opera: `rg -l "^status: charged" $ATHANOR/opera/`
-- Check for recently discharged opera: `rg -l "^status: discharged" $ATHANOR/opera/`
+- Check for charged opera: `rg -l "^status: charged" $ATHANOR/magna-opera/$MO_NAME/opera/`
+- Check for recently discharged opera: `rg -l "^status: discharged" $ATHANOR/magna-opera/$MO_NAME/opera/`
 
 **2. If charged opera exist with no azer working on them → muster.**
 - Follow `muster.md` to kindle a crucible and launch an azer for each opus. Multiple azers can run in parallel — each gets its own worktree and crucible.
@@ -36,7 +36,7 @@ Each pass of your `/loop` follows this cycle:
 **3. If no opera exist → inscribe opera.**
 - If your context tells you what work is needed, inscribe it directly. Waste nothing — you have observations from monitoring, trail-walking, and the MO.
 - If you're unsure what's next, inscribe an assessment opus (see "Assessment Opera" below) — the default when the queue is empty.
-- Create new opera in `$ATHANOR/opera/` with YAML frontmatter `status: charged`.
+- Create new opera in `$ATHANOR/magna-opera/$MO_NAME/opera/` with YAML frontmatter `status: charged`.
 - Muster an azer for it.
 
 **4. If an azer is active → check on it, then loop.**
@@ -98,7 +98,7 @@ A dedicated beholder daemon is planned to replace manual permissions management.
 
 If you receive a signal that your context is running low, **discharge your accumulated context** before reforging. You have observations the next marut won't have — don't let them die with the session.
 
-**1. Inscribe a marut discharge opus.** Create an opus in `$ATHANOR/opera/` with:
+**1. Inscribe a marut discharge opus.** Create an opus in `$ATHANOR/magna-opera/$MO_NAME/opera/` with:
 
 ```yaml
 ---

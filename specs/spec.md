@@ -152,7 +152,7 @@ The athanor uses distinctive names because precise names create precise meanings
 | **Beholder** | Monster manual | Watcher. Scans channels and conditions, inscribes opera when it finds work. |
 | **Primus, the Forge Lord** | Monster manual | Athanor-level supervisor. Ensures each MO has its marut, keeps the furnace lit. Currently: the artifex fills this role. |
 | **Homunculus** | Alchemical | The artifex's familiar. An interactive Claude Code session that assists the artifex — not autonomous. |
-| **Magnum Opus** | Alchemical | Top-level goal container. Task-based (has completion criteria) or state-based (maintained continuously). One or more per athanor instance, in `magna-opera/`. |
+| **Magnum Opus** | Alchemical | Top-level goal container. Task-based (has completion criteria) or state-based (maintained continuously). Each MO is a directory under `magna-opera/` containing its document and an `opera/` subdirectory. |
 | **Opus** | Alchemical | A single unit of work. Goal + geas + context. Charged to an agent, discharged when geas is met. |
 | **Geas** | D&D / Celtic | Binding behavioral compulsion. Frames completion as obligation; makes escalation an equally valid fulfillment. |
 | **Materia** | Alchemical | Anything in the world an agent can access via tool use — files, Slack threads, Linear tickets, meeting transcripts, specs, web pages. Materia exists outside the agent and has potential charge (relevance/value). Tool use is the alchemizing process that extracts charge from materia into the crucible. |
@@ -284,11 +284,11 @@ assessed: 2026-03-23     # added at assessment
 ---
 ```
 
-All opera live in a single `opera/` directory — flat, datestamp prefix, status in frontmatter. No files move.
+Opera live in their MO's directory: `magna-opera/<mo-name>/opera/`. Datestamp prefix, status in frontmatter. No files move.
 
 **Assessed** — a discharged opus is assessed when its captured context has been extracted and released somewhere useful. Assessment is best-effort. The assessor (an azer doing a trail-walking pass) uses:
 ```bash
-rg -l "^status: discharged" opera/
+rg -l "^status: discharged" magna-opera/<mo-name>/opera/
 ```
 
 Opera already marked `assessed` are skipped.
@@ -386,18 +386,21 @@ The trail is walked one grounded step at a time. Each step is taken with evidenc
 ```
 ~/athanor/athanors/<name>/
 ├── AGENTS.md          ← core vocabulary, geas, constraints (all agents read)
-├── magna-opera/       ← one or more magnum opus files
-│   ├── bugsnag.md
-│   └── slack-monitoring.md
+├── magna-opera/       ← one directory per magnum opus
+│   ├── bugsnag/
+│   │   ├── bugsnag.md          ← MO document
+│   │   └── opera/              ← opera for this MO
+│   │       └── YYYY-MM-DD-<descriptive-name>.md
+│   └── slack-monitoring/
+│       ├── slack-monitoring.md
+│       └── opera/
 ├── marut.md           ← supervisor role
 ├── azer.md            ← worker role
 ├── opus.md            ← lifecycle, inscription/discharge protocol
-├── muster.md          ← crucible kindling, reforging, monitoring
-└── opera/
-    └── YYYY-MM-DD-<descriptive-name>.md   ← all opera, YAML frontmatter for status
+└── muster.md          ← crucible kindling, monitoring
 ```
 
-Shared files (`AGENTS.md`, role files, `opus.md`, `muster.md`) are symlinked from `~/athanor/shared/`. The `magna-opera/` directory contains one or more Magnum Opus files, each authored per-instance. Each MO gets its own marut. Legacy instances with a single `magnum-opus.md` are still supported.
+Shared files (`AGENTS.md`, role files, `opus.md`, `muster.md`) are symlinked from `~/athanor/shared/`. Each MO is a directory under `magna-opera/` containing its document and an `opera/` subdirectory — correlation between opera and MOs is structural. Each MO gets its own marut. Legacy instances with a single `magnum-opus.md` are still supported.
 
 ### What Agents See vs. What the Artifex Sees
 
@@ -470,10 +473,10 @@ Built, fired, and working.
 
 | Concept | Where It Lives | Notes |
 |---------|---------------|-------|
-| Athanor instance pattern | `~/athanor/athanors/<name>/` | AGENTS.md, magna-opera/, role files, opera dir. Multiple MOs per instance supported. Active instances: bugsnag, sal-117-l2-metrics, seismic-classifier-mapping, blogging. |
+| Athanor instance pattern | `~/athanor/athanors/<name>/` | AGENTS.md, magna-opera/ (each MO is a directory with its own opera/), role files. Multiple MOs per instance supported. Active instances: bugsnag, sal-117-l2-metrics, seismic-classifier-mapping, blogging. |
 | Shared components | `~/athanor/shared/` | Universal AGENTS.md, azer.md, marut.md, muster.md, opus.md. Symlinked into each instance — change once, applies everywhere. These define the athanor itself — they are not materia. |
-| Magnum Opus format | `magna-opera/<name>.md` per instance | One or more MO files per instance. Goal + abundant satisfaction + witnesses + getting-started pointer. Intent only — no procedures, no discovery findings. Legacy `magnum-opus.md` backward compat. |
-| Opus lifecycle | `opera/` with YAML frontmatter | Inscription / charge / discharge / assess. Datestamp filename prefix: `YYYY-MM-DD-<name>.md`. Single directory, status in frontmatter. |
+| Magnum Opus format | `magna-opera/<name>/<name>.md` per instance | Each MO is a directory containing its document and an `opera/` subdir. Goal + abundant satisfaction + witnesses + getting-started pointer. Intent only — no procedures, no discovery findings. Legacy `magnum-opus.md` backward compat. |
+| Opus lifecycle | `magna-opera/<mo>/opera/` with YAML frontmatter | Inscription / charge / discharge / assess. Datestamp filename prefix: `YYYY-MM-DD-<name>.md`. Opera nested under their MO — correlation is structural. |
 | Core geas + escalation-as-geas | `AGENTS.md` (shared) | "Both are equally valid fulfillments of your geas." Tested in first bugsnag firing. |
 | Azer role | `azer.md` (shared) | Verification-first (three questions before mise), mise en place, context management, proof of fulfillment at discharge. |
 | Marut role | `marut.md` (shared) | Operational loop, assessment opera, monitoring/stall detection, reforging. |

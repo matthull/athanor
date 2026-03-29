@@ -24,7 +24,7 @@ There are no other states. No backlog, no draft, no "planned for later." Plannin
 
 ## Frontmatter
 
-All opera use YAML frontmatter to track status. Opera live in a single `opera/` directory — no subdirectories. Status is in the file, not the filesystem.
+All opera use YAML frontmatter to track status. Opera live in their Magnum Opus's `opera/` directory at `magna-opera/<mo-name>/opera/`. Status is in the file, not the filesystem.
 
 ```yaml
 ---
@@ -81,7 +81,7 @@ The geas (binding obligation to pursue with integrity, observe verification disc
 | Bad | Produce an inventory by: 1) audit Highspot UI, 2) catalog interaction patterns for setup/validation/errors, 3) rate complexity, 4) create Linear ticket | *(intent mixed with procedure — the numbered steps belong in Context as suggestions, not in Goal)* |
 | Good | The team understands the UX complexity landscape for mapping admin — patterns needed, design risks, decisions required before implementation | *(same work, stated as witness experience delta)* |
 
-**Where opera live:** All opera in `opera/` — flat directory, datestamp prefix, YAML frontmatter for status.
+**Where opera live:** Opera live in their Magnum Opus's directory: `magna-opera/<mo-name>/opera/` — flat within that directory, datestamp prefix, YAML frontmatter for status.
 
 Name files with a datestamp prefix: `YYYY-MM-DD-<descriptive-name>.md` (e.g., `2026-03-23-fix-nomethoderror-proof-recommendation.md`). The datestamp is the date of inscription and never changes.
 
@@ -146,7 +146,7 @@ Assessment is the act of extracting a discharged opus's context and releasing it
 **Command to list discharged-but-not-assessed opera** (run from within the athanor directory):
 
 ```bash
-rg -l "^status: discharged" opera/
+rg -l "^status: discharged" magna-opera/*/opera/
 ```
 
 **After assessing an opus:** Update its frontmatter to `status: assessed` with `assessed: YYYY-MM-DD`. Do not re-assess opera already marked `assessed`.
@@ -179,4 +179,4 @@ The top section of your current opus was written by whoever inscribed it. **You 
 If the inscription seems wrong, off-track, or based on bad assumptions, you have two options depending on your confidence:
 
 - **Low confidence / need judgment:** Escalate. "The inscription assumes X but I found Y" is a clear, useful escalation.
-- **High confidence / have evidence:** Inscribe a corrected opus in `opera/`, discharge the current one with a reflection explaining what was wrong and why the new opus is better. The trail preserves both — the original intent and the correction. This is not "rewriting history" — it's the system learning.
+- **High confidence / have evidence:** Inscribe a corrected opus in the MO's `opera/` directory (with `status: charged`), discharge the current one with a reflection explaining what was wrong and why the new opus is better. The trail preserves both — the original intent and the correction. This is not "rewriting history" — it's the system learning.

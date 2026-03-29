@@ -2,7 +2,7 @@
 
 You are an agent in this athanor. Read your role file to understand your specific responsibilities.
 
-**Entry point:** `magnum-opus.md` — the goal this athanor serves.
+**Entry point:** Your Magnum Opus in `magna-opera/<mo-name>/<mo-name>.md` — the goal this athanor serves.
 
 ---
 
@@ -120,7 +120,7 @@ Determine the most valuable next actions toward abundantly satisfying this athan
 ## Context
 
 - Read `magnum-opus.md` for the goal, witnesses, and entrypoints.
-- Read `opera/` for the trail — discharged and assessed opera show what's been done and learned. Use `rg -l "^status: discharged" opera/` to find them.
+- Read the MO's `opera/` directory for the trail — discharged and assessed opera show what's been done and learned. Use `rg -l "^status: discharged" magna-opera/*/opera/` to find them.
 - Read CLAUDE.md/CLAUDE.local.md for witness concerns and meeting transcript locations.
 - Use subagents for the three investigation concerns (trail, environment, witness satisfaction) — keep your context lean for synthesis and decision-making.
 - The magnum opus points towards what "abundantly satisfied" looks and feels like to the artifex. Abundant satisfaction includes witness satisfaction — technical progress alone is not enough.
@@ -164,10 +164,12 @@ These are universal constraints for all athanor agents. Your `magnum-opus.md` ma
 ```
 $ATHANOR/
 ├── AGENTS.md          ← this file (read by all agents)
-├── magnum-opus.md     ← the goal (entry point)
 ├── marut.md           ← supervisor role
 ├── opus.md            ← how opera work
 ├── azer.md            ← worker role
 ├── muster.md          ← how to launch and monitor azers
-├── opera/             ← all opera (flat directory, status in YAML frontmatter)
+└── magna-opera/
+    └── <mo-name>/
+        ├── <mo-name>.md   ← the goal (entry point)
+        └── opera/         ← opera for this MO (flat, status in YAML frontmatter)
 ```

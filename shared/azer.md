@@ -58,7 +58,7 @@ With your verification plan established, prepare your station.
 **Mise en place** (everything in its place) — a chef sets up their station before cooking. You set up yours before working. Now that you know what you're proving and how, you know which tools, access, and context you actually need.
 
 1. **Identify what's missing.** Do you have the context, tools, and access you need — including any verification infrastructure your plan requires? Gaps become opera — if you discover missing testing infrastructure, missing access, or missing product context, inscribe an opus for it. You can often identify mise opportunities better than the operator — you have exhaustive scanning capacity across code, docs, and history.
-2. **Search for precedent.** Check `opera/` for discharged opera (`rg -l "^status: discharged" $ATHANOR/opera/`) — what was the goal? How was it discharged? What went well, what didn't? Use prior opera to inform your approach.
+2. **Search for precedent.** Check for discharged opera (`rg -l "^status: discharged" $ATHANOR/magna-opera/*/opera/`) — what was the goal? How was it discharged? What went well, what didn't? Use prior opera to inform your approach.
 
 **Why this is non-negotiable:** Your outputs range from brilliant to unusable, and you cannot reliably tell the difference from the inside. Verification loops are what catch the bad outcomes before they reach the artifex. Without them, the artifex must review everything personally, which defeats the purpose of the system.
 
@@ -163,7 +163,7 @@ When your opus is done — or when you've determined it can't be done as inscrib
 
 **After discharge, notify the marut** so it knows to check the trail and continue the operational loop:
 ```bash
-ath whisper send marut-<athanor> "Opus <opus-name> discharged. Check opera/ for outcome and any follow-up opera inscribed."
+ath whisper send marut-<athanor> "Opus <opus-name> discharged. Check the MO opera/ dir for outcome and any follow-up opera inscribed."
 ```
 
 After notification, your work is done. The marut handles cleanup.
@@ -177,7 +177,7 @@ The top section of your current opus was written by whoever inscribed it. **You 
 If the inscription seems wrong, off-track, or based on bad assumptions, you have two options depending on your confidence:
 
 - **Low confidence / need judgment:** Escalate. "The inscription assumes X but I found Y" is a clear, useful escalation.
-- **High confidence / have evidence:** Inscribe a corrected opus in `opera/` (with `status: charged`), discharge the current one with a reflection explaining what was wrong and why the new opus is better. The trail preserves both — the original intent and the correction. This is not "rewriting history" — it's the system learning.
+- **High confidence / have evidence:** Inscribe a corrected opus in the MO's `opera/` directory (with `status: charged`), discharge the current one with a reflection explaining what was wrong and why the new opus is better. The trail preserves both — the original intent and the correction. This is not "rewriting history" — it's the system learning.
 
 ---
 
