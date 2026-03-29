@@ -41,7 +41,7 @@ Every professional domain has decades of hard-won wisdom about how to build thin
 
 **Adaptability through essentialism.** The athanor's power comes from what it *doesn't* carry. Every piece of rigidity — a prescribed workflow, a spec template, a fixed communication protocol — is a piece of incompatibility with some future environment. The athanor carries only what is true regardless of project, team, or methodology: intent, geas, the trail, supervision, abundant satisfaction. Everything specific to a project — its conventions, tools, workflows, communication norms, definition of "done" — lives in the environment. The athanor reads and adapts to the environment; it does not impose its own. This is why the Briatic boundary matters practically, not just philosophically: principles are portable across environments; procedures are bound to a specific one.
 
-**Embeddedness, not invention.** Goal-orientation doesn't mean agents invent process from scratch. The means — project conventions, CI pipelines, deployment procedures, available skills — already exist in the world the athanor operates in. The athanor reads them, uses them, and operates within them naturally. When something needed to operate fluidly doesn't exist, that gap surfaces cleanly as an escalation or a mise opus — not silent degradation. An agent doesn't need to know every step of the deployment process. It needs to understand why deployment discipline matters, where to find the process that's already defined, and how to surface it when it's missing. Embeddedness is adaptability in practice — the athanor adopts the process of whatever project it's in rather than competing with it.
+**Embeddedness, not invention.** Goal-orientation doesn't mean agents invent process from scratch. The means — project conventions, CI pipelines, deployment procedures, available skills — already exist in the world the athanor operates in. The athanor reads them, uses them, and operates within them naturally while improvising further as needed. When something needed to operate fluidly doesn't exist, that gap surfaces cleanly as an escalation or a mise en place opus — not silent degradation. An agent doesn't need to know every step of the deployment process. It needs to understand why deployment discipline matters, where to find the process that's already defined, and how to surface it when it's missing. Embeddedness is adaptability in practice — the athanor adopts the process of whatever project it's in rather than competing with it.
 
 **The vocabulary is the transmuted substance, not a naming convention.** The domain terms don't exist primarily for precision — precision is the side benefit. They exist because the naming IS the transmutation. "Geas" activates reasoning about binding obligation and integrity. "Acceptance criteria" activates PM-as-practiced, including every way PM theater goes wrong. Renaming strips the institutional scar tissue and lets agents reason from the underlying principle directly.
 
@@ -92,6 +92,28 @@ This is primarily an executive function mechanism. Technical completion leaves a
 
 This is a Goldilocks mechanism — elicit too early and you waste witness attention on course corrections you could have caught yourself; elicit too late (or never) and you ship something that misses the mark. The discipline: **exhaust autonomous verification first, then elicit for the judgment only a human can make.** Run the tests, check the spec, verify the behavior, review the output yourself. When you've done everything you can to build confidence that the intent is met, *then* present to the witness — not for basic quality checks, but for the subjective judgment that no automated check can substitute. The witness's attention is scarce; make every elicitation high-signal.
 
+### Calcinatio — Refinement Through Verifying Force
+
+In alchemy, calcination burns away what doesn't survive the fire. In the athanor, calcinatio is any process that refines work by subjecting it to resistance — and what survives is closer to abundant satisfaction than what went in.
+
+A unit test is calcinatio. A browser QA session is calcinatio. An independent agent reviewing architecture from fresh context is calcinatio. A UX designer's critique of a screen against field ergonomics constraints is calcinatio. The common property is not the technique — it's that **the work encounters a force that rejects what doesn't hold up.**
+
+**Calcinatio is inherent in abundant satisfaction.** Work that hasn't been refined through available fires hasn't been refined enough to warrant witness attention. The more thoroughly work is calcined, the more the witness's scarce attention goes to judgments only they can make — not to catching flaws the system could have caught. This is the conservation-of-attention principle made operational.
+
+**Generative by default, conformant to environment.** The environment may prescribe specific calcinatio — CI pipelines, test suites, linting, type checking, required QA processes. These are a floor: pick them up and execute them. Beyond that floor, the athanor generates additional fires from the principle: what the agent can create (TDD for unit-testable code, architectural review by independent agent, critique against domain constraints) and what tools exist or can be requested (browser MCP for visual QA, device emulators). If calcinatio requires a tool the agent doesn't have, that's an assay gap — escalate for the tool, don't skip the fire.
+
+**The principle generates the practice.** When code is unit-testable, calcinatio generates TDD — the test is written first because the test *is* the fire that defines what the code must survive. When an architectural decision has downstream consequences, calcinatio generates a design document reviewed by a fresh-context agent. When a UI must serve users in hostile environments, calcinatio generates device QA against field constraints. An agent that has internalized calcinatio derives the appropriate fires from the work at hand.
+
+**Fresh context for judgment.** Any calcinatio that involves judgment — code review, design critique, architectural review — requires an independent agent with fresh context. The agent that built the thing cannot review it. The builder's context is contaminated with their own reasoning. Fresh eyes see what familiar eyes rationalize away.
+
+**Witness assay.** Calcinatio connects to witnesses through professional proxy. When the Magnum Opus defines a witness, the question is: *which professional discipline exists to serve this class of witness?* A UX designer can anticipate a horse owner's reaction better than an agent impersonating a horse owner, because the designer has frameworks for reasoning about user needs that the end user doesn't have themselves. The proxy applies professional judgment on behalf of the witness — not impersonation, but the discipline whose purpose is to serve that witness's interests.
+
+**Termination.** Calcinatio rounds continue until convergence (findings repeat — the fires have found the same grain), divergence (findings contradict — need the artifex's judgment), or exhaustion (all available fires applied, work has survived). The number of rounds is not prescribed. The termination condition is.
+
+**The calcinatio loop — calcinatio applied to tool-skill interactions.** When an agent needs focused expertise (opus inscription, code review, research, MO shaping), it faces a tension: its rich context biases it, but a subagent's fresh focus may miss things from lossy context handoff. The calcinatio loop resolves this through iterative refinement: shape context → fire specialist subagent → review output against rich context → refine with corrective guidance → converge. The context-holder's review IS calcinatio — a fire that burns away what doesn't survive contact with the reality they know. The specialist's expertise is a complementary fire — burning away procedural thinking, witness-blindness, or domain errors. Neither alone produces quality; the interplay does. This is calcinatio's principle applied to the agent/subagent boundary: two fires from different angles producing refined output. The protocol is documented in the `/opus` skill and applies to all tool-skill interactions, not just opus work.
+
+**Calcinatio opera.** Some verification is itself an opus — too large, too different in nature, or requiring too different a context to be a step within the current opus. An architectural review of a system. A UAT pass across features. An editorial review of a finished publication. When calcinatio derivation from witnesses identifies verification of this scale, it becomes work inscribed through the normal opus lifecycle. The inscription subagent naturally produces calcinatio opera when the witness analysis warrants them.
+
 ### Opera as Actualization
 
 Plans are documents. Opera are commitments to act.
@@ -103,6 +125,8 @@ This separation keeps the operational kernel minimal. An agent needs to understa
 **Geas: compulsion, not checklist.** The geas is not completion criteria — it is a behavioral habit that, when genuinely internalized, inevitably produces rigorous work. "You are under a geas to pursue this with integrity and abundantly satisfy the Magnum Opus" operates at the level of felt obligation, not task list. Critically: the geas makes escalation feel like compliance, not failure. "Your geas is to take the best next step — which may be escalation if you cannot build evidence for proceeding." This is the primary injection point for countering completion bias: both completing AND escalating satisfy the compulsion equally.
 
 A poorly designed geas turns on the creator. Folklore warns this for good reason: vague behavioral directives produce perverse outcomes. The discipline of writing a good geas — clear orientation, strong compulsion toward integrity and abundant satisfaction — is one of the artifex's highest-leverage activities.
+
+**Inscription as a quality-gated act.** Opus quality has the same leverage as geas quality — a procedural opus produces procedural work; a witness-oriented opus produces judgment-driven work. Inscription is therefore a specialized act performed via the calcinatio loop: the agent with context (azer at discharge, marut with observations, artifex with intent) shapes that context and fires an inscription subagent, which produces a well-formed opus with witness experience delta intent and calcinatio derivation. The calling agent reviews against its rich context and refines until convergence. The `/opus` skill encodes this protocol. The same pattern applies to MO shaping (with mandatory artifex involvement — MO creation is a big event) and witness auditing.
 
 ### Trail as Durable State
 
@@ -167,7 +191,9 @@ The athanor uses distinctive names because precise names create precise meanings
 
 **Naming philosophy.** Distinctive names create precise meanings. "Azer" has less ambiguity than "worker"; "geas" less than "acceptance criteria"; "opus" less than "task." The goal is good metaphors, not maximum weirdness — names range from mundane to deep cut, and what matters is that each name fits, is unambiguous, and carries the right connotation. "Session" and "sandbox" are fine as-is. "Azer" and "geas" earn their weirdness by being more precise than their normie equivalents. Two loose registers: **monster manual** for agents (creatures with purpose, will, and behavior) and **alchemical/esoteric** for infrastructure, process, and materials. Mixed freely.
 
-**Verbs:** "inscribe an opus" (create), "charge the azer" (assign), "discharge the geas" (fulfill), "transmutatio" (all transformation of potential — the genus), "sublimatio" (transmutatio toward the crucible — materia entering context, an opus being read, any movement toward fluidity), "fixatio" (transmutatio toward Assiyah — charge becoming artifact, charge becoming tincture, any movement toward materiality), "kindle a Magnum Opus" (establish a new top-level goal), "reforge" (kill a marut session and spawn fresh in the same crucible — the crucible endures, the session is reforged. Applies to maruts only; azers are not reforged, they discharge and the trail drives what comes next), "muster" (dispatch azers for discovered opera), "assay" (assess readiness before executing).
+**Verbs:** "inscribe an opus" (create — via the calcinatio loop with a specialist inscription subagent; the quality-gated act of shaping intent as witness experience delta), "charge the azer" (assign), "discharge the geas" (fulfill), "transmutatio" (all transformation of potential — the genus), "sublimatio" (transmutatio toward the crucible — materia entering context, an opus being read, any movement toward fluidity), "fixatio" (transmutatio toward Assiyah — charge becoming artifact, charge becoming tincture, any movement toward materiality), "calcinatio" (refinement through verifying force — subjecting work to fires that burn away what doesn't hold up. Tests, QA, independent review, professional critique are all calcinatio. Inherent in abundant satisfaction — unrefined work wastes witness attention. Generative by default: the agent derives fires from the work and witnesses. Conformant to environment: prescribed fires are a floor, not a ceiling.), "kindle a Magnum Opus" (establish a new top-level goal), "reforge" (kill a marut session and spawn fresh in the same crucible — the crucible endures, the session is reforged. Applies to maruts only; azers are not reforged, they discharge and the trail drives what comes next), "muster" (dispatch azers for discovered opera), "assay" (assess readiness before executing).
+
+**Protocols:** "calcinatio loop" (the operational protocol for azer-tool interactions: shape context → fire specialist subagent → review output against rich context → refine → elicit artifex if present or in doubt → converge. Neither side alone produces quality; the interplay does. Applies to inscription, MO shaping, witness auditing, and other tool-skills. See `/opus` skill.).
 
 **Weirdness boundary.** The vocabulary is for athanor infrastructure — skills, hooks, session injection, internal docs. External output (Linear tickets, PR descriptions, Slack messages, commit messages) uses normie language. A beholder inscribes an opus internally; the Linear ticket says "Fix NoMethodError in ProofRecommendationService."
 
@@ -347,19 +373,19 @@ What happens when a geas is discharged? Work begets work — until the chain nat
 
 **Assay before transmuting.** The core geas says: find what you need or escalate. Mise en place is the structured process for fulfilling that geas — confirming tools, context, access, people, permissions before acting. Never assume; confirm or escalate. Gaps become opera or escalations. The assay is recursive — broad at Magnum Opus level, concrete at individual opus level.
 
-**Inscribe what furthers unfulfilled goals.** After discharge, look at the broader context the opus served. Are completion criteria still unfulfilled? Inscribe opera to further them. If the goal is satisfied, the chain terminates naturally.
+**Inscribe what furthers unfulfilled goals.** After discharge, look at the broader context the opus served. Are completion criteria still unfulfilled? Inscribe opera to further them — using the inscription subagent via the calcinatio loop so the resulting opera are witness-oriented, not procedural. If the goal is satisfied, the chain terminates naturally.
 
-**Fidelity matches context.** The inscribed opus is as detailed as the agent's context allows:
+**Fidelity matches context.** The context you pass to the inscription subagent is as detailed as your knowledge allows:
 
-| Context | What to inscribe |
+| Context | What you pass |
 |---------|-----------------|
-| Rich — know exactly what to do | Detailed opus with specific goal, approach, files |
-| Partial — see the direction | Directional opus: "investigate X, likely needs Y" |
-| Minimal — know something's unfulfilled | Assessment opus: "figure out the next steps" |
+| Rich — know exactly what to do | Detailed findings, specific files, approach hypotheses |
+| Partial — see the direction | "I found X, the witness likely needs Y, investigate Z" |
+| Minimal — know something's unfulfilled | "There's an unfulfilled goal, here's what I can see" |
 
-The assessment opus is the universal fallback — there's no shame in it.
+The inscription subagent shapes these into well-formed opera. The assessment opus is the universal fallback when the queue is empty — it uses a standard template and doesn't need the inscription subagent.
 
-**Inscribe with gaps, not conclusions.** Present observations and gaps to the next agent, not polished conclusions. The next agent has fresh context and may see things you missed. Over-specifying the approach closes off better paths.
+**Inscribe with gaps, not conclusions.** Present observations and gaps to the inscription subagent, not polished conclusions. The next azer has fresh context and may see things you missed. Over-specifying the approach closes off better paths.
 
 **Chains terminate naturally.** Not every discharged geas produces a next opus. When the Magnum Opus goals are satisfied, the chain ends. No make-work.
 
@@ -495,6 +521,10 @@ Built, fired, and working.
 | Dashboard | `ath dashboard` | At-a-glance system observability: MO goals, in-flight/waiting/recent opera, crucible states. `--watch` for auto-refresh, `--json` for machine-readable output. |
 | Craft (collaborative azer) | `ath craft` | Workshop entry point: auto-inscribes a lightweight opus, kindles an interactive crucible. No `--permission-mode auto` — normal Claude Code session. The artifex sits down at the bench. |
 | Workshop model | Spec + existing tooling | The full spectrum (autonomous → collaborative → manual) is already supported: `ath kindle`/`ath muster` for autonomous, `ath craft` for collaborative, walk up to any marut and direct it for manual. No special modes needed — the marut already inscribes opera and musters azers on request. |
+| Calcinatio loop | `/opus` skill (SKILL.md) | General protocol for azer-tool interactions: context-holder ↔ specialist refinement loop. Applies to inscription, MO shaping, witness auditing, and other tool-skills. Includes artifex elicitation step. |
+| Opus inscription subagent | `/opus` skill (resources/inscription-protocol.md) | Specialist subagent for creating well-formed opera. Witness experience delta intent, calcinatio derivation from witnesses, anti-pattern detection. Called via calcinatio loop by any inscribing agent. |
+| Witness audit subagent | `/opus` skill (resources/witness-audit-protocol.md) | Specialist subagent for assessing witness definition quality. Tests: can agents derive calcinatio? Are witnesses reachable? Missing witnesses? |
+| MO shaping subagent | `/opus` skill (resources/mo-shaping-protocol.md) | Specialist subagent for crafting/refining Magna Opera. Intent altitude, witness specification, calcinatio framework. Mandatory artifex involvement (collaborative > consulted > informed). |
 
 ### Designed, Not Built
 

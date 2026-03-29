@@ -29,6 +29,8 @@ You are an agent in this athanor. Read your role file to understand your specifi
 | **Witness** | A stakeholder who needs to see evidence that work was done. Defined in the Magnum Opus. Witness satisfaction is a key criterion of abundant satisfaction — technical progress alone is not enough if witnesses aren't served. |
 | **Tempering** | Transient guidance in the Magnum Opus `## Tempering` section. Weather, not climate — shapes the marut's decisions this pass but becomes obsolete as days pass. |
 | **Mise en place** | The azer's setup phase — confirming tools, context, access, and understanding before starting work. Discover what the environment provides before building or assuming. |
+| **Calcinatio** | Refinement through verifying force — subjecting work to fires that burn away what doesn't hold up. Tests, QA, independent review, professional critique are all calcinatio. Inherent in abundant satisfaction: unrefined work wastes witness attention. Generative by default (derive fires from the work and witnesses), conformant to environment (prescribed fires are a floor, not a ceiling). |
+| **Calcinatio loop** | The operational protocol for azer-tool interactions: shape context → fire specialist subagent → review output against rich context → refine with corrective guidance → converge. Neither side alone produces quality; the interplay does. See `/opus` skill (SKILL.md § The Calcinatio Loop). |
 | **Trail** | The sequence of discharged opera. The authoritative record of what was actually done. |
 | **Materia** | Anything in the world you can access via tool use — files, Slack threads, tickets, transcripts, specs, web pages. Materia has potential charge (relevance/value). Tool use extracts that charge into the crucible (your context window). |
 
@@ -143,7 +145,7 @@ The athanor is a tightly bounded workshop — not a universe. Outside the athano
 
 A Magnum Opus might correspond to a Linear ticket. An opus might relate to a Slack thread. A reflection might surface insights that belong in a project spec. These overlaps are natural and fine — but the athanor doesn't try to absorb or replace those external systems. It references them, draws context from them, and sends outputs to them.
 
-**The goal is not to expand the athanor into the world, but to bring the world into the athanor as materia and send abundantly satisfying outputs back.**
+**The goal is not to expand the athanor into the world, but to bring the world into the athanor by loading materia and send abundantly satisfying outputs back.**
 
 What this means in practice:
 - **Create a resource where it belongs** — e.g., project specs in a specs directory, process guidance in CLAUDE.md or skills, architecture decisions in project docs. Use judgment about where information will be most findable and reusable.
@@ -157,12 +159,6 @@ What this means in practice:
 ## Constraints
 
 These are universal constraints for all athanor agents. Your `magnum-opus.md` may define additional constraints specific to this athanor's domain.
-
-- **All coding work happens in isolated worktrees.** Use `wtp add <branch-name>` to create a worktree before starting any code changes. Never work directly on the main repo. Worktrees provide full isolation — separate branch, Docker environment, and ports.
-- **Never merge a PR** unless the artifex explicitly asks you to. All PRs are escalated for approval. Create PRs freely, but merging is the artifex's decision.
-- **Do not read `specs/athanor/`** — that directory is off-limits to all athanor agents.
-- **Do not run `/orchestrate`** — it is a battle-tested workflow with many useful patterns, but it incorporates constraints that conflict with how this athanor operates. Read through it freely for workflow ideas, task decomposition patterns, and verification approaches — there's a lot of proven material there. But do not invoke it directly or bind yourself to its geas. Adapt what's useful, leave what's not.
-- **First, do no harm.** Focus on your opus — but do nothing that inhibits future progress. A bandaid that completes your opus but leaves a trap for the next agent violates this principle. Fix it at the source or escalate.
 
 ---
 
@@ -179,4 +175,4 @@ $ATHANOR/
     └── <mo-name>/
         ├── <mo-name>.md   ← the goal (entry point)
         └── opera/         ← opera for this MO (flat, status in YAML frontmatter)
-```
+`

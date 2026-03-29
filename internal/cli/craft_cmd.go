@@ -13,15 +13,16 @@ import (
 
 func runCraft(args []string) int {
 	var (
-		dir   string
-		model string
+		dir    string
+		model  string
+		intent string
 	)
 
 	positional, flagArgs := splitArgs(args)
 
 	if len(positional) < 2 {
 		fmt.Fprintln(os.Stderr, "error: athanor name and session name required")
-		fmt.Fprintln(os.Stderr, "usage: ath craft <athanor> <session-name> [--dir <path>] [--model <model>]")
+		fmt.Fprintln(os.Stderr, "usage: ath craft <athanor> <session-name> [<mo-name>] [--dir <path>] [--model <model>] [--intent <text>]")
 		return 2
 	}
 	athName := positional[0]
@@ -36,6 +37,7 @@ func runCraft(args []string) int {
 	fs := flag.NewFlagSet("craft", flag.ContinueOnError)
 	fs.StringVar(&dir, "dir", "", "working directory")
 	fs.StringVar(&model, "model", "", "model override")
+	fs.StringVar(&intent, "intent", "", "natural language intent for the session")
 	fs.SetOutput(os.Stderr)
 
 	if err := fs.Parse(flagArgs); err != nil {
@@ -63,48 +65,36 @@ func runCraft(args []string) int {
 		}
 	}
 
-	// Create the opus file
+	// Create the opus file — or defer if no MO exists yet (bootstrap mode)
 	datestamp := time.Now().Format("2006-01-02")
 	opusFilename := fmt.Sprintf("%s-%s.md", datestamp, sessionName)
+	bootstrap := moName == ""
 
 	var opusPath string
-	if moName != "" {
+	if !bootstrap {
 		operaDir := athanor.OperaPath(instDir, moName)
 		if err := os.MkdirAll(operaDir, 0755); err != nil {
 			fmt.Fprintf(os.Stderr, "error creating opera dir: %v\n", err)
 			return 1
 		}
 		opusPath = filepath.Join(operaDir, opusFilename)
-	} else {
-		fmt.Fprintln(os.Stderr, "error: mo-name required (no single MO to default to)")
-		fmt.Fprintln(os.Stderr, "usage: ath craft <athanor> <session-name> <mo-name> [--dir <path>] [--model <model>]")
-		return 2
-	}
 
-	// Build frontmatter
-	frontmatter := fmt.Sprintf("---\nstatus: charged\ninscribed: %s\ninteractive: true\n", datestamp)
-	frontmatter += fmt.Sprintf("magnum_opus: %s\n", moName)
-	frontmatter += "---\n"
+		// Build opus content
+		intentText := "(Shape collaboratively with the artifex)"
+		if intent != "" {
+			intentText = intent
+		}
 
-	opusContent := frontmatter + fmt.Sprintf(`# %s
+		frontmatter := fmt.Sprintf("---\nstatus: charged\ninscribed: %s\ninteractive: true\n", datestamp)
+		frontmatter += fmt.Sprintf("magnum_opus: %s\n", moName)
+		frontmatter += "---\n"
 
-## Intent
+		opusContent := frontmatter + fmt.Sprintf("# %s\n\n## Intent\n\n%s\n\n## Boundary\n\n- **Agent:** Interactive — work alongside the artifex\n- **Operator:** Present and directing\n\n## Context\n\n(Add context as the session progresses)\n", sessionName, intentText)
 
-(Shape collaboratively with the artifex)
-
-## Boundary
-
-- **Agent:** Interactive — work alongside the artifex
-- **Operator:** Present and directing
-
-## Context
-
-(Add context as the session progresses)
-`, sessionName)
-
-	if err := os.WriteFile(opusPath, []byte(opusContent), 0644); err != nil {
-		fmt.Fprintf(os.Stderr, "error creating opus: %v\n", err)
-		return 1
+		if err := os.WriteFile(opusPath, []byte(opusContent), 0644); err != nil {
+			fmt.Fprintf(os.Stderr, "error creating opus: %v\n", err)
+			return 1
+		}
 	}
 
 	// Resolve working directory
@@ -121,17 +111,29 @@ func runCraft(args []string) int {
 		model = cfg.EffectiveAzerModel()
 	}
 
-	// Build boot prompt — conversational, includes MO if available
+	// Build boot prompt
 	var bootPrompt string
-	moContext := ""
-	if moName != "" {
+	if bootstrap {
+		// No MO exists — bootstrap mode
+		intentClause := ""
+		if intent != "" {
+			intentClause = fmt.Sprintf(" The artifex's intent: %s.", intent)
+		}
+		bootPrompt = fmt.Sprintf(
+			"Read %s/AGENTS.md, then read %s/azer.md. You are an interactive azer working alongside the artifex in a bootstrap session — no Magnum Opus exists yet.%s The artifex will guide the session. When an MO is created during this session, create an opus file under its opera/ directory with the session name %q so discharge can be recorded. If no MO is created, the session's charge is accepted as lost — the artifex was present and nothing is lost that isn't in their head.",
+			instDir, instDir, intentClause, opusFilename,
+		)
+	} else {
 		moPath := athanor.MagnumOpusPath(instDir, moName)
-		moContext = fmt.Sprintf(", then read %s", moPath)
+		intentClause := ""
+		if intent != "" {
+			intentClause = fmt.Sprintf(" The artifex's intent: %s.", intent)
+		}
+		bootPrompt = fmt.Sprintf(
+			"Read %s/AGENTS.md, then read %s, then read %s/azer.md. You are an interactive azer working alongside the artifex. Your opus is at %s — read it, then shape the intent collaboratively.%s The artifex will guide the session. When done, the artifex will signal discharge.",
+			instDir, moPath, instDir, opusPath, intentClause,
+		)
 	}
-	bootPrompt = fmt.Sprintf(
-		"Read %s/AGENTS.md%s, then read %s/azer.md. You are an interactive azer working alongside the artifex. Your opus is at %s — read it, then shape the intent collaboratively. The artifex will guide the session. When done, the artifex will signal discharge.",
-		instDir, moContext, instDir, opusPath,
-	)
 
 	crucName := "azer-" + sessionName
 	claudeArgs := fmt.Sprintf(
@@ -156,7 +158,14 @@ func runCraft(args []string) int {
 	}
 
 	fmt.Printf("Craft session started in crucible %q\n", crucName)
-	fmt.Printf("  Opus: %s\n", opusPath)
+	if bootstrap {
+		fmt.Println("  Mode: bootstrap (no MO — opus deferred until MO is created)")
+	} else {
+		fmt.Printf("  Opus: %s\n", opusPath)
+	}
+	if intent != "" {
+		fmt.Printf("  Intent: %s\n", intent)
+	}
 	fmt.Printf("  Model: %s\n", model)
 	fmt.Printf("  Working dir: %s\n", dir)
 
