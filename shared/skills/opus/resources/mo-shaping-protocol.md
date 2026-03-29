@@ -58,11 +58,20 @@ Who needs to experience the change? Be specific. Run each through the witness au
 
 ### 3. Derive the calcinatio framework
 
-Given the witnesses, what classes of verification fires does this MO need across its opera? This is the MO-level calcinatio — not individual test plans, but the types of fires that should recur:
+Given the witnesses, what concerns drive verification fires across this MO's opera? MO-level calcinatio identifies the *types* of concerns and their relative weight — not specific tools or test suites. Specific fires are derived at opus time by the azer, who has current knowledge of the environment.
 
-- "Work under this MO should always be reviewed by a fresh-context agent for [architectural coherence / editorial quality / UX integrity]"
-- "Witness X can be served through professional proxy: [UX design review / security audit / editorial critique]"
-- "The calcinatio floor from the environment includes: [CI pipeline / test suite / linting]. Beyond that floor, this MO warrants: [browser QA / stakeholder demo / performance benchmarking]"
+Good MO calcinatio answers:
+- **What concerns matter most?** Name them and weight them. "This is a design-oriented MO — emotional resonance outweighs technical correctness."
+- **Which concerns are hardest to verify?** The easy-to-automate fires happen naturally. The hard ones need explicit attention. "Domain credibility requires a human with equine expertise."
+- **How can witnesses be reached?** Directly, via professional proxy, via async review? "Witness X reviews via screenshots sent async."
+
+The right altitude is derivation guidance — an azer reading the MO should understand *why* certain fires matter and *which witness concerns* drive them, then select specific fires from whatever the environment provides at that moment.
+
+| Write this | Not this |
+|---|---|
+| "Domain credibility is the gate Julie holds" | "Run eslint, jest, and pgTAP before merge" |
+| "Emotional resonance is the highest-value fire and the hardest to automate" | "Use /mock-uat and /agricultural-ux pair critique" |
+| "Technical soundness is the floor, not the ceiling" | "CI pipeline includes test suite + linting" |
 
 ### 4. Describe abundant satisfaction — generatively, not prescriptively
 

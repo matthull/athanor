@@ -38,18 +38,18 @@ When the calling agent's context doesn't identify witnesses clearly, **say so in
 
 ## Calcinatio Derivation
 
-Given the witnesses, derive the verification fires this opus needs. This is not a step-by-step test plan — it's a reasoning framework the azer operationalizes during its verification planning phase.
+Given the witnesses, derive the *questions that need answering* to know the work serves them. This is derivation guidance — not a test plan, not a list of fire types. The azer decides which specific fires to use based on the environment, available tools, and the nature of the work.
 
-**The question:** For each witness, what fires would reveal whether the work serves them?
+**The question:** For each witness, what would they check? What would concern them? What would delight them?
 
-| Witness | Derived calcinatio |
+| Witness | Questions the azer must be able to answer |
 |---|---|
-| End users who configure mappings | Does the UI flow make sense without documentation? Can common mistakes be recovered from? (UX review, browser QA) |
-| Developers who maintain the code | Is the implementation idiomatic? Are there tests? Would a fresh developer understand the approach? (Code review, test suite, architectural review) |
-| The artifex who reads the blog | Does the piece land? Is the argument clear? Does it hold together? (Editorial review — independent agent with writing expertise) |
-| The sales team demoing the feature | Does the happy path demo smoothly? Are edge cases handled gracefully? (End-to-end walkthrough of the demo scenario) |
+| End users who configure mappings | Does the UI flow make sense without documentation? Can common mistakes be recovered from? |
+| Developers who maintain the code | Is the implementation idiomatic? Would a fresh developer understand the approach? |
+| The artifex who reads the blog | Does the piece land? Is the argument clear? Does it hold together? |
+| The sales team demoing the feature | Does the happy path tell a compelling story? Are edge cases handled gracefully? |
 
-**Include this reasoning in the opus Context section** as "Calcinatio framework." The azer reads this during verification planning and operationalizes it — turning "UX review" into specific browser QA steps, turning "code review" into a `/code-review` subagent, etc. The opus provides the *why* and *what kind*; the azer provides the *how*.
+**Include this reasoning in the opus Context section** as "Calcinatio framework." The azer reads these questions during verification planning and selects fires that can answer them — from whatever the environment provides. The opus provides the *why* (witness concerns) and the *questions*; the azer provides the *how* (specific fires, tools, and verification approaches).
 
 **Calcinatio opera.** Sometimes the right verification is itself an opus — too large or too different in nature to be a step within the current opus. An architectural review of a whole system. A UAT pass across multiple features. An editorial review of a finished publication. When you identify calcinatio that should be a separate opus, note it in Context: "This work may warrant a follow-up calcinatio opus for [X]." Don't inscribe the calcinatio opus now — the azer or assessor will decide timing.
 
