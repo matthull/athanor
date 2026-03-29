@@ -47,49 +47,47 @@ func runOpera(args []string) int {
 		return 2
 	}
 
-	operaDir := filepath.Join(instDir, athanor.OperaDir)
-	entries, err := os.ReadDir(operaDir)
-	if err != nil {
-		if os.IsNotExist(err) {
-			fmt.Println("No opera found.")
-			return 0
-		}
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		return 1
+	// Determine which MOs to scan
+	var mosToScan []string
+	if moFilter != "" {
+		mosToScan = []string{moFilter}
+	} else {
+		mos, _ := athanor.ListMagnaOpera(instDir)
+		mosToScan = mos
 	}
 
 	hasOpera := false
 	fmt.Printf("%-12s %-12s %-20s %s\n", "STATUS", "DATE", "MO", "OPUS")
-	for _, e := range entries {
-		if !strings.HasSuffix(e.Name(), ".md") {
-			continue
-		}
-		opusPath := filepath.Join(operaDir, e.Name())
-		mo := athanor.ReadOpusMO(opusPath)
-		if mo == "" {
-			mo = "-"
-		}
 
-		// Apply MO filter
-		if moFilter != "" && mo != moFilter {
+	for _, mo := range mosToScan {
+		operaDir := athanor.OperaPath(instDir, mo)
+		entries, err := os.ReadDir(operaDir)
+		if err != nil {
 			continue
 		}
 
-		hasOpera = true
-		status := readOpusStatus(opusPath)
-		if status == "" {
-			status = "unknown"
-		}
-		opusName := strings.TrimSuffix(e.Name(), ".md")
+		for _, e := range entries {
+			if !strings.HasSuffix(e.Name(), ".md") {
+				continue
+			}
+			opusPath := filepath.Join(operaDir, e.Name())
 
-		// Extract date from filename (YYYY-MM-DD prefix)
-		date := "-"
-		if len(opusName) >= 10 && opusName[4] == '-' && opusName[7] == '-' {
-			date = opusName[:10]
-			opusName = opusName[11:] // Strip date prefix
-		}
+			hasOpera = true
+			status := readOpusStatus(opusPath)
+			if status == "" {
+				status = "unknown"
+			}
+			opusName := strings.TrimSuffix(e.Name(), ".md")
 
-		fmt.Printf("%-12s %-12s %-20s %s\n", status, date, mo, opusName)
+			// Extract date from filename (YYYY-MM-DD prefix)
+			date := "-"
+			if len(opusName) >= 10 && opusName[4] == '-' && opusName[7] == '-' {
+				date = opusName[:10]
+				opusName = opusName[11:] // Strip date prefix
+			}
+
+			fmt.Printf("%-12s %-12s %-20s %s\n", status, date, mo, opusName)
+		}
 	}
 
 	if !hasOpera {

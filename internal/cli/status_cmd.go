@@ -134,11 +134,14 @@ func showInstanceStatus(home, name string) int {
 		fmt.Println("Magna Opera: (none)")
 	}
 
-	// List opera
-	operaDir := filepath.Join(instDir, athanor.OperaDir)
-	entries, err := os.ReadDir(operaDir)
-	if err == nil {
-		var charged, discharged, assessed []string
+	// List opera across all MOs
+	var charged, discharged, assessed []string
+	for _, mo := range mos {
+		operaDir := athanor.OperaPath(instDir, mo)
+		entries, err := os.ReadDir(operaDir)
+		if err != nil {
+			continue
+		}
 		for _, e := range entries {
 			if !strings.HasSuffix(e.Name(), ".md") {
 				continue
@@ -154,19 +157,19 @@ func showInstanceStatus(home, name string) int {
 				assessed = append(assessed, opusName)
 			}
 		}
-		fmt.Println("Opera:")
-		if len(charged) > 0 {
-			fmt.Printf("  Charged:    %s\n", strings.Join(charged, ", "))
-		}
-		if len(discharged) > 0 {
-			fmt.Printf("  Discharged: %s\n", strings.Join(discharged, ", "))
-		}
-		if len(assessed) > 0 {
-			fmt.Printf("  Assessed:   %s\n", strings.Join(assessed, ", "))
-		}
-		if len(charged)+len(discharged)+len(assessed) == 0 {
-			fmt.Println("  (none)")
-		}
+	}
+	fmt.Println("Opera:")
+	if len(charged) > 0 {
+		fmt.Printf("  Charged:    %s\n", strings.Join(charged, ", "))
+	}
+	if len(discharged) > 0 {
+		fmt.Printf("  Discharged: %s\n", strings.Join(discharged, ", "))
+	}
+	if len(assessed) > 0 {
+		fmt.Printf("  Assessed:   %s\n", strings.Join(assessed, ", "))
+	}
+	if len(charged)+len(discharged)+len(assessed) == 0 {
+		fmt.Println("  (none)")
 	}
 
 	return 0
@@ -203,23 +206,26 @@ func countAzerWindows(r *tmux.Runner, _ string) int {
 	return count
 }
 
-// countOpera counts opera files by status (charged, discharged).
+// countOpera counts opera files by status (charged, discharged) across all MOs.
 func countOpera(instDir string) (charged, discharged int) {
-	operaDir := filepath.Join(instDir, athanor.OperaDir)
-	entries, err := os.ReadDir(operaDir)
-	if err != nil {
-		return 0, 0
-	}
-	for _, e := range entries {
-		if !strings.HasSuffix(e.Name(), ".md") {
+	mos, _ := athanor.ListMagnaOpera(instDir)
+	for _, mo := range mos {
+		operaDir := athanor.OperaPath(instDir, mo)
+		entries, err := os.ReadDir(operaDir)
+		if err != nil {
 			continue
 		}
-		status := readOpusStatus(filepath.Join(operaDir, e.Name()))
-		switch status {
-		case "charged":
-			charged++
-		case "discharged":
-			discharged++
+		for _, e := range entries {
+			if !strings.HasSuffix(e.Name(), ".md") {
+				continue
+			}
+			status := readOpusStatus(filepath.Join(operaDir, e.Name()))
+			switch status {
+			case "charged":
+				charged++
+			case "discharged":
+				discharged++
+			}
 		}
 	}
 	return

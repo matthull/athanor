@@ -70,8 +70,8 @@ func InitInstance(home, name, project string) error {
 		return fmt.Errorf("athanor %q already exists at %s", name, instDir)
 	}
 
-	// Create instance directory and opera/
-	if err := os.MkdirAll(filepath.Join(instDir, OperaDir), 0755); err != nil {
+	// Create instance directory
+	if err := os.MkdirAll(instDir, 0755); err != nil {
 		return fmt.Errorf("creating instance directory: %w", err)
 	}
 
@@ -144,12 +144,18 @@ func HasLegacyMagnumOpus(instanceDir string) bool {
 
 // MagnumOpusPath returns the filesystem path to a specific MO file.
 // For legacy instances (no magna-opera/ dir), returns magnum-opus.md.
-// For multi-MO instances, returns magna-opera/<moName>.md.
+// For multi-MO instances, returns magna-opera/<moName>/<moName>.md.
 func MagnumOpusPath(instanceDir, moName string) string {
 	if HasLegacyMagnumOpus(instanceDir) {
 		return filepath.Join(instanceDir, "magnum-opus.md")
 	}
-	return filepath.Join(instanceDir, MagnaOperaDir, moName+".md")
+	return filepath.Join(instanceDir, MagnaOperaDir, moName, moName+".md")
+}
+
+// OperaPath returns the filesystem path to a specific MO's opera directory.
+// Returns magna-opera/<moName>/opera.
+func OperaPath(instanceDir, moName string) string {
+	return filepath.Join(instanceDir, MagnaOperaDir, moName, "opera")
 }
 
 // ListMagnaOpera returns the names of all magna opera in an instance.
@@ -170,8 +176,8 @@ func ListMagnaOpera(instanceDir string) ([]string, error) {
 
 	var names []string
 	for _, e := range entries {
-		if !e.IsDir() && strings.HasSuffix(e.Name(), ".md") {
-			names = append(names, strings.TrimSuffix(e.Name(), ".md"))
+		if e.IsDir() {
+			names = append(names, e.Name())
 		}
 	}
 	return names, nil
@@ -201,7 +207,7 @@ func ReadOpusMO(path string) string {
 	return ""
 }
 
-// WriteMOTemplate writes a template magnum opus file to magna-opera/<moName>.md.
+// WriteMOTemplate writes a template magnum opus file to magna-opera/<moName>/<moName>.md.
 func WriteMOTemplate(instanceDir, moName string) error {
 	content := fmt.Sprintf(`# %s — Magnum Opus
 
@@ -230,9 +236,13 @@ func WriteMOTemplate(instanceDir, moName string) error {
 [TODO] What does the first azer need to not start from scratch? Discovery findings, references, known open questions, relevant services/files.
 `, moName)
 
-	moDir := filepath.Join(instanceDir, MagnaOperaDir)
+	moDir := filepath.Join(instanceDir, MagnaOperaDir, moName)
 	if err := os.MkdirAll(moDir, 0755); err != nil {
-		return fmt.Errorf("creating magna-opera directory: %w", err)
+		return fmt.Errorf("creating MO directory: %w", err)
+	}
+	// Create opera subdirectory for this MO
+	if err := os.MkdirAll(filepath.Join(moDir, "opera"), 0755); err != nil {
+		return fmt.Errorf("creating MO opera directory: %w", err)
 	}
 	return os.WriteFile(filepath.Join(moDir, moName+".md"), []byte(content), 0644)
 }

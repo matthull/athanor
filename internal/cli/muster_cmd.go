@@ -64,9 +64,22 @@ func runMuster(args []string) int {
 	// Resolve opus file path
 	opusPath := opusArg
 	if !filepath.IsAbs(opusPath) {
-		opusPath = filepath.Join(instDir, athanor.OperaDir, opusArg)
-	}
-	if _, err := os.Stat(opusPath); err != nil {
+		// Search across all MO opera directories for the opus file
+		mos, _ := athanor.ListMagnaOpera(instDir)
+		found := false
+		for _, mo := range mos {
+			candidate := filepath.Join(athanor.OperaPath(instDir, mo), opusArg)
+			if _, err := os.Stat(candidate); err == nil {
+				opusPath = candidate
+				found = true
+				break
+			}
+		}
+		if !found {
+			fmt.Fprintf(os.Stderr, "error: opus file not found: %s\n", opusArg)
+			return 1
+		}
+	} else if _, err := os.Stat(opusPath); err != nil {
 		fmt.Fprintf(os.Stderr, "error: opus file not found: %s\n", opusPath)
 		return 1
 	}

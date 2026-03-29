@@ -89,7 +89,6 @@ func TestATHFullLifecycle(t *testing.T) {
 		// Verify directory structure
 		for _, path := range []string{
 			instDir,
-			filepath.Join(instDir, "opera"),
 			filepath.Join(instDir, "athanor.yml"),
 			filepath.Join(instDir, "magna-opera"),
 		} {
@@ -135,7 +134,14 @@ func TestATHFullLifecycle(t *testing.T) {
 	// ─── Phase 2: Create a magnum opus ──────────────────────────────
 
 	instDir := athanor.InstanceDir(tmpHome, "qa-test")
-	moPath := filepath.Join(instDir, "magna-opera", "qa-goal.md")
+	moDir := filepath.Join(instDir, "magna-opera", "qa-goal")
+	if err := os.MkdirAll(moDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(moDir, "opera"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	moPath := filepath.Join(moDir, "qa-goal.md")
 	moContent := `# qa-goal — Magnum Opus
 
 ## Goal
@@ -189,7 +195,7 @@ This is an automated test. No prior context needed.
 
 	// ─── Phase 4: Create test opus ───────────────────────────────────
 
-	opusPath := filepath.Join(instDir, "opera", "2026-03-25-qa-fix-something.md")
+	opusPath := filepath.Join(instDir, "magna-opera", "qa-goal", "opera", "2026-03-25-qa-fix-something.md")
 	opusContent := `---
 status: charged
 inscribed: 2026-03-25

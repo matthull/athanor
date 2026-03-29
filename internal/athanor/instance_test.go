@@ -84,11 +84,6 @@ func TestInitInstance(t *testing.T) {
 		t.Fatalf("instance directory not created")
 	}
 
-	// Verify opera/ exists
-	if info, err := os.Stat(filepath.Join(instDir, OperaDir)); err != nil || !info.IsDir() {
-		t.Fatalf("opera/ directory not created")
-	}
-
 	// Verify symlinks
 	for _, f := range SharedFiles {
 		path := filepath.Join(instDir, f)
@@ -131,7 +126,7 @@ func TestValidateMO(t *testing.T) {
 	t.Run("missing file multi-MO", func(t *testing.T) {
 		t.Parallel()
 		dir := t.TempDir()
-		if err := os.MkdirAll(filepath.Join(dir, MagnaOperaDir), 0755); err != nil {
+		if err := os.MkdirAll(filepath.Join(dir, MagnaOperaDir, "nonexistent"), 0755); err != nil {
 			t.Fatal(err)
 		}
 		if err := ValidateMO(dir, "nonexistent"); err == nil {
@@ -142,7 +137,7 @@ func TestValidateMO(t *testing.T) {
 	t.Run("template with TODOs", func(t *testing.T) {
 		t.Parallel()
 		dir := t.TempDir()
-		moDir := filepath.Join(dir, MagnaOperaDir)
+		moDir := filepath.Join(dir, MagnaOperaDir, "test")
 		if err := os.MkdirAll(moDir, 0755); err != nil {
 			t.Fatal(err)
 		}
@@ -157,7 +152,7 @@ func TestValidateMO(t *testing.T) {
 	t.Run("real content passes", func(t *testing.T) {
 		t.Parallel()
 		dir := t.TempDir()
-		moDir := filepath.Join(dir, MagnaOperaDir)
+		moDir := filepath.Join(dir, MagnaOperaDir, "test")
 		if err := os.MkdirAll(moDir, 0755); err != nil {
 			t.Fatal(err)
 		}
@@ -224,12 +219,9 @@ func TestListMagnaOpera(t *testing.T) {
 	t.Run("multi-MO", func(t *testing.T) {
 		t.Parallel()
 		dir := t.TempDir()
-		moDir := filepath.Join(dir, MagnaOperaDir)
-		if err := os.MkdirAll(moDir, 0755); err != nil {
-			t.Fatal(err)
-		}
-		for _, name := range []string{"bugsnag.md", "slack-monitoring.md"} {
-			if err := os.WriteFile(filepath.Join(moDir, name), []byte("# "+name), 0644); err != nil {
+		for _, name := range []string{"bugsnag", "slack-monitoring"} {
+			moDir := filepath.Join(dir, MagnaOperaDir, name)
+			if err := os.MkdirAll(moDir, 0755); err != nil {
 				t.Fatal(err)
 			}
 		}
@@ -285,7 +277,7 @@ func TestMagnumOpusPath(t *testing.T) {
 			t.Fatal(err)
 		}
 		got := MagnumOpusPath(dir, "bugsnag")
-		want := filepath.Join(dir, MagnaOperaDir, "bugsnag.md")
+		want := filepath.Join(dir, MagnaOperaDir, "bugsnag", "bugsnag.md")
 		if got != want {
 			t.Errorf("MagnumOpusPath = %q, want %q", got, want)
 		}
@@ -341,12 +333,17 @@ func TestWriteMOTemplate(t *testing.T) {
 	if err := WriteMOTemplate(dir, "test-goal"); err != nil {
 		t.Fatalf("WriteMOTemplate: %v", err)
 	}
-	path := filepath.Join(dir, MagnaOperaDir, "test-goal.md")
+	path := filepath.Join(dir, MagnaOperaDir, "test-goal", "test-goal.md")
 	data, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("MO template not created: %v", err)
 	}
 	if len(data) == 0 {
 		t.Error("MO template is empty")
+	}
+	// Verify opera subdirectory was created
+	operaDir := filepath.Join(dir, MagnaOperaDir, "test-goal", "opera")
+	if info, err := os.Stat(operaDir); err != nil || !info.IsDir() {
+		t.Fatalf("opera/ subdirectory not created under MO directory")
 	}
 }

@@ -84,9 +84,10 @@ func runReforge(args []string) int {
 	model := cfg.EffectiveMarutModel()
 
 	moPath := athanor.MagnumOpusPath(instDir, moName)
+	operaDir := athanor.OperaPath(instDir, moName)
 	reforgePrompt := fmt.Sprintf(
-		"Read %s/AGENTS.md, then read %s, then read %s/marut.md, then read %s/muster.md. You are the marut for this athanor. Check opera/ for in-progress work and the trail. Start /loop 5m and resume your operational cycle.",
-		instDir, moPath, instDir, instDir,
+		"Read %s/AGENTS.md, then read %s, then read %s/marut.md, then read %s/muster.md. You are the marut for this athanor. Check %s for in-progress work and the trail. Start /loop 5m and resume your operational cycle.",
+		instDir, moPath, instDir, instDir, operaDir,
 	)
 
 	claudeArgs := fmt.Sprintf(

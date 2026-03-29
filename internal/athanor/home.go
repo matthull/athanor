@@ -19,9 +19,6 @@ const (
 
 	// MagnaOperaDir is the subdirectory containing magna opera (top-level goals).
 	MagnaOperaDir = "magna-opera"
-
-	// OperaDir is the subdirectory within each instance containing opera.
-	OperaDir = "opera"
 )
 
 // SharedFiles are the component files symlinked from shared/ into each instance.

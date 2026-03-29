@@ -136,10 +136,9 @@ func collectAthanorView(instDir, name string, r *tmux.Runner, windows []string, 
 	mos, _ := athanor.ListMagnaOpera(instDir)
 	legacy := athanor.HasLegacyMagnumOpus(instDir)
 
-	operaDir := filepath.Join(instDir, athanor.OperaDir)
-	operaEntries, _ := os.ReadDir(operaDir)
-
 	for _, mo := range mos {
+		operaDir := athanor.OperaPath(instDir, mo)
+		operaEntries, _ := os.ReadDir(operaDir)
 		mv := collectMOView(instDir, name, mo, legacy, r, windows, operaEntries, operaDir, now)
 		av.MOs = append(av.MOs, mv)
 	}

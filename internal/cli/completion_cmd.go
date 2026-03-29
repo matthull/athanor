@@ -41,7 +41,7 @@ _ath_opus_files() {
         return
     fi
     local -a files
-    files=( ${(f)"$(ls "$athanor_dir/opera/" 2>/dev/null)"} )
+    files=( ${(f)"$(ls "$athanor_dir/magna-opera"/*/opera/ 2>/dev/null)"} )
     compadd -- "${files[@]}"
 }
 
@@ -60,8 +60,8 @@ _ath_tmux_azer_windows() {
 _ath_mo_names() {
     local athanor_name="$1"
     local -a names
-    # Multi-MO: list files from magna-opera/
-    names=( ${(f)"$(ls ~/athanor/athanors/$athanor_name/magna-opera/*.md 2>/dev/null | xargs -I{} basename {} .md)"} )
+    # Multi-MO: list directories from magna-opera/
+    names=( ${(f)"$(ls -d ~/athanor/athanors/$athanor_name/magna-opera/*/ 2>/dev/null | xargs -I{} basename {})"} )
     if [[ ${#names[@]} -eq 0 ]]; then
         # Legacy: no completion needed (mo-name is optional)
         return

@@ -55,16 +55,35 @@ func runCraft(args []string) int {
 		return 1
 	}
 
+	// Resolve MO for opera path — if no moName given, try to find a single MO
+	if moName == "" {
+		mos, _ := athanor.ListMagnaOpera(instDir)
+		if len(mos) == 1 {
+			moName = mos[0]
+		}
+	}
+
 	// Create the opus file
 	datestamp := time.Now().Format("2006-01-02")
 	opusFilename := fmt.Sprintf("%s-%s.md", datestamp, sessionName)
-	opusPath := filepath.Join(instDir, athanor.OperaDir, opusFilename)
+
+	var opusPath string
+	if moName != "" {
+		operaDir := athanor.OperaPath(instDir, moName)
+		if err := os.MkdirAll(operaDir, 0755); err != nil {
+			fmt.Fprintf(os.Stderr, "error creating opera dir: %v\n", err)
+			return 1
+		}
+		opusPath = filepath.Join(operaDir, opusFilename)
+	} else {
+		fmt.Fprintln(os.Stderr, "error: mo-name required (no single MO to default to)")
+		fmt.Fprintln(os.Stderr, "usage: ath craft <athanor> <session-name> <mo-name> [--dir <path>] [--model <model>]")
+		return 2
+	}
 
 	// Build frontmatter
 	frontmatter := fmt.Sprintf("---\nstatus: charged\ninscribed: %s\ninteractive: true\n", datestamp)
-	if moName != "" {
-		frontmatter += fmt.Sprintf("magnum_opus: %s\n", moName)
-	}
+	frontmatter += fmt.Sprintf("magnum_opus: %s\n", moName)
 	frontmatter += "---\n"
 
 	opusContent := frontmatter + fmt.Sprintf(`# %s
