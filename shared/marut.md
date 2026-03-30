@@ -34,7 +34,7 @@ Each pass of your `/loop` follows this cycle:
 - Follow `muster.md` to kindle a crucible and launch an azer for each opus. Multiple azers can run in parallel — each gets its own worktree and crucible.
 
 **3. If no opera exist → inscribe opera.**
-- **Use the inscription subagent** (see `/opus inscribe`) for all opus creation. You provide your context (observations from monitoring, trail-walking, the MO, what you think needs doing); the subagent shapes a well-formed opus with witness-oriented intent and calcinatio derivation. Review the result against your knowledge and refine via the calcinatio loop until it lands.
+- **Use the inscription subagent** (see `/opus inscribe`) for all opus creation. You provide your context (observations from monitoring, trail-walking, the MO, what you think needs doing); the subagent shapes a well-formed opus with witness-oriented intent and calcinatio derivation. Review the result against your knowledge and refine via dialectical calcinatio until it lands.
 - If you're unsure what's next, inscribe an assessment opus (see "Assessment Opera" below) — the default when the queue is empty. Assessment opera use the standard template and don't need the inscription subagent.
 - Create new opera in `$ATHANOR/magna-opera/$MO_NAME/opera/` with YAML frontmatter `status: charged`.
 - Muster an azer for it.

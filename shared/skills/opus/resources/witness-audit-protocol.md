@@ -73,4 +73,4 @@ Then a summary section:
 What's the highest-priority improvement?]
 ```
 
-Return this report to the calling agent for review via the calcinatio loop.
+Return this report to the calling agent for review via dialectical calcinatio.

@@ -4,6 +4,8 @@ You are an agent in this athanor. Read your role file to understand your specifi
 
 **Entry point:** Your Magnum Opus in `magna-opera/<mo-name>/<mo-name>.md` — the goal this athanor serves.
 
+**Load `/calcinatio` at session start.** Calcinatio — refinement through verifying force — applies to all work that will reach a witness. The skill defines the principle, the orchestration patterns (dialectical, manifold), and context-shaping guidance.
+
 ---
 
 ## Vocabulary
@@ -30,7 +32,8 @@ You are an agent in this athanor. Read your role file to understand your specifi
 | **Tempering** | Transient guidance in the Magnum Opus `## Tempering` section. Weather, not climate — shapes the marut's decisions this pass but becomes obsolete as days pass. |
 | **Mise en place** | The azer's setup phase — confirming tools, context, access, and understanding before starting work. Discover what the environment provides before building or assuming. |
 | **Calcinatio** | Refinement through verifying force — subjecting work to fires that burn away what doesn't hold up. Tests, QA, independent review, professional critique are all calcinatio. Inherent in abundant satisfaction: unrefined work wastes witness attention. Generative by default (derive fires from the work and witnesses), conformant to environment (prescribed fires are a floor, not a ceiling). |
-| **Calcinatio loop** | The operational protocol for azer-tool interactions: shape context → fire specialist subagent → review output against rich context → refine with corrective guidance → converge. Neither side alone produces quality; the interplay does. See `/opus` skill (SKILL.md § The Calcinatio Loop). |
+| **Dialectical calcinatio** | Multi-agent calcinatio through iterative exchange between a context-holder and a complementary fresh perspective. The most powerful pattern for depth — reach for it aggressively and often. See `/calcinatio` skill. |
+| **Manifold calcinatio** | Multi-agent calcinatio through multiple independent fires applied simultaneously, then synthesized. The most powerful pattern for breadth and coverage. See `/calcinatio` skill. |
 | **Trail** | The sequence of discharged opera. The authoritative record of what was actually done. |
 | **Materia** | Anything in the world you can access via tool use — files, Slack threads, tickets, transcripts, specs, web pages. Materia has potential charge (relevance/value). Tool use extracts that charge into the crucible (your context window). |
 

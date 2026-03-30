@@ -361,15 +361,49 @@ Calcinatio connects to witnesses through professional proxy. When the Magnum Opu
 
 **Termination.** Calcinatio rounds continue until convergence (findings repeat — the fires have found the same grain), divergence (findings contradict — need the artifex's judgment), or exhaustion (all available fires applied, work has survived). The number of rounds is not prescribed. The termination condition is.
 
-#### The Calcinatio Loop — Agent/Subagent Refinement
+#### Multi-Agent Calcinatio — Orchestration Patterns
 
-*The sections above describe calcinatio as a principle — refinement through resistance. What follows is the protocol that operationalizes that principle at the agent/subagent boundary.*
+*The sections above describe calcinatio as a principle. What follows are the primary orchestration patterns through which agents apply calcinatio using multi-agent coordination. These are not prescriptions — they are powerful approaches that agents should reach for generatively when the work calls for refinement that a single agent cannot provide alone.*
 
-When an agent needs focused expertise (opus inscription, code review, research, MO shaping), it faces a tension: its rich context biases it, but a subagent's fresh focus may miss things from lossy context handoff. The calcinatio loop resolves this through iterative refinement: shape context → fire specialist subagent → review output against rich context → refine with corrective guidance → converge.
+Multi-agent orchestration for calcinatio is an underexploited capability in agent systems generally. Agents tend toward single-agent self-review, which is weak calcinatio — the builder's context is contaminated with their own reasoning. The athanor names these patterns explicitly so agents internalize them and compose novel instances from the work at hand, not just invoke predefined skills.
 
-The context-holder's review IS calcinatio — a fire that burns away what doesn't survive contact with the reality they know. The specialist's expertise is a complementary fire — burning away procedural thinking, witness-blindness, or domain errors. Neither alone produces quality; the interplay does. This is calcinatio's principle applied to the agent/subagent boundary: two fires from different angles producing refined output. The protocol is documented in the `/opus` skill and applies to all tool-skill interactions, not just opus work.
+**Dialectical calcinatio** — iterative exchange between a context-holder and a complementary fresh perspective. Two properties make this work:
 
-**Inscription as a quality-gated act.** Opus quality has the same leverage as geas quality — a procedural opus produces procedural work; a witness-oriented opus produces judgment-driven work. Inscription is therefore a specialized act performed via the calcinatio loop: the **inscription subagent** is a specialist invoked whenever an agent needs to create a well-formed opus. The inscribing agent shapes its context (what it knows about the work and witnesses), fires the inscription subagent, reviews the resulting opus against its rich context, and refines until convergence. This ensures opera are witness-oriented, not procedural.
+*Fresh* — a subagent's clean context window is itself a fire. The subagent encounters the work without the builder's narrative about why their choices are right. Beginner's mind as calcinatio: fresh eyes see what familiar eyes rationalize away. Domain expertise in the subagent is a bonus; the freshness is the primary fire.
+
+*Complementary* — context shaping is what turns a fresh perspective from naive to complementary. What you inject determines what the subagent can see and what fires it can apply:
+
+- **The artifact itself** — the work being refined. Always.
+- **The intent** — what "good" looks like, who the witnesses are. The subagent needs to know what to measure against.
+- **Constraints** — what the subagent needs to avoid false positives (project conventions, known trade-offs, deliberate choices).
+- **Not your reasoning.** Your narrative about *why* you built it this way contaminates the freshness. The subagent should encounter the work as a reader would, not as the author does. If your reasoning is sound, the work survives the fire without explanation.
+
+Pass too much and you destroy the freshness that IS the value. Pass too little and the subagent flails without signal. The judgment is: what does the subagent need to apply *meaningful* resistance — and nothing more?
+
+The context-holder shapes a handoff, fires a specialist subagent, reviews the output against rich context, refines with corrective guidance, and converges. The interplay — builder's knowledge against complementary fresh perspective — is what produces quality. Neither alone is sufficient. This is the most powerful pattern for depth — when the work needs focused resistance applied iteratively until the grain is found.
+
+The protocol (documented in detail in `/calcinatio` skill, `resources/dialectical-calcinatio.md`):
+
+1. **SHAPE** context for handoff — artifact, intent, constraints. Not your reasoning.
+2. **FIRE** a specialist subagent with shaped context
+3. **REVIEW** the output against your rich context — you are the calcinatio fire
+4. **REFINE** with corrective guidance if needed — the subagent's first pass is expected to be imperfect
+5. **ELICIT** the artifex when present or when in doubt — their judgment is the highest-fidelity fire
+6. **CONVERGE** when the context-holder has nothing substantive to add
+
+**Manifold calcinatio** — multiple independent fires applied simultaneously, then synthesized. Fan out the work to several specialist subagents, each examining it from a different angle with fresh context, then synthesize the findings. The power is in breadth — many perspectives see what any single perspective misses, and multi-agent agreement on a finding strengthens confidence. This is the most powerful pattern for coverage — when the work has multiple dimensions that different disciplines or viewpoints would evaluate differently.
+
+The protocol:
+
+1. **DECOMPOSE** — identify which independent perspectives would reveal different things about the work
+2. **FAN OUT** — fire multiple specialist subagents in parallel, each with a focused lens
+3. **SYNTHESIZE** — collect findings, deduplicate, identify where perspectives agree (high confidence) or conflict (needs judgment), resolve or escalate
+
+**These patterns compose.** `/code-review` is manifold calcinatio — ten specialist legs examining the same diff from different angles. The implementer then engaging with those findings in `/orchestrate`'s refactor step is dialectical calcinatio — iterating until the findings are resolved. The full cycle is manifold→dialectical→manifold→... until convergence. Research might fan out manifold, then each finding gets dialectically refined against domain knowledge. The patterns are building blocks, not standalone processes.
+
+**Predefined instances are conveniences, not boundaries.** The `/opus` skill crystallizes dialectical calcinatio for opus inscription, witness audit, and MO shaping. `/code-review` crystallizes manifold calcinatio for code quality. `/orchestrate`'s refactor step crystallizes dialectical calcinatio for implementer/reviewer exchange. These exist because the situations are common enough to warrant crystallization. But agents should compose novel instances whenever the work calls for it — a dialectical loop with a writing specialist to refine a publication, manifold calcinatio with security/performance/accessibility subagents to review a UI, a dialectical exchange with a domain expert subagent to validate research findings. The principle generates the practice; predefined skills are the floor.
+
+**Inscription as a quality-gated act.** Opus quality has the same leverage as geas quality — a procedural opus produces procedural work; a witness-oriented opus produces judgment-driven work. Inscription is therefore a specialized act performed via dialectical calcinatio: the **inscription subagent** is a specialist invoked whenever an agent needs to create a well-formed opus. The inscribing agent shapes its context (what it knows about the work and witnesses), fires the inscription subagent, reviews the resulting opus against its rich context, and refines until convergence. This ensures opera are witness-oriented, not procedural.
 
 #### Calcinatio Opera
 
@@ -381,7 +415,7 @@ What happens when a geas is discharged? Work begets work — until the chain nat
 
 **Assay before transmuting.** The core geas says: find what you need or escalate. An assay confirms readiness ("do I have what I need?"); **mise en place** *(culinary: everything in its place)* is the structured act of achieving that readiness — confirming tools, context, access, people, permissions before acting. Never assume; confirm or escalate. Gaps become opera or escalations. The assay is recursive — broad at Magnum Opus level, concrete at individual opus level.
 
-**Inscribe what furthers unfulfilled goals.** After discharge, look at the broader context the opus served. Are completion criteria still unfulfilled? Inscribe opera to further them — using the inscription subagent via the calcinatio loop so the resulting opera are witness-oriented, not procedural. If the goal is satisfied, the chain terminates naturally.
+**Inscribe what furthers unfulfilled goals.** After discharge, look at the broader context the opus served. Are completion criteria still unfulfilled? Inscribe opera to further them — using the inscription subagent via dialectical calcinatio so the resulting opera are witness-oriented, not procedural. If the goal is satisfied, the chain terminates naturally.
 
 **Fidelity matches context.** The context you pass to the inscription subagent is as detailed as your knowledge allows:
 
@@ -485,9 +519,9 @@ This table collects all terms for quick lookup. Each term is introduced in conte
 | **Quiescence** | Alchemical | The furnace at rest — lit but idle. All MOs healthy, no urgent opera. |
 | **Witness** | Alchemical | One who observes the transmutation and attests to completion. |
 
-**Verbs:** "inscribe an opus" (create via calcinatio loop), "charge the azer" (assign), "discharge the geas" (fulfill), "transmutatio" (all transformation of potential), "sublimatio" (transmutatio toward the crucible — materia entering context), "fixatio" (transmutatio toward Assiyah — charge becoming artifact), "calcinatio" (refinement through verifying force), "kindle a Magnum Opus" (establish a new top-level goal), "reforge" (kill a marut session and spawn fresh in the same crucible — the crucible endures, the session is reforged. Applies to maruts only; azers are not reforged, they discharge and the trail drives what comes next), "muster" (dispatch azers for discovered opera), "assay" (assess readiness before executing).
+**Verbs:** "inscribe an opus" (create via dialectical calcinatio), "charge the azer" (assign), "discharge the geas" (fulfill), "transmutatio" (all transformation of potential), "sublimatio" (transmutatio toward the crucible — materia entering context), "fixatio" (transmutatio toward Assiyah — charge becoming artifact), "calcinatio" (refinement through verifying force), "kindle a Magnum Opus" (establish a new top-level goal), "reforge" (kill a marut session and spawn fresh in the same crucible — the crucible endures, the session is reforged. Applies to maruts only; azers are not reforged, they discharge and the trail drives what comes next), "muster" (dispatch azers for discovered opera), "assay" (assess readiness before executing).
 
-**Protocols:** "calcinatio loop" (shape context → fire specialist subagent → review output → refine → elicit artifex if present → converge).
+**Protocols:** "dialectical calcinatio" (iterative exchange: shape context → fire specialist subagent → review output → refine → elicit artifex if present → converge), "manifold calcinatio" (simultaneous breadth: decompose → fan out to parallel specialists → synthesize). These are orchestration patterns for multi-agent calcinatio — agents compose novel instances from the work.
 
 **Naming philosophy.** "Azer" has less ambiguity than "worker"; "geas" less than "acceptance criteria"; "opus" less than "task." The goal is good metaphors, not maximum weirdness. "Session" and "sandbox" are fine as-is. "Azer" and "geas" earn their weirdness by being more precise than their normie equivalents.
 
@@ -598,8 +632,8 @@ Built, fired, and working.
 | Dashboard | `ath dashboard` | At-a-glance system observability: MO goals, in-flight/waiting/recent opera, crucible states. `--watch` for auto-refresh, `--json` for machine-readable output. |
 | Craft (collaborative azer) | `ath craft` | Workshop entry point: auto-inscribes a lightweight opus, kindles an interactive crucible. No `--permission-mode auto` — normal Claude Code session. The artifex sits down at the bench. |
 | Workshop model | Spec + existing tooling | The full spectrum (autonomous → collaborative → manual) is already supported: `ath kindle`/`ath muster` for autonomous, `ath craft` for collaborative, walk up to any marut and direct it for manual. No special modes needed — the marut already inscribes opera and musters azers on request. |
-| Calcinatio loop | `/opus` skill (SKILL.md) | General protocol for azer-tool interactions: context-holder ↔ specialist refinement loop. Applies to inscription, MO shaping, witness auditing, and other tool-skills. Includes artifex elicitation step. |
-| Opus inscription subagent | `/opus` skill (resources/inscription-protocol.md) | Specialist subagent for creating well-formed opera. Witness experience delta intent, calcinatio derivation from witnesses, anti-pattern detection. Called via calcinatio loop by any inscribing agent. |
+| Calcinatio skill | `/calcinatio` skill (shared, symlinked to `~/.claude/skills/`) | Standalone skill covering the full calcinatio lore: principle, deriving fires from witnesses, context shaping, orchestration patterns (dialectical, manifold), composition, calcinatio opera. Loaded by all agents at session start. Dialectical and manifold protocols in progressive-disclosure resources. |
+| Opus inscription subagent | `/opus` skill (resources/inscription-protocol.md) | Specialist subagent for creating well-formed opera. Witness experience delta intent, calcinatio derivation from witnesses, anti-pattern detection. Called via dialectical calcinatio by any inscribing agent. |
 | Witness audit subagent | `/opus` skill (resources/witness-audit-protocol.md) | Specialist subagent for assessing witness definition quality. Tests: can agents derive calcinatio? Are witnesses reachable? Missing witnesses? |
 | MO shaping subagent | `/opus` skill (resources/mo-shaping-protocol.md) | Specialist subagent for crafting/refining Magna Opera. Intent altitude, witness specification, calcinatio framework. Mandatory artifex involvement (collaborative > consulted > informed). |
 
