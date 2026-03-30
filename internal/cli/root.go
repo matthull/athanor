@@ -50,6 +50,8 @@ func Execute() int {
 		return runView(os.Args[2:])
 	case "opera":
 		return runOpera(os.Args[2:])
+	case "patrol":
+		return runPatrol(os.Args[2:])
 	case "dashboard":
 		return runDashboard(os.Args[2:])
 	case "completion":
@@ -83,6 +85,7 @@ Usage:
   ath status [<name>]                      Show athanor health
   ath view <athanor> <mo> [<opus>]          Open MO or opus in $EDITOR
   ath opera [<name>] [--mo <mo-name>]      List opera with status
+  ath patrol [--json] [--exclude <pane>]  Scan panes for prompts/stalls
   ath dashboard [--watch] [--json]        At-a-glance system overview
 
   ath whisper send <target> <message>     Send a message to a tmux target
