@@ -82,7 +82,7 @@ A **Magnum Opus** (MO) is a top-level goal container. Each athanor can have mult
 - **Task-based:** Has a terminal state. Done when an assessment finds nothing worthwhile left to do.
 - **State-based:** Maintains an ideal state continuously ("AppSignal is clean and stays clean"). Done when the operator decides diminishing returns.
 
-**Witnesses** are mandatory. If the artifex doesn't name them, the agent interviews them to find out — even if the answer is "just me," that must be explicit. Witnesses are dependencies like any other: if the agent can't find who the team is or how to reach them, that's a gap to escalate. Agents that know the witnesses handle the communication tail as part of completion — a major executive function offload. Witnesses are the alchemized form of RACI: the useful distinction is *who witnesses the transmutation*. People consulted for input are a subset — they witness AND contribute. Witnesses also drive the system's verification strategy — the question "what would satisfy this witness?" generates the specific quality checks the work must survive (see Calcinatio in Part II).
+**Witnesses** are mandatory. If the environment doesn't contain witness definitions, the agent interviews them to find out — even if the answer is "just me," that must be explicit. Witnesses are dependencies like any other: if the agent can't find who the team is or how to reach them, that's a gap to escalate. Agents that know the witnesses handle the communication tail as part of completion — a major executive function offload. Witnesses are the alchemized form of RACI: the useful distinction is *who witnesses the transmutation*. People consulted for input are a subset — they witness AND contribute. Witnesses also drive the system's verification strategy — the question "what would satisfy this witness?" generates the specific quality checks the work must survive (see Calcinatio in Part II).
 
 **Crafting Magna Opera — the specificity boundary.**
 
@@ -98,12 +98,15 @@ State the intent at the broadest level agents can assess clearly. Add operationa
 
 **Agent drift is signal, not failure.** A marut that drifts under a well-aligned intent reveals what operational guidance is genuinely missing. Preemptive guardrails prevent learning.
 
+The goal is not total autonomy. The point is for the agent system to maximize delivery of useful work products. It's assumed that there will still be some last mile for human effort to bridge. But as the athanor
+iterates aggressively towards maximizing satisfaction of person-centered goals, the last mile can shrink significantly before human time and attention are engaged.
+
 ### The Opus — Units of Work
 
 An **opus** is a single unit of work — the atomic building block. It is inscribed only when immediately actionable. There are no draft opera, no queued opera, no "inscribed for later." Planning is valuable, but plans live in project documents and specs — not in the opera directory. An inscribed opus means an agent should pick this up *now*.
 
 Every opus has three parts:
-- **Intent** — the change in the witness's experience. "I experience X but want to experience Y." The opus is discharged when Y is true.
+- **Intent** — the change in the witness's experience. "I experience X but want to experience Y." The opus is discharged when there is ample evidence that Y is satisfied, or some obstacle prevents that.
 - **Boundary** — what the agent does vs. what the operator does.
 - **Context** — references, pointers to **materia** (anything an agent can access via tool use — files, Slack threads, Linear tickets, specs, web pages). Everything that isn't intent or boundary goes to the environment, not the opus.
 
@@ -135,7 +138,7 @@ Want to know the status of a Magnum Opus? Read its discharged opera. The marut a
 
 When a session dies, the trail holds the progress. When an agent needs to resume work, the trail provides context. When the artifex needs to understand what happened, the trail speaks for itself. This is why waste nothing (see Part II) is non-negotiable: context that isn't captured in the trail before a session ends is unrecoverable.
 
-**The lightning path.** The trail is only legible in hindsight. Looking forward, there is no trail — only the path of least resistance toward the ground (MO goals, witness satisfaction). A lightning bolt originating from the same point would take a completely different path but still reach the ground. This means there is no imperative to resume interrupted work. An opus that was "almost done" has no special claim on the system's next step. The marut reads the trail and the MO goals, assesses the current state, and inscribes whatever opus the evidence points to — which may resemble the interrupted work, or may be something entirely different. Both are equally valid. If the system is not reaching ground, that's a systemic issue regardless of which path it took. Treating any specific interrupted path as privileged is a sunk cost fallacy.
+**The lightning path.** The trail is only legible in hindsight. Looking forward, there is no trail — only the next small step of least resistance in the general direction of the ground (MO goals, witness satisfaction). A lightning bolt originating from the same point would take a completely different path but still reach the ground. This means there is no imperative to resume interrupted work. An opus that was "almost done" has no special claim on the system's next step. The marut reads the trail and the MO goals, assesses the current state, and inscribes whatever opus the evidence points to — which may resemble the interrupted work, or may be something entirely different. Both are equally valid. If the system is not reaching ground, that's a systemic issue regardless of which path it took. Treating any specific interrupted path as privileged is a sunk cost fallacy.
 
 **Success is the best next step from where you are.** Past and future are irrelevant to what "success" means right now. A Magnum Opus that has been one long chain of fuckups — if right now the agent takes the best available action to improve the situation, that is 100% success. Escalating to the artifex after hours of thrashing is 100% success. This eliminates sunk cost: an agent never needs to "recover" from a bad trail. It just takes the best next step.
 

@@ -15,7 +15,7 @@ func runCompletion(args []string) int {
 
 	switch args[0] {
 	case "zsh":
-		fmt.Print(zshCompletionScript)
+		os.Stdout.WriteString(zshCompletionScript)
 		return 0
 	default:
 		fmt.Fprintf(os.Stderr, "unsupported shell: %s (only zsh is supported)\n", args[0])
@@ -27,6 +27,9 @@ const zshCompletionScript = `#compdef ath
 
 # Zsh completion for ath — athanor agent orchestration CLI
 # Install: ath completion zsh > ~/.zsh/completions/_ath
+
+# Ensure _message hints are visible (e.g. "session name" for free-text args)
+zstyle ':completion:*:ath:*:messages' format '%d'
 
 _ath_athanor_names() {
     local -a names
@@ -74,6 +77,7 @@ _ath() {
     commands=(
         'init:Create a new athanor instance'
         'craft:Interactive session with the artifex'
+        'craft-mo:Create a new Magnum Opus interactively'
         'kindle:Launch a marut for an athanor'
         'reforge:Kill and relaunch a marut'
         'muster:Launch an azer for an opus'
@@ -97,9 +101,14 @@ _ath() {
             if (( CURRENT == 3 )); then
                 _ath_athanor_names
             elif (( CURRENT == 4 )); then
-                _message 'session name'
-            elif (( CURRENT == 5 )); then
                 _ath_mo_names "${words[3]}"
+            elif (( CURRENT == 5 )); then
+                _message 'session name'
+            fi
+            ;;
+        craft-mo)
+            if (( CURRENT == 3 )); then
+                _ath_athanor_names
             fi
             ;;
         kindle|reforge|quiesce)
