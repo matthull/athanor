@@ -70,8 +70,9 @@ func showAllStatus(home string) int {
 			} else {
 				crucible = athanor.MarutCrucibleName(name, mo)
 			}
+			session := athanor.SessionName(name)
 			marutStatus := "-"
-			if windowExists(r, crucible) {
+			if windowExistsInSession(r, session, crucible) {
 				marutStatus = "active"
 			}
 
@@ -120,8 +121,9 @@ func showInstanceStatus(home, name string) int {
 			} else {
 				crucible = athanor.MarutCrucibleName(name, mo)
 			}
+			session := athanor.SessionName(name)
 			status := "-"
-			if windowExists(r, crucible) {
+			if windowExistsInSession(r, session, crucible) {
 				status = fmt.Sprintf("active (%s)", crucible)
 			}
 			label := mo
@@ -175,9 +177,9 @@ func showInstanceStatus(home, name string) int {
 	return 0
 }
 
-// windowExists checks if a tmux window with the exact given name exists.
-func windowExists(r *tmux.Runner, name string) bool {
-	windows, err := r.ListWindows()
+// windowExistsInSession checks if a tmux window with the exact given name exists in a session.
+func windowExistsInSession(r *tmux.Runner, session, name string) bool {
+	windows, err := r.ListSessionWindows(session)
 	if err != nil {
 		return false
 	}
@@ -189,11 +191,10 @@ func windowExists(r *tmux.Runner, name string) bool {
 	return false
 }
 
-// countAzerWindows counts tmux windows matching "azer-*" pattern.
-// This is a simple heuristic — checks common patterns.
-func countAzerWindows(r *tmux.Runner, _ string) int {
-	// List all windows and count ones starting with "azer-"
-	windows, err := r.ListWindows()
+// countAzerWindows counts tmux windows matching "azer-*" in an athanor's session.
+func countAzerWindows(r *tmux.Runner, athName string) int {
+	session := athanor.SessionName(athName)
+	windows, err := r.ListSessionWindows(session)
 	if err != nil {
 		return 0
 	}

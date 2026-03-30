@@ -108,11 +108,12 @@ func collectDashboard(home string) dashboardSnapshot {
 	}
 
 	r := tmux.NewRunner()
-	windows, _ := r.ListWindows()
 
 	for _, name := range instances {
 		instDir := athanor.InstanceDir(home, name)
-		av := collectAthanorView(instDir, name, r, windows, now)
+		session := athanor.SessionName(name)
+		windows, _ := r.ListSessionWindows(session)
+		av := collectAthanorView(instDir, name, r, session, windows, now)
 		if len(av.MOs) > 0 {
 			snap.Athanors = append(snap.Athanors, av)
 		}
@@ -121,7 +122,7 @@ func collectDashboard(home string) dashboardSnapshot {
 	return snap
 }
 
-func collectAthanorView(instDir, name string, r *tmux.Runner, windows []string, now time.Time) dashboardAthanor {
+func collectAthanorView(instDir, name string, r *tmux.Runner, session string, windows []string, now time.Time) dashboardAthanor {
 	cfg, _ := athanor.ReadConfig(instDir)
 	project := ""
 	if cfg != nil {
@@ -139,14 +140,14 @@ func collectAthanorView(instDir, name string, r *tmux.Runner, windows []string, 
 	for _, mo := range mos {
 		operaDir := athanor.OperaPath(instDir, mo)
 		operaEntries, _ := os.ReadDir(operaDir)
-		mv := collectMOView(instDir, name, mo, legacy, r, windows, operaEntries, operaDir, now)
+		mv := collectMOView(instDir, name, mo, legacy, r, session, windows, operaEntries, operaDir, now)
 		av.MOs = append(av.MOs, mv)
 	}
 
 	return av
 }
 
-func collectMOView(instDir, athName, moName string, legacy bool, r *tmux.Runner, windows []string, operaEntries []os.DirEntry, operaDir string, now time.Time) dashboardMO {
+func collectMOView(instDir, athName, moName string, legacy bool, r *tmux.Runner, session string, windows []string, operaEntries []os.DirEntry, operaDir string, now time.Time) dashboardMO {
 	moPath := athanor.MagnumOpusPath(instDir, moName)
 	moContent, _ := os.ReadFile(moPath)
 	goal := extractSection(string(moContent), "Goal")
@@ -160,7 +161,7 @@ func collectMOView(instDir, athName, moName string, legacy bool, r *tmux.Runner,
 
 	marutState := "dead"
 	if sliceContains(windows, crucible) {
-		state, _, _ := r.CheckCrucible(crucible)
+		state, _, _ := r.CheckCrucible(session + ":" + crucible)
 		marutState = state.String()
 	}
 
@@ -209,7 +210,7 @@ func collectMOView(instDir, athName, moName string, legacy bool, r *tmux.Runner,
 		case "charged":
 			azerName := "azer-" + strippedName
 			if sliceContains(windows, azerName) {
-				state, _, _ := r.CheckCrucible(azerName)
+				state, _, _ := r.CheckCrucible(session + ":" + azerName)
 				ov.AzerName = azerName
 				ov.AzerState = state.String()
 				mv.InFlight = append(mv.InFlight, ov)

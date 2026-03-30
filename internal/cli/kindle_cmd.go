@@ -87,21 +87,28 @@ func runKindle(args []string) int {
 	)
 
 	claudeArgs := fmt.Sprintf(
-		"cd %s && ATHANOR=%s claude --model %s --permission-mode auto %q",
+		"cd %s && ATHANOR=%s claude --model %q --permission-mode auto %q",
 		workDir, instDir, model, bootPrompt,
 	)
 
 	r := tmux.NewRunner()
-	if err := r.NewWindow(crucible, workDir); err != nil {
+	session := athanor.SessionName(name)
+	if err := r.EnsureSession(session); err != nil {
+		fmt.Fprintf(os.Stderr, "error ensuring tmux session: %v\n", err)
+		return 1
+	}
+
+	if err := r.NewWindow(session, crucible, workDir); err != nil {
 		fmt.Fprintf(os.Stderr, "error creating crucible: %v\n", err)
 		return 1
 	}
 
-	if err := r.SendKeysLiteral(crucible, claudeArgs); err != nil {
+	target := session + ":" + crucible
+	if err := r.SendKeysLiteral(target, claudeArgs); err != nil {
 		fmt.Fprintf(os.Stderr, "error launching marut: %v\n", err)
 		return 1
 	}
-	if err := r.SendKeys(crucible, "Enter"); err != nil {
+	if err := r.SendKeys(target, "Enter"); err != nil {
 		fmt.Fprintf(os.Stderr, "error launching marut: %v\n", err)
 		return 1
 	}

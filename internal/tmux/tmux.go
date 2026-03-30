@@ -152,9 +152,21 @@ func (r *Runner) InCopyMode(target string) (bool, error) {
 	return strings.TrimSpace(out) == "1", nil
 }
 
-// NewWindow creates a new tmux window with the given name and working directory.
-func (r *Runner) NewWindow(name, dir string) error {
-	args := []string{"new-window", "-n", name}
+// EnsureSession creates a tmux session if it doesn't already exist.
+// Idempotent — returns nil if the session already exists.
+func (r *Runner) EnsureSession(name string) error {
+	_, err := r.run("has-session", "-t", name)
+	if err == nil {
+		return nil
+	}
+	_, err = r.run("new-session", "-d", "-s", name)
+	return err
+}
+
+// NewWindow creates a new tmux window in the specified session.
+// Session must already exist (call EnsureSession first).
+func (r *Runner) NewWindow(session, name, dir string) error {
+	args := []string{"new-window", "-t", session + ":", "-n", name}
 	if dir != "" {
 		args = append(args, "-c", dir)
 	}
@@ -174,6 +186,18 @@ func (r *Runner) KillWindow(name string) error {
 // ListWindows returns the names of all tmux windows across all sessions.
 func (r *Runner) ListWindows() ([]string, error) {
 	out, err := r.run("list-windows", "-a", "-F", "#{window_name}")
+	if err != nil {
+		return nil, err
+	}
+	if out == "" {
+		return nil, nil
+	}
+	return strings.Split(out, "\n"), nil
+}
+
+// ListSessionWindows returns window names for a specific session.
+func (r *Runner) ListSessionWindows(session string) ([]string, error) {
+	out, err := r.run("list-windows", "-t", session, "-F", "#{window_name}")
 	if err != nil {
 		return nil, err
 	}

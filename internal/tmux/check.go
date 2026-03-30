@@ -49,19 +49,9 @@ var (
 //  5. Prompt prefix visible → StateIdle
 //  6. Fallback → StateActive
 func (r *Runner) CheckCrucible(target string) (CrucibleState, string, error) {
-	// 1. Check window exists
-	windows, err := r.ListWindows()
+	// 1. Check window exists by querying it directly
+	_, err := r.DisplayMessage(target, "#{window_name}")
 	if err != nil {
-		return StateDead, "crucible not found", err
-	}
-	found := false
-	for _, w := range windows {
-		if w == target {
-			found = true
-			break
-		}
-	}
-	if !found {
 		return StateDead, "crucible not found", nil
 	}
 

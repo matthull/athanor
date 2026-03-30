@@ -35,6 +35,10 @@ func TestATHFullLifecycle(t *testing.T) {
 		t.Skip("ath binary not found in PATH, run 'make install' first")
 	}
 
+	// Clean up any stale sessions from previous test runs
+	_ = exec.Command("tmux", "kill-session", "-t", athanor.SessionName("qa-test")).Run()
+	_ = exec.Command("tmux", "kill-session", "-t", athanor.SessionName("qa-warn-test")).Run()
+
 	// Set up temporary athanor home
 	tmpHome := t.TempDir()
 	t.Setenv("ATHANOR_HOME", tmpHome)
@@ -62,14 +66,23 @@ func TestATHFullLifecycle(t *testing.T) {
 		return string(out), err
 	}
 
-	// Helper for tmux cleanup
+	// Helper for tmux cleanup — kill session-qualified targets
+	sessionsToCleanup := map[string]bool{}
 	windowsToCleanup := []string{}
 	defer func() {
 		for _, w := range windowsToCleanup {
 			_ = exec.Command("tmux", "kill-window", "-t", w).Run()
 		}
+		for s := range sessionsToCleanup {
+			_ = exec.Command("tmux", "kill-session", "-t", s).Run()
+		}
 	}()
-	trackWindow := func(name string) {
+	trackWindow := func(session, name string) {
+		sessionsToCleanup[session] = true
+		windowsToCleanup = append(windowsToCleanup, session+":"+name)
+	}
+	// For non-session-scoped windows (e.g. whisper test target)
+	trackBareWindow := func(name string) {
 		windowsToCleanup = append(windowsToCleanup, name)
 	}
 
@@ -275,6 +288,8 @@ This is a test opus created by the QA harness.
 	// The claude command will either start (and sit at prompt) or fail — either
 	// way, the window existing proves kindle worked.
 
+	qaSession := athanor.SessionName("qa-test")
+
 	t.Run("kindle creates marut crucible", func(t *testing.T) {
 		// Override project to /tmp so cd works
 		cfg, _ := athanor.ReadConfig(instDir)
@@ -287,7 +302,7 @@ This is a test opus created by the QA harness.
 		if err != nil {
 			t.Fatalf("ath kindle failed: %v\n%s", err, out)
 		}
-		trackWindow("marut-qa-test-qa-goal")
+		trackWindow(qaSession, "marut-qa-test-qa-goal")
 
 		if !strings.Contains(out, "marut-qa-test-qa-goal") {
 			t.Errorf("expected crucible name in output, got: %s", out)
@@ -296,18 +311,24 @@ This is a test opus created by the QA harness.
 		// Give tmux a moment to create the window
 		time.Sleep(500 * time.Millisecond)
 
-		// Verify window exists
-		windows := listTmuxWindows(t)
+		// Verify window exists in the athanor's session
+		windows := listSessionWindows(t, qaSession)
 		if !containsExact(windows, "marut-qa-test-qa-goal") {
-			t.Errorf("expected tmux window 'marut-qa-test-qa-goal', got windows: %v", windows)
+			t.Errorf("expected tmux window 'marut-qa-test-qa-goal' in session %s, got windows: %v", qaSession, windows)
 		}
 
 		// Verify the command sent to the window contains claude and the boot prompt
-		paneContent := capturePaneContent(t, "marut-qa-test-qa-goal", 20)
+		paneContent := capturePaneContent(t, qaSession+":marut-qa-test-qa-goal", 20)
 		if !strings.Contains(paneContent, "claude") || !strings.Contains(paneContent, "AGENTS.md") {
 			t.Logf("pane content: %s", paneContent)
 			// Not a hard failure — pane capture can be timing-sensitive
 			t.Log("warning: could not verify boot command in pane (timing-sensitive)")
+		}
+
+		// Verify model parameter is quoted (brackets in model names need quoting for zsh)
+		expectedModel := athanor.DefaultMarutModel
+		if strings.Contains(paneContent, "--model "+expectedModel) {
+			t.Errorf("model parameter is unquoted in pane command — zsh will glob-expand brackets.\npane content: %s", paneContent)
 		}
 	})
 
@@ -326,7 +347,7 @@ This is a test opus created by the QA harness.
 	// ─── Phase 7b: ath check ────────────────────────────────────────
 
 	t.Run("check reports state for existing crucible", func(t *testing.T) {
-		out, err := runAth("check", "marut-qa-test-qa-goal")
+		out, err := runAth("check", qaSession+":marut-qa-test-qa-goal")
 		// Exit code 0 or 1 are both valid — depends on what claude is doing
 		if err != nil {
 			// check returns exit 1 for permission/exhausted, 2 for dead/error
@@ -380,7 +401,7 @@ This is a test opus created by the QA harness.
 		if err != nil {
 			t.Fatalf("ath muster failed: %v\n%s", err, out)
 		}
-		trackWindow("azer-qa-fix-something")
+		trackWindow(qaSession, "azer-qa-fix-something")
 
 		if !strings.Contains(out, "azer-qa-fix-something") {
 			t.Errorf("expected crucible name in output, got: %s", out)
@@ -388,9 +409,9 @@ This is a test opus created by the QA harness.
 
 		time.Sleep(500 * time.Millisecond)
 
-		windows := listTmuxWindows(t)
+		windows := listSessionWindows(t, qaSession)
 		if !containsExact(windows, "azer-qa-fix-something") {
-			t.Errorf("expected tmux window 'azer-qa-fix-something', got: %v", windows)
+			t.Errorf("expected tmux window 'azer-qa-fix-something' in session %s, got: %v", qaSession, windows)
 		}
 	})
 
@@ -399,9 +420,9 @@ This is a test opus created by the QA harness.
 	// a claude session which has its own TUI)
 
 	t.Run("whisper send delivers message", func(t *testing.T) {
-		// Create a test target window
+		// Create a test target window (in current session, not athanor-scoped)
 		_ = exec.Command("tmux", "new-window", "-n", "qa-whisper-target").Run()
-		trackWindow("qa-whisper-target")
+		trackBareWindow("qa-whisper-target")
 		time.Sleep(300 * time.Millisecond)
 
 		out, err := runAth("whisper", "send", "qa-whisper-target", "hello from QA test")
@@ -431,20 +452,20 @@ This is a test opus created by the QA harness.
 	// ─── Phase 10: ath cleanup ───────────────────────────────────────
 
 	t.Run("cleanup kills azer crucible", func(t *testing.T) {
-		out, err := runAth("cleanup", "azer-qa-fix-something")
+		out, err := runAth("cleanup", "azer-qa-fix-something", "--athanor", "qa-test")
 		if err != nil {
 			t.Fatalf("ath cleanup failed: %v\n%s", err, out)
 		}
 
 		time.Sleep(300 * time.Millisecond)
-		windows := listTmuxWindows(t)
+		windows := listSessionWindows(t, qaSession)
 		if containsExact(windows, "azer-qa-fix-something") {
 			t.Error("expected azer window to be killed after cleanup")
 		}
 	})
 
 	t.Run("cleanup is idempotent", func(t *testing.T) {
-		out, err := runAth("cleanup", "azer-qa-fix-something")
+		out, err := runAth("cleanup", "azer-qa-fix-something", "--athanor", "qa-test")
 		if err != nil {
 			t.Fatalf("second cleanup should succeed (idempotent): %v\n%s", err, out)
 		}
@@ -463,9 +484,9 @@ This is a test opus created by the QA harness.
 		}
 
 		time.Sleep(500 * time.Millisecond)
-		windows := listTmuxWindows(t)
+		windows := listSessionWindows(t, qaSession)
 		if !containsExact(windows, "marut-qa-test-qa-goal") {
-			t.Errorf("expected marut window to exist after reforge, got: %v", windows)
+			t.Errorf("expected marut window to exist after reforge in session %s, got: %v", qaSession, windows)
 		}
 	})
 
@@ -490,12 +511,19 @@ This is a test opus created by the QA harness.
 	// ─── Phase 13: ath quiesce ───────────────────────────────────────
 
 	t.Run("quiesce shuts down athanor", func(t *testing.T) {
-		// DISABLED: quiesce --force kills ALL azer-* windows globally,
-		// not just the target athanor's azers. Without --force, it refuses
-		// if any azer window exists anywhere. Both paths are broken until
-		// quiesce can scope azers to a specific athanor.
-		// See: azer windows are named azer-<opus>, with no athanor prefix.
-		t.Skip("quiesce cannot scope azers to a specific athanor — kills real craft sessions")
+		out, err := runAth("quiesce", "qa-test", "qa-goal")
+		if err != nil {
+			t.Fatalf("ath quiesce failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "quiesced") {
+			t.Errorf("expected 'quiesced' in output, got: %s", out)
+		}
+
+		time.Sleep(300 * time.Millisecond)
+		windows := listSessionWindows(t, qaSession)
+		if containsExact(windows, "marut-qa-test-qa-goal") {
+			t.Error("expected marut window to be killed after quiesce")
+		}
 	})
 
 	// ─── Phase 14: Error cases ───────────────────────────────────────
@@ -510,7 +538,7 @@ This is a test opus created by the QA harness.
 		out, err := runAth("kindle", "qa-warn-test", "warn-goal")
 		// Should warn but not necessarily fail hard
 		_ = err
-		trackWindow("marut-qa-warn-test-warn-goal")
+		trackWindow(athanor.SessionName("qa-warn-test"), "marut-qa-warn-test-warn-goal")
 		if !strings.Contains(out, "TODO") && !strings.Contains(out, "warning") {
 			t.Logf("expected warning about TODO placeholders, got: %s", out)
 		}
@@ -585,11 +613,11 @@ This is a test opus created by the QA harness.
 
 // ── Test Helpers ─────────────────────────────────────────────────────
 
-func listTmuxWindows(t *testing.T) []string {
+func listSessionWindows(t *testing.T, session string) []string {
 	t.Helper()
-	out, err := exec.Command("tmux", "list-windows", "-a", "-F", "#{window_name}").CombinedOutput()
+	out, err := exec.Command("tmux", "list-windows", "-t", session, "-F", "#{window_name}").CombinedOutput()
 	if err != nil {
-		t.Logf("tmux list-windows: %v", err)
+		t.Logf("tmux list-windows -t %s: %v", session, err)
 		return nil
 	}
 	result := strings.TrimSpace(string(out))

@@ -25,7 +25,8 @@
       "Bash(ath help:*)",
       "Bash(ath whisper:*)",
       "Bash(tmux list-windows:*)",
-      "Bash(claude-stall-scan:*)"
+      "Bash(claude-stall-scan:*)",
+      "Bash(tmux display-message:*)"
     ]
   }
 }

@@ -47,9 +47,10 @@ func runQuiesce(args []string) int {
 	}
 
 	r := tmux.NewRunner()
+	session := athanor.SessionName(name)
 
-	// Check for active azers
-	windows, _ := r.ListWindows()
+	// Check for active azers in this athanor's session
+	windows, _ := r.ListSessionWindows(session)
 	var activeAzers []string
 	for _, w := range windows {
 		if strings.HasPrefix(w, "azer-") {
@@ -65,23 +66,22 @@ func runQuiesce(args []string) int {
 
 	// Kill marut crucible(s)
 	if moName != "" {
-		// Kill specific MO's marut
 		crucible := athanor.MarutCrucibleName(name, moName)
-		_ = r.KillWindow(crucible)
+		_ = r.KillWindow(session + ":" + crucible)
 		fmt.Printf("Marut for %q quiesced.\n", moName)
 	} else {
 		// Kill all maruts for this athanor (both legacy and multi-MO patterns)
-		_ = r.KillWindow(athanor.MarutCrucibleName(name, "")) // legacy
+		_ = r.KillWindow(session + ":" + athanor.MarutCrucibleName(name, "")) // legacy
 		mos, _ := athanor.ListMagnaOpera(instDir)
 		for _, mo := range mos {
-			_ = r.KillWindow(athanor.MarutCrucibleName(name, mo))
+			_ = r.KillWindow(session + ":" + athanor.MarutCrucibleName(name, mo))
 		}
 	}
 
 	// Kill azers if forced
 	if force {
 		for _, a := range activeAzers {
-			_ = r.KillWindow(a)
+			_ = r.KillWindow(session + ":" + a)
 		}
 	}
 

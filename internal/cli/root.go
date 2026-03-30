@@ -42,10 +42,7 @@ func Execute() int {
 	case "cleanup":
 		return runCleanup(os.Args[2:])
 	case "quiesce":
-		fmt.Fprintln(os.Stderr, "error: quiesce is disabled — it cannot scope azers to a specific athanor")
-		fmt.Fprintln(os.Stderr, "       and --force kills ALL azer-* windows globally, including real craft sessions.")
-		fmt.Fprintln(os.Stderr, "       Use 'tmux kill-window -t marut-<name>' to kill a specific marut instead.")
-		return 1
+		return runQuiesce(os.Args[2:])
 	case "view":
 		return runView(os.Args[2:])
 	case "opera":

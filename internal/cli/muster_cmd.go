@@ -126,22 +126,29 @@ func runMuster(args []string) int {
 	}
 
 	claudeArgs := fmt.Sprintf(
-		"cd %s && ATHANOR=%s claude --model %s --permission-mode auto %q",
+		"cd %s && ATHANOR=%s claude --model %q --permission-mode auto %q",
 		dir, instDir, model, bootPrompt,
 	)
 
 	// Create tmux window and launch
+	athSessionName := athanor.SessionName(athanor.AthanorName(instDir))
 	r := tmux.NewRunner()
-	if err := r.NewWindow(crucName, dir); err != nil {
+	if err := r.EnsureSession(athSessionName); err != nil {
+		fmt.Fprintf(os.Stderr, "error ensuring tmux session: %v\n", err)
+		return 1
+	}
+
+	if err := r.NewWindow(athSessionName, crucName, dir); err != nil {
 		fmt.Fprintf(os.Stderr, "error creating crucible: %v\n", err)
 		return 1
 	}
 
-	if err := r.SendKeysLiteral(crucName, claudeArgs); err != nil {
+	target := athSessionName + ":" + crucName
+	if err := r.SendKeysLiteral(target, claudeArgs); err != nil {
 		fmt.Fprintf(os.Stderr, "error launching azer: %v\n", err)
 		return 1
 	}
-	if err := r.SendKeys(crucName, "Enter"); err != nil {
+	if err := r.SendKeys(target, "Enter"); err != nil {
 		fmt.Fprintf(os.Stderr, "error launching azer: %v\n", err)
 		return 1
 	}
