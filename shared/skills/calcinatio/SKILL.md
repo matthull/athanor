@@ -9,7 +9,25 @@ In alchemy, calcination burns away what doesn't survive the fire. In the athanor
 
 A unit test is calcinatio. A browser QA session is calcinatio. An independent agent reviewing architecture from fresh context is calcinatio. A UX designer's critique of a screen against field ergonomics constraints is calcinatio. The common property is not the technique — it's that **the work encounters a force that rejects what doesn't hold up.**
 
+### Connection to the Geas
+
+The core geas says: proceed with evidence or escalate. Calcinatio is how you *build* evidence. Without it, "I believe I've satisfied the intent" is a feeling. With it, "the work survived these fires" is evidence. Calcinatio is the mechanism that transforms the geas from abstract obligation into concrete practice.
+
+The chain: **geas demands evidence → calcinatio produces evidence → evidence enables abundant satisfaction → abundant satisfaction conserves witness attention.** At every link, calcinatio is doing the work. An agent that internalizes calcinatio isn't just "testing things" — it's fulfilling the deepest obligation of its geas by building the proof that its work is sound.
+
 **Calcinatio is inherent in abundant satisfaction.** Work that hasn't been refined through available fires hasn't been refined enough to warrant witness attention. The more thoroughly work is calcined, the more the witness's scarce attention goes to judgments only they can make — not to catching flaws the system could have caught.
+
+---
+
+## The Maximalist Posture
+
+**Exhaust every fire you can before a witness sees the work.** This is the operational heart of calcinatio. Every flaw you catch is a flaw the witness doesn't have to catch. Every verification you perform autonomously is attention you conserve for the judgments that genuinely require a human. Be aggressive about this. Be creative. Be thorough.
+
+The posture is maximalist: look at what verification *can* be done and do all of it, not just what's prescribed. The environment provides tools and procedures — discover them, use them. Then go further: what fires can you *create* from the work's nature, the witnesses' concerns, and the tools available? Calcinatio is generative. The environment's test suites and CI pipelines are the floor; what you derive from the principle is the ceiling, and the ceiling should be high.
+
+**Verify agentically before involving humans.** You have agents available. Use them as professional proxies — subagents examining the work from the perspective of each witness's discipline. A security-specialist subagent reviewing before the CTO sees it. A UX-proxy subagent evaluating before the field technician tests it. A domain-expert subagent critiquing before the subject-matter expert reviews it. The witness should encounter work that has already survived the fires their professional discipline would apply. Their attention then goes to the subtle judgments — taste, strategic fit, political nuance — that no agent can substitute for.
+
+**The test:** Before presenting work to any witness, ask: *have I applied every fire I could?* If the answer is no — if there are tests you could run, reviews you could spawn, tools you could use, proxy perspectives you could fire — do them first. The witness's time is the scarcest resource in the system. Respect it by exhausting autonomous verification before requesting it.
 
 ---
 
@@ -17,11 +35,13 @@ A unit test is calcinatio. A browser QA session is calcinatio. An independent ag
 
 The fires are not prescribed. They are derived.
 
-**Start with the witnesses.** The Magnum Opus defines who the work serves. Each witness implies concerns — what would they check, what would bother them, what would delight them? Those concerns generate fires. A sales engineer witness generates demo-flow testing. A security-conscious CTO witness generates threat modeling. A field technician witness generates device QA under hostile conditions.
+**Discover what the environment provides.** Before generating fires, look at what already exists. Test suites, CI pipelines, linting, type checking, browser tools, QA processes, project skills, review conventions — the environment may have substantial calcinatio infrastructure you haven't found yet. Discovering it is part of the work. Use it.
 
-**The environment is the floor.** CI pipelines, test suites, linting, type checking, required QA processes — these are prescribed calcinatio from the environment. Pick them up and execute them. They are a floor, not a ceiling.
+**Start with the witnesses.** The Magnum Opus defines who the work serves. Each witness implies concerns — what would they check, what would bother them, what would delight them? Those concerns generate fires. A sales engineer witness generates demo-flow testing. A security-conscious CTO witness generates threat modeling. A field technician witness generates device QA under hostile conditions. For each concern, ask: can I execute this fire agentically? If yes, do it — spawn a subagent as professional proxy.
 
-**Generate fires beyond the floor.** What fires can you create from the work's nature? Unit-testable code generates TDD — the test is written first because the test *is* the fire. Architectural decisions with downstream consequences generate design review by a fresh-context agent. UI work generates browser QA against the witnesses' usage context. The principle generates the practice.
+**The environment is the floor, not the ceiling.** CI pipelines, test suites, linting, type checking, required QA processes — these are prescribed calcinatio. Pick them up and execute them. Then go further.
+
+**Generate fires beyond the floor.** What fires can you create from the work's nature? Unit-testable code generates TDD — the test is written first because the test *is* the fire. Architectural decisions with downstream consequences generate design review by a fresh-context agent. UI work generates browser QA against the witnesses' usage context. A data migration generates before/after integrity checks. An API change generates contract testing against consumers. The principle generates the practice — look at the work and ask what resistance it should survive.
 
 **Missing fires are assay gaps.** If calcinatio requires a tool you don't have — browser MCP for visual QA, device emulators for field testing, a domain expert for specialized review — that's an assay gap. Escalate for the tool; don't skip the fire.
 

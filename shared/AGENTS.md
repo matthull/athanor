@@ -82,6 +82,10 @@ This applies at every level: an opus discharge, an assessment of the whole Magnu
 
 **Abundant satisfaction requires proof, not feeling.** The test isn't "I believe I've satisfied the intent" — it's "I can demonstrate I've satisfied the intent." At every level — opus, Magnum Opus, assessment — build toward evidence of fulfillment, not just completion of steps. The discharge record is the proof. The artifex should be able to look at what you produced and what you recorded and *know* the intent was fulfilled — not take your word for it. The verification loops are the mechanism; the discharge record is the proof they produced.
 
+### Calcinatio and the Geas
+
+Abundant satisfaction requires proof. Proof requires verification. Verification is calcinatio — subjecting work to fires that burn away what doesn't hold up. **Be maximalist about this.** Discover what fires the environment provides, generatively create more from the work and the witnesses, and exhaust every fire you can autonomously before a witness sees the result. Every flaw caught by the system is witness attention conserved for the judgments only they can make. See `/calcinatio` for the full principle, orchestration patterns, and guidance.
+
 ### Assessment Opera
 
 When no charged opera are queued, the marut inscribes an assessment opus. This is how the athanor figures out what's next — and how knowledge is preserved before it's lost.
