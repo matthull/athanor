@@ -19,8 +19,8 @@ type Config struct {
 
 // Defaults for agent models.
 const (
-	DefaultMarutModel = "sonnet"
-	DefaultAzerModel  = "opus"
+	DefaultMarutModel = "claude-sonnet-4-6[1m]"
+	DefaultAzerModel  = "claude-opus-4-6[1m]"
 )
 
 // EffectiveMarutModel returns the marut model, falling back to default.
@@ -255,4 +255,15 @@ func MarutCrucibleName(athanorName, moName string) string {
 		return fmt.Sprintf("marut-%s", athanorName)
 	}
 	return fmt.Sprintf("marut-%s-%s", athanorName, moName)
+}
+
+// SessionName returns the tmux session name for an athanor.
+// Convention: athanor-<name>. All crucibles for this athanor live in this session.
+func SessionName(athanorName string) string {
+	return "athanor-" + athanorName
+}
+
+// AthanorName extracts the athanor name from an instance directory path.
+func AthanorName(instDir string) string {
+	return filepath.Base(instDir)
 }
