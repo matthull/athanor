@@ -72,6 +72,32 @@ _ath_mo_names() {
     compadd -- "${names[@]}"
 }
 
+_ath_opus_names_ordered() {
+    local athanor_name="$1" mo_name="$2"
+    local opera_dir="$HOME/athanor/athanors/$athanor_name/magna-opera/$mo_name/opera"
+    local -a charged discharged assessed other
+
+    if [[ ! -d "$opera_dir" ]]; then
+        return
+    fi
+
+    for f in "$opera_dir"/*.md(N); do
+        local name="${${f:t}%.md}"
+        local opus_status=$(awk '/^---$/{if(n++)exit}n&&/^status:/{print $2}' "$f")
+        case "$opus_status" in
+            charged) charged+=("$name") ;;
+            discharged) discharged+=("$name") ;;
+            assessed) assessed+=("$name") ;;
+            *) other+=("$name") ;;
+        esac
+    done
+
+    [[ ${#charged} -gt 0 ]] && compadd -V charged -- "${charged[@]}"
+    [[ ${#discharged} -gt 0 ]] && compadd -V discharged -- "${discharged[@]}"
+    [[ ${#assessed} -gt 0 ]] && compadd -V assessed -- "${assessed[@]}"
+    [[ ${#other} -gt 0 ]] && compadd -V other -- "${other[@]}"
+}
+
 _ath() {
     local -a commands
     commands=(
@@ -85,6 +111,7 @@ _ath() {
         'cleanup:Clean up after a discharged opus'
         'quiesce:Graceful shutdown of an athanor'
         'status:Show athanor health'
+        'view:Open MO or opus in \$EDITOR'
         'opera:List opera with status'
         'whisper:Reliable message delivery to tmux sessions'
         'completion:Generate shell completion script'
@@ -116,6 +143,15 @@ _ath() {
                 _ath_athanor_names
             elif (( CURRENT == 4 )); then
                 _ath_mo_names "${words[3]}"
+            fi
+            ;;
+        view)
+            if (( CURRENT == 3 )); then
+                _ath_athanor_names
+            elif (( CURRENT == 4 )); then
+                _ath_mo_names "${words[3]}"
+            elif (( CURRENT == 5 )); then
+                _ath_opus_names_ordered "${words[3]}" "${words[4]}"
             fi
             ;;
         status|opera)

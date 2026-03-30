@@ -490,21 +490,12 @@ This is a test opus created by the QA harness.
 	// ─── Phase 13: ath quiesce ───────────────────────────────────────
 
 	t.Run("quiesce shuts down athanor", func(t *testing.T) {
-		// Use --force because other athanors may have azer-* windows running
-		// that quiesce can't yet distinguish from this athanor's azers
-		out, err := runAth("quiesce", "qa-test", "--force")
-		if err != nil {
-			t.Fatalf("ath quiesce failed: %v\n%s", err, out)
-		}
-		if !strings.Contains(out, "quiesced") {
-			t.Errorf("expected 'quiesced' in output, got: %s", out)
-		}
-
-		time.Sleep(300 * time.Millisecond)
-		windows := listTmuxWindows(t)
-		if containsExact(windows, "marut-qa-test-qa-goal") {
-			t.Error("expected marut window to be killed after quiesce")
-		}
+		// DISABLED: quiesce --force kills ALL azer-* windows globally,
+		// not just the target athanor's azers. Without --force, it refuses
+		// if any azer window exists anywhere. Both paths are broken until
+		// quiesce can scope azers to a specific athanor.
+		// See: azer windows are named azer-<opus>, with no athanor prefix.
+		t.Skip("quiesce cannot scope azers to a specific athanor — kills real craft sessions")
 	})
 
 	// ─── Phase 14: Error cases ───────────────────────────────────────

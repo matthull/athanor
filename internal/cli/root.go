@@ -42,7 +42,12 @@ func Execute() int {
 	case "cleanup":
 		return runCleanup(os.Args[2:])
 	case "quiesce":
-		return runQuiesce(os.Args[2:])
+		fmt.Fprintln(os.Stderr, "error: quiesce is disabled — it cannot scope azers to a specific athanor")
+		fmt.Fprintln(os.Stderr, "       and --force kills ALL azer-* windows globally, including real craft sessions.")
+		fmt.Fprintln(os.Stderr, "       Use 'tmux kill-window -t marut-<name>' to kill a specific marut instead.")
+		return 1
+	case "view":
+		return runView(os.Args[2:])
 	case "opera":
 		return runOpera(os.Args[2:])
 	case "dashboard":
@@ -76,6 +81,7 @@ Usage:
   ath cleanup <crucible>                   Clean up after a discharged opus
   ath quiesce <name> [<mo-name>] [--force] Graceful shutdown
   ath status [<name>]                      Show athanor health
+  ath view <athanor> <mo> [<opus>]          Open MO or opus in $EDITOR
   ath opera [<name>] [--mo <mo-name>]      List opera with status
   ath dashboard [--watch] [--json]        At-a-glance system overview
 
