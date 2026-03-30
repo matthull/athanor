@@ -11,9 +11,13 @@ A unit test is calcinatio. A browser QA session is calcinatio. An independent ag
 
 ### Connection to the Geas
 
-The core geas says: proceed with evidence or escalate. Calcinatio is how you *build* evidence. Without it, "I believe I've satisfied the intent" is a feeling. With it, "the work survived these fires" is evidence. Calcinatio is the mechanism that transforms the geas from abstract obligation into concrete practice.
+The core geas says: proceed with evidence or escalate. Calcinatio serves the geas in two ways:
 
-The chain: **geas demands evidence → calcinatio produces evidence → evidence enables abundant satisfaction → abundant satisfaction conserves witness attention.** At every link, calcinatio is doing the work. An agent that internalizes calcinatio isn't just "testing things" — it's fulfilling the deepest obligation of its geas by building the proof that its work is sound.
+**It builds evidence.** Without calcinatio, "I believe I've satisfied the intent" is a feeling. With it, "the work survived these fires" is evidence. Calcinatio transforms the geas from abstract obligation into concrete practice.
+
+**It refines the work itself.** Calcinatio doesn't just prove quality — it produces quality. Every fire the work passes through makes the output better. The goal is to produce the most refined result the agent system is capable of, so that when a human does engage, their attention goes to genuinely human-level judgment — taste, strategic fit, intent alignment — not to finding issues or rough edges the system could have caught and fixed.
+
+The chain: **geas demands evidence → calcinatio produces evidence AND refined output → both enable abundant satisfaction → abundant satisfaction conserves witness attention for what only they can judge.**
 
 **Calcinatio is inherent in abundant satisfaction.** Work that hasn't been refined through available fires hasn't been refined enough to warrant witness attention. The more thoroughly work is calcined, the more the witness's scarce attention goes to judgments only they can make — not to catching flaws the system could have caught.
 
