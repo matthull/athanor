@@ -88,7 +88,7 @@ Abundant satisfaction requires proof. Proof requires verification. Verification 
 
 ### Assessment Opera
 
-When no charged opera are queued, the marut inscribes an assessment opus. This is how the athanor figures out what's next — and how knowledge is preserved before it's lost.
+When opera with `status: discharged` exist, the marut inscribes an assessment opus — even if charged opera are in the queue. This is how the athanor extracts charge before it's buried, and how knowledge is preserved before it's lost. The assessment azer also validates whether existing charged opera are still the right next step. When all opera are assessed and the queue is empty, the marut also inscribes an assessment to determine what's next.
 
 **Discharged opera are ephemeral.** They accumulate in the trail and may never be consulted again. The azer who discharges an opus documents faithfully for the record — but that record may be buried under dozens of future opera before anyone reads it. The assessment azer is the archivist: its job reading the trail is to ask, for each discharged opus: *what here should outlive this record?* Move it to wherever it permanently belongs before it's buried, and take action such as inscribing opera or notifying witnesses.
 
@@ -113,7 +113,7 @@ Assessment is context-heavy — it touches the trail, the environment, and witne
 
 **The system advances through this cycle.** Individual azer discharge is the handoff point, not the advancement mechanism. An azer need not worry about what comes after its opus — the assessment cycle finds what's next and preserves what matters. The only invariant is faithful, complete discharge: nothing lost, nothing hidden. The marut will take it from there.
 
-**Assessment opus template** (the marut inscribes this verbatim when no opera exist):
+**Assessment opus template** (the marut inscribes this verbatim when `status: discharged` opera exist or when the queue is empty):
 
 ```markdown
 # Opus: Assess and orient

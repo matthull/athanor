@@ -30,26 +30,32 @@ Each pass of your `/loop` follows this cycle:
 - Check for charged opera: `rg -l "^status: charged" $ATHANOR/magna-opera/$MO_NAME/opera/`
 - Check for recently discharged opera: `rg -l "^status: discharged" $ATHANOR/magna-opera/$MO_NAME/opera/`
 
-**2. If charged opera exist with no azer working on them → muster.**
+**2. If opera with `status: discharged` exist → inscribe an assessment opus.**
+- Discharged opera carry unextracted charge — knowledge, deferred work, signals that will be buried if not processed. The assessment azer is the archivist who extracts that charge before it's lost.
+- This takes priority over mustering for charged opera. The assessment azer will also validate whether existing charged opera are still the right next step.
+- See "Assessment Opera" below. Use the standard template — no inscription subagent needed.
+- Muster an azer for it.
+
+**3. If charged opera exist with no azer working on them → muster.**
 - Follow `muster.md` to kindle a crucible and launch an azer for each opus. Multiple azers can run in parallel — each gets its own worktree and crucible.
 
-**3. If no opera exist → inscribe opera.**
+**4. If no opera exist (all assessed, none charged) → inscribe opera.**
 - **Use the inscription subagent** (see `/opus inscribe`) for all opus creation. You provide your context (observations from monitoring, trail-walking, the MO, what you think needs doing); the subagent shapes a well-formed opus with witness-oriented intent and calcinatio derivation. Review the result against your knowledge and refine via dialectical calcinatio until it lands.
 - If you're unsure what's next, inscribe an assessment opus (see "Assessment Opera" below) — the default when the queue is empty. Assessment opera use the standard template and don't need the inscription subagent.
 - Create new opera in `$ATHANOR/magna-opera/$MO_NAME/opera/` with YAML frontmatter `status: charged`.
 - Muster an azer for it.
 
-**4. If an azer is active → check on it, then loop.**
+**5. If an azer is active → check on it, then loop.**
 - Check for activity, stalls, permission blocks (see Monitoring below).
 - Nudge if stalled. Escalate if nudging doesn't work.
 - **Do not sit and watch.** Check the azer, then return to step 1. Your `/loop` handles this — each pass checks state, acts on what's changed, and loops again.
 
-**5. When an azer discharges → clean up and loop.**
+**6. When an azer discharges → clean up and loop.**
 - Verify discharge (pull specs, confirm opus frontmatter shows `status: discharged`).
 - Clean up the worktree and crucible (see `muster.md` cleanup section).
 - Return to step 1.
 
-**6. If the azer declares the Magnum Opus abundantly satisfied → notify the artifex.**
+**7. If the azer declares the Magnum Opus abundantly satisfied → notify the artifex.**
 - The azer's assessment determines when the goal is met, not yours.
 - Notify the artifex via Telegram with the azer's assessment and evidence.
 - Quiesce (stop the loop) unless the artifex says otherwise.
@@ -58,7 +64,7 @@ Each pass of your `/loop` follows this cycle:
 
 ## Assessment Opera
 
-When no opera exist, inscribe an assessment opus using the template in `AGENTS.md § Assessment Opera`. Do not customize it — the assessment opus is always the same shape, giving the azer latitude to investigate and decide.
+Inscribe an assessment opus when opera with `status: discharged` exist (to extract charge before it's buried) or when the queue is empty (to determine what's next). Use the template in `AGENTS.md § Assessment Opera`. Do not customize it — the assessment opus is always the same shape, giving the azer latitude to investigate and decide.
 
 ---
 
