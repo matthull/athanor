@@ -90,6 +90,10 @@ Abundant satisfaction requires proof. Proof requires verification. Verification 
 
 When opera with `status: discharged` exist, the marut inscribes an assessment opus — even if charged opera are in the queue. This is how the athanor extracts charge before it's buried, and how knowledge is preserved before it's lost. The assessment azer also validates whether existing charged opera are still the right next step. When all opera are assessed and the queue is empty, the marut also inscribes an assessment to determine what's next.
 
+**Assessment is dialectical calcinatio.** The assessment process was always quality control — a fresh perspective examining discharged work to catch what the original azer missed. Making this explicit: assessment is dialectical calcinatio applied to the trail. The per-opus assessor subagents are fresh-context fires; the assessment azer synthesizes their findings against their own rich understanding of the MO. See `/calcinatio` for the full dialectical protocol, including the documented-rationale principle.
+
+**Two layers of value extraction.** Discharge calcinatio (`azer.md § Discharge Calcinatio`) is "local tests" — a focused check while the azer has peak context. Assessment is "CI" — a thorough independent review after the fact. Both catch different things. Discharge calcinatio catches what the azer can see from inside; assessment catches what only an outsider with MO-level perspective can see. Neither replaces the other.
+
 **Discharged opera are ephemeral.** They accumulate in the trail and may never be consulted again. The azer who discharges an opus documents faithfully for the record — but that record may be buried under dozens of future opera before anyone reads it. The assessment azer is the archivist: its job reading the trail is to ask, for each discharged opus: *what here should outlive this record?* Move it to wherever it permanently belongs before it's buried, and take action such as inscribing opera or notifying witnesses.
 
 **The assessment process:**
@@ -100,16 +104,16 @@ Assessment is context-heavy — it touches the trail, the environment, and witne
 
 2. **Dispatch investigation subagents.** Assessment is context-heavy. Delegate to keep the assessor lean for synthesis.
 
-   - **Per-opus assessors** (one subagent per unassessed discharged opus) — Each reads the opus, the magnum opus, and the witness concerns (CLAUDE.md/CLAUDE.local.md). The question: **was this opus fully discharged?** That means: was context fully extracted — knowledge, deferred work, signals moved to durable facilities before they're buried? And critically: were witnesses served? Did the work become visible to the people who care about it — were they notified, are docs current, is there a status snapshot? Witness fulfillment is not separate from discharge quality; it is a key criterion of it. Mark the opus `status: assessed` and report back the verdict with evidence.
+   - **Per-opus assessors** (one subagent per unassessed discharged opus) — Each reads the opus, the magnum opus, and the witness concerns (CLAUDE.md/CLAUDE.local.md). The core question: **was charge fully converted to materia — was maximum value extracted from this azer's position?** That means: was context fully extracted — knowledge, deferred work, signals moved to durable facilities before they're buried? Were witnesses served — did the work become visible to the people who care about it, were they notified, are docs current, is there a status snapshot? Was value left on the table — follow-up work that should have been inscribed, documentation that should have been updated, communication that should have been sent? Mark the opus `status: assessed` and report back the verdict with evidence.
 
    - **Environment scanner** (one subagent) — Look at the broader world the athanor operates in. Check Slack channels, Linear projects, recent PRs, error monitors, meeting transcripts (see CLAUDE.md for locations), any external source relevant to the MO. Report back: new signals, blockers, context the trail doesn't have.
 
-3. **Synthesize and decide.** With the subagent reports in hand, one of three outcomes:
+3. **Synthesize and decide.** With the subagent reports in hand, apply your own judgment — you retain agency over which findings to act on, but document your rationale when you override an assessor's recommendation (at minimum in your discharge record). One of three outcomes:
    - **Inscribe one or more concrete opera** — if you can identify actionable work. Multiple opera are encouraged when the work is parallelizable — each independently actionable and scoped for a single azer. Witness satisfaction gaps are opera just like technical gaps — unsatisfied witnesses mean the MO is not abundantly satisfied regardless of technical progress.
    - **Declare the Magnum Opus abundantly satisfied** — if the goal is fully handled with no obvious loose ends *and* witnesses are served. Provide evidence.
    - **Escalate** — if you need the artifex's judgment to determine the path forward.
 
-4. **Discharge the assessment opus** with your findings, what you extracted, what you inscribed, and why.
+4. **Discharge the assessment opus** with your findings, what you extracted, what you inscribed, and why. Apply discharge calcinatio (`azer.md § Discharge Calcinatio`) to the assessment discharge itself — assessments are value-rich context that deserves the same rigor.
 
 **The system advances through this cycle.** Individual azer discharge is the handoff point, not the advancement mechanism. An azer need not worry about what comes after its opus — the assessment cycle finds what's next and preserves what matters. The only invariant is faithful, complete discharge: nothing lost, nothing hidden. The marut will take it from there.
 

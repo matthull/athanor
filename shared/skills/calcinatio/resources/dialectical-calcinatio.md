@@ -38,6 +38,11 @@ Neither property alone is sufficient. A fresh agent with no context is naive. A 
    - Does the output align with what you know about the situation?
    - Did the subagent miss something your context reveals?
    - Did the subagent catch something you missed? (This is the point.)
+   - You retain agency — you are not bound to accept every finding.
+     But when you override a finding, DOCUMENT WHY (at minimum in
+     the discharge record — not just in conversation that vanishes).
+     The articulation itself is a fire: reasoning that can't survive
+     being written down shouldn't survive at all.
 
 4. REFINE if needed
    - Fire again with corrective guidance: "You missed X" / "The witness

@@ -5,9 +5,9 @@ description: Refinement through verifying force — the principle and practice o
 
 # Calcinatio — Refinement Through Verifying Force
 
-In alchemy, calcination burns away what doesn't survive the fire. In the athanor, calcinatio is any process that refines work by subjecting it to resistance — and what survives is closer to abundant satisfaction than what went in.
+In alchemy, calcination burns away what doesn't survive the fire. In the athanor, calcinatio is any process that refines work by subjecting it to resistance such that what survives is closer to abundant satisfaction than what went in.
 
-A unit test is calcinatio. A browser QA session is calcinatio. An independent agent reviewing architecture from fresh context is calcinatio. A UX designer's critique of a screen against field ergonomics constraints is calcinatio. The common property is not the technique — it's that **the work encounters a force that rejects what doesn't hold up.**
+A unit test is calcinatio. A browser QA session is calcinatio. A legal review, an editor reviewing an article before publication. An independent agent reviewing architecture from fresh context. A UX designer's critique of a screen against field ergonomics constraints. The common property is not the technique — it's that **the work encounters a force that rejects what doesn't hold up.**
 
 ### Connection to the Geas
 
@@ -27,9 +27,9 @@ The chain: **geas demands evidence → calcinatio produces evidence AND refined 
 
 **Exhaust every fire you can before a witness sees the work.** This is the operational heart of calcinatio. Every flaw you catch is a flaw the witness doesn't have to catch. Every verification you perform autonomously is attention you conserve for the judgments that genuinely require a human. Be aggressive about this. Be creative. Be thorough.
 
-The posture is maximalist: look at what verification *can* be done and do all of it, not just what's prescribed. The environment provides tools and procedures — discover them, use them. Then go further: what fires can you *create* from the work's nature, the witnesses' concerns, and the tools available? Calcinatio is generative. The environment's test suites and CI pipelines are the floor; what you derive from the principle is the ceiling, and the ceiling should be high.
+The posture is maximalist: look at what verification *can* be done and do all of it, not just what's prescribed. The environment provides tools and procedures — discover them, use them. Then go further: what fires can you *create* from the work's nature, the witnesses' concerns, and the tools available? Calcinatio is generative. The environment's test suites, CI pipelines, and review procedures are the floor; what you derive from the principle is the ceiling, and the ceiling should be high.
 
-**Verify agentically before involving humans.** You have agents available. Use them as professional proxies — subagents examining the work from the perspective of each witness's discipline. A security-specialist subagent reviewing before the CTO sees it. A UX-proxy subagent evaluating before the field technician tests it. A domain-expert subagent critiquing before the subject-matter expert reviews it. The witness should encounter work that has already survived the fires their professional discipline would apply. Their attention then goes to the subtle judgments — taste, strategic fit, political nuance — that no agent can substitute for.
+**Verify agentically before involving humans.** You have agents and skills available. Use them as professional proxies — subagents examining the work from the perspective of each witness's discipline. A security-specialist subagent reviewing before the CTO sees it. A UX-proxy subagent evaluating before the field technician tests it. A domain-expert subagent critiquing before the subject-matter expert reviews it. The witness should encounter work that has already survived the fires their professional discipline would apply. Their attention then goes to the subtle judgments — taste, strategic fit, political nuance — that no agent can substitute for. If there isn't a subagent available, invent one, tell a subagent to be a security expert or an expert blog post editor and give it some relevant context, and see where that leads. You can always research how validation works in a domain and go from there.
 
 **The test:** Before presenting work to any witness, ask: *have I applied every fire I could?* If the answer is no — if there are tests you could run, reviews you could spawn, tools you could use, proxy perspectives you could fire — do them first. The witness's time is the scarcest resource in the system. Respect it by exhausting autonomous verification before requesting it.
 
@@ -66,6 +66,8 @@ This is the foundation of multi-agent calcinatio: **a clean context window is it
 
 Pass too much and you destroy the freshness that IS the value. Pass too little and the agent flails without signal. The judgment is: what does the reviewer need to apply *meaningful* resistance — and nothing more?
 
+By using dialectical calcinatio you can leverage your own rich context to review the feedback from the fresh agent and use your judgement, critique the critique.
+
 ---
 
 ## Orchestration Patterns
@@ -80,11 +82,17 @@ Iterative exchange between a context-holder and a complementary fresh perspectiv
 
 Shape context → fire a specialist subagent → review the output against your rich context → refine with corrective guidance → converge. The subagent's first pass is *expected* to be imperfect. Your review catches what the lossy handoff missed. Refinement is the normal path, not a failure case.
 
+**The receiver retains agency — but must document rationale.** The context-holder who receives critique is not bound to accept every finding. They have richer context and may have good reasons to override. But when they override a finding, they must document *why* — at minimum in the discharge record, not just in conversation that vanishes. This serves three purposes: (1) audit trail — the trail shows what was considered, not just what was done, (2) anti-rationalization — the act of articulating "I'm overriding this because X" is itself a fire; reasoning that can't survive being written down is reasoning that shouldn't survive, and (3) anti-hallucination — forcing connection between decision and evidence makes it harder to proceed on confabulated grounds. It matters less how disagreements between builder and reviewer are resolved and more that the rationale is documented.
+
+This is a very powerful form of calcinatio for producing a more refined product before presenting to witnesses. Use it liberally.
+
 **See `resources/dialectical-calcinatio.md` for the full protocol, context-shaping guidance, and illustrative examples.**
 
 ### Manifold Calcinatio
 
 Multiple independent fires applied simultaneously, then synthesized. Fan out the work to several specialist subagents — each examining it from a different angle — then synthesize the findings. The power is in breadth: many perspectives see what any single one misses, and agreement across perspectives strengthens confidence.
+
+Use this when there are a multitude of concerns to evaluate or tests to run.
 
 Decompose → fan out in parallel → synthesize: deduplicate, identify agreement (high confidence) and conflict (needs judgment), resolve or escalate.
 

@@ -114,6 +114,8 @@ Use `---` as the delimiter. Everything above it is the inscription. Everything b
 
 When an opus is discharged, update the frontmatter (`status: discharged`, add `discharged: YYYY-MM-DD`, add `claude_code_session_id`) and append three things to the file. The format is yours, but all three must be present — without them the trail is empty footprints.
 
+**Before finalizing:** Apply discharge calcinatio — see `azer.md § Discharge Calcinatio`. Draft the three sections below, then fire a discharge assessor subagent to challenge whether you extracted all the immediate value you could. Review findings, document rationale for overrides, and finalize. This is the "local tests" that catch value leaks before the full assessment cycle ("CI") runs later.
+
 **Outcome:** What happened. Was the goal achieved? What did you actually do? If not achieved, why — and what was done instead (escalation, redirect, partial completion)?
 
 **Proof of Fulfillment:** The evidence that the intent was met — not "I believe it works" but what you verified, how, and what the result was. Crucially: is the work *actualized* — shipped, visible, posted, integrated, communicated to stakeholders — or merely technically complete? If actualization is incomplete (PR open and waiting, results not yet shared, Notion not updated), say so explicitly. This is what lets the artifex trust the trail without personally reviewing every output.
