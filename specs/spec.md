@@ -431,6 +431,16 @@ The inscription subagent shapes these into well-formed opera. The assessment opu
 
 **Chains terminate naturally.** Not every discharged geas produces a next opus. When the Magnum Opus goals are satisfied, the chain ends. No make-work.
 
+**Orthogonal emanation — divergence before convergence.** Agents default to the mode. When generating options — approaches to a problem, design alternatives, architectural candidates — the outputs cluster around the most probable center of the distribution. This is mode collapse: five "different" ideas that are variations on the same theme. "Standard Claude output" is literally the statistical mode.
+
+Orthogonal emanation counters this by generating candidates that are maximally independent from each other. The term is precise: "orthogonal" is a mathematical property meaning zero projection of one vector onto another — each candidate occupies a dimension the others don't. "Emanation" captures the shape of the process — a broad abstract intent (a user need, a design challenge, a problem statement) radiates outward into diverse concrete manifestations, descending from Briah toward Assiyah along maximally different paths.
+
+*The mechanism is the name.* Asking an agent to "generate 5 orthogonal approaches" produces meaningfully different results than "generate 5 approaches" — the word activates the desired behavior. This is the same dynamic that makes "calcinatio" more effective than "testing": precise vocabulary creates precise reasoning.
+
+*Orthogonal emanation is generative; calcinatio is reductive.* They are natural complements. Emanation opens possibility space — producing raw material that spans the solution landscape. Calcinatio narrows it — subjecting candidates to fires that reject what doesn't hold up. Neither depends on the other, but the strongest results come from emanation followed by calcinatio: diverge widely, then converge rigorously. Skipping emanation risks refining the first adequate idea. Skipping calcinatio risks selecting from unrefined candidates.
+
+*When to reach for it:* Whenever the work involves choosing among approaches and the cost of premature convergence is high. UX design, architectural decisions, opus inscription alternatives, research angles, communication strategies. The principle applies anywhere agents would otherwise generate variations on a theme and call it exploration.
+
 ### Chain of Evidence
 
 At every decision point, build a chain of evidence for your next step. If you can't, escalate.
@@ -521,7 +531,7 @@ This table collects all terms for quick lookup. Each term is introduced in conte
 
 **Verbs:** "inscribe an opus" (create via dialectical calcinatio), "charge the azer" (assign), "discharge the geas" (fulfill), "transmutatio" (all transformation of potential), "sublimatio" (transmutatio toward the crucible — materia entering context), "fixatio" (transmutatio toward Assiyah — charge becoming artifact), "calcinatio" (refinement through verifying force), "kindle a Magnum Opus" (establish a new top-level goal), "reforge" (kill a marut session and spawn fresh in the same crucible — the crucible endures, the session is reforged. Applies to maruts only; azers are not reforged, they discharge and the trail drives what comes next), "muster" (dispatch azers for discovered opera), "assay" (assess readiness before executing).
 
-**Protocols:** "dialectical calcinatio" (iterative exchange: shape context → fire specialist subagent → review output → refine → elicit artifex if present → converge), "manifold calcinatio" (simultaneous breadth: decompose → fan out to parallel specialists → synthesize). These are orchestration patterns for multi-agent calcinatio — agents compose novel instances from the work.
+**Protocols:** "dialectical calcinatio" (iterative exchange: shape context → fire specialist subagent → review output → refine → elicit artifex if present → converge), "manifold calcinatio" (simultaneous breadth: decompose → fan out to parallel specialists → synthesize), "orthogonal emanation" (divergence before convergence — generate candidates that are maximally independent from each other, countering mode collapse). These are orchestration patterns and generative principles — agents compose novel instances from the work.
 
 **Naming philosophy.** "Azer" has less ambiguity than "worker"; "geas" less than "acceptance criteria"; "opus" less than "task." The goal is good metaphors, not maximum weirdness. "Session" and "sandbox" are fine as-is. "Azer" and "geas" earn their weirdness by being more precise than their normie equivalents.
 
