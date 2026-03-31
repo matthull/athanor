@@ -75,7 +75,7 @@ _ath_mo_names() {
 _ath_opus_names_ordered() {
     local athanor_name="$1" mo_name="$2"
     local opera_dir="$HOME/athanor/athanors/$athanor_name/magna-opera/$mo_name/opera"
-    local -a charged discharged assessed other
+    local -a charged charged_d discharged discharged_d assessed assessed_d other other_d
 
     if [[ ! -d "$opera_dir" ]]; then
         return
@@ -85,17 +85,17 @@ _ath_opus_names_ordered() {
         local name="${${f:t}%.md}"
         local opus_status=$(awk '/^---$/{if(n++)exit}n&&/^status:/{print $2}' "$f")
         case "$opus_status" in
-            charged) charged+=("$name") ;;
-            discharged) discharged+=("$name") ;;
-            assessed) assessed+=("$name") ;;
-            *) other+=("$name") ;;
+            charged) charged+=("$name"); charged_d+=("[charged] $name") ;;
+            discharged) discharged+=("$name"); discharged_d+=("[discharged] $name") ;;
+            assessed) assessed+=("$name"); assessed_d+=("[assessed] $name") ;;
+            *) other+=("$name"); other_d+=("[?] $name") ;;
         esac
     done
 
-    [[ ${#charged} -gt 0 ]] && compadd -V charged -- "${charged[@]}"
-    [[ ${#discharged} -gt 0 ]] && compadd -V discharged -- "${discharged[@]}"
-    [[ ${#assessed} -gt 0 ]] && compadd -V assessed -- "${assessed[@]}"
-    [[ ${#other} -gt 0 ]] && compadd -V other -- "${other[@]}"
+    [[ ${#charged} -gt 0 ]] && compadd -V charged -d charged_d -- "${charged[@]}"
+    [[ ${#discharged} -gt 0 ]] && compadd -V discharged -d discharged_d -- "${discharged[@]}"
+    [[ ${#assessed} -gt 0 ]] && compadd -V assessed -d assessed_d -- "${assessed[@]}"
+    [[ ${#other} -gt 0 ]] && compadd -V other -d other_d -- "${other[@]}"
 }
 
 _ath() {
