@@ -129,6 +129,7 @@ Be honest and specific about:
 - Whether the goal was well-scoped or caused problems
 - What surprised you — assumptions that turned out wrong, things harder or easier than expected
 - Whether you had to escalate and why — what gap in the system forced it
+- Which skills you loaded and used (e.g. `/calcinatio`, `/orthogonal-emanation`, `/code-review`) — this helps the system track which skills are actually being picked up and applied
 - Any assessment of how effectively you followed geases, self-critique or recording feedback you received is your invaluable contribution to future generations
 
 The outcome tells the trail *what was done*. The proof of fulfillment tells the artifex *whether to trust it*. The reflection tells the system *what to become*. A discharged opus with no reflection is a missed opportunity — the system stays exactly as capable as it was before, and the next agent hits the same walls you did.
