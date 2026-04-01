@@ -447,17 +447,22 @@ Since this is a process/protocol spec (not code), test scenarios are behavioral:
 When this design is implemented and tested in real assessment cycles:
 
 ### Documentation Updates
-- [ ] AGENTS.md § Assessment Opera — revised to reflect the new process
-- [ ] Assessment opus template — updated with sephirotic phases
-- [ ] azer.md — any updates needed for assessment opera behavior
-- [ ] specs/spec.md — update the assessment references
+- [x] AGENTS.md § Assessment Opera — fully rewritten (commit 19703c9, 2026-04-01)
+- [x] Assessment opus template — updated with manifold generation and landscape report (commit 19703c9)
+- [ ] Assessment opus template — encode sephirotic phases (deferred — kept in spec pending more operational experience)
+- [ ] azer.md — check for any needed updates re: assessment behavior
+- [x] specs/spec.md — cross-reference added to Built table (commit 19703c9)
+- [ ] marut.md — check alignment with new assessment process
+- [ ] calcinatio skill — add manifold generation as peer formula alongside manifold calcinatio
 
 ### Pattern Capture
-- [ ] Manifold generation pattern — if validated, document as a reusable pattern alongside manifold calcinatio and orthogonal emanation
-- [ ] Combinatorial stimulus — if the pattern has a name from research, adopt it
+- [ ] Manifold generation pattern — document as a reusable formula alongside manifold calcinatio and orthogonal emanation
+- [ ] Combinatorial stimulus — if the research finds a name, adopt it
 - [ ] Sephirotic hierarchy — if useful beyond assessment, document as a general design principle
+- [x] Formula as Briah-level concept — added to AGENTS.md vocabulary (commit 19703c9)
 
 ### Research Integration
-- [ ] Generative context extraction patterns — integrate findings
-- [ ] SKAN AOW — integrate relevant insights
+- [ ] Generative context extraction patterns — execute research request and integrate findings
+- [ ] SKAN AOW — integrate findings (research executed, findings not yet loaded)
+- [ ] A/B test results — compare thin-context vs full-MO assessments from seismic-classifier-mapping, integrate learnings
 - [ ] Any patterns discovered that refine or replace manifold generation
