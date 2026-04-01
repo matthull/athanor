@@ -121,7 +121,9 @@ Survey the full landscape of available materia. This is the prospector phase —
 
 **Output: a landscape report.** A structured summary of what the survey found, with citations linking to primary sources (use `/citations` for source traceability). The report's structure, detail level, and emphasis are the assessor's judgment — shaped by what the landscape actually contains, not by a predetermined template. The only formatting directive: use `/citations` so subagents and future readers can follow links to drill deeper.
 
-The landscape report serves three purposes: (1) shared base context for all generation subagents (baked verbatim into their prompts so they don't re-gather), (2) depth on demand via citation links, and (3) a durable artifact — a snapshot of the athanor's state at assessment time, appended to the discharge record.
+The landscape report serves three purposes: (1) shared base context for all generation subagents (baked verbatim into their prompts so they don't re-gather), (2) depth on demand via citation links, and (3) a durable artifact — a snapshot of the athanor's state at assessment time.
+
+**Save the landscape report to the project corpus.** The report is too valuable to exist only in the assessment opus discharge record where it may be buried. Save it as a file in the project — location is the assessor's judgment (e.g., a `reports/` directory, alongside specs, wherever the project organizes status artifacts). The report is a rich, cited snapshot of the MO's landscape at a point in time; future assessments, agents, and the artifex all benefit from being able to read prior landscape reports without digging through discharged opera.
 
 #### 3. Generate bountifully — manifold generation
 
