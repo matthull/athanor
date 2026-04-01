@@ -528,6 +528,7 @@ This table collects all terms for quick lookup. Each term is introduced in conte
 | **Athanor** | Alchemical | The furnace. A materialized instance scoped to a domain. |
 | **Quiescence** | Alchemical | The furnace at rest — lit but idle. All MOs healthy, no urgent opera. |
 | **Witness** | Alchemical | One who observes the transmutation and attests to completion. |
+| **Corpus Map** | Alchemical | A curated map to the most essential parts of the corpus for a given scope. Not the corpus itself — the map to it. Each entry names a document, its location, and why it's essential. Lives at MO level (`## Corpus Map` in the MO file) and athanor level (`corpus-map.md`). Updated as agents discover essential materia — the athanor learns its world through exploration. The test: "Would an agent making decisions at this scope be meaningfully impaired without knowing this exists?" |
 
 **Verbs:** "inscribe an opus" (create via dialectical calcinatio), "charge the azer" (assign), "discharge the geas" (fulfill), "transmutatio" (all transformation of potential), "sublimatio" (transmutatio toward the crucible — materia entering context), "fixatio" (transmutatio toward Assiyah — charge becoming artifact), "calcinatio" (refinement through verifying force), "kindle a Magnum Opus" (establish a new top-level goal), "reforge" (kill a marut session and spawn fresh in the same crucible — the crucible endures, the session is reforged. Applies to maruts only; azers are not reforged, they discharge and the trail drives what comes next), "muster" (dispatch azers for discovered opera), "assay" (assess readiness before executing).
 
@@ -583,10 +584,11 @@ Opera already marked `assessed` are skipped.
 ├── marut.md           ← supervisor role
 ├── azer.md            ← worker role
 ├── opus.md            ← lifecycle, inscription/discharge protocol
-└── muster.md          ← crucible kindling, monitoring
+├── muster.md          ← crucible kindling, monitoring
+└── corpus-map.md      ← curated map to essential materia for this athanor (living, per-instance)
 ```
 
-Shared files (`AGENTS.md`, role files, `opus.md`, `muster.md`) are symlinked from `~/athanor/shared/`. Each MO is a directory under `magna-opera/` containing its document and an `opera/` subdirectory — correlation between opera and MOs is structural. Each MO gets its own marut. Legacy instances with a single `magnum-opus.md` are still supported.
+Shared files (`AGENTS.md`, role files, `opus.md`, `muster.md`) are symlinked from `~/athanor/shared/`. `corpus-map.md` is per-instance (not shared) — each athanor's world is different. Each MO is a directory under `magna-opera/` containing its document and an `opera/` subdirectory — correlation between opera and MOs is structural. Each MO gets its own marut. Legacy instances with a single `magnum-opus.md` are still supported.
 
 ### What Agents See vs. What the Artifex Sees
 
@@ -622,7 +624,7 @@ Built, fired, and working.
 |---------|---------------|-------|
 | Athanor instance pattern | `~/athanor/athanors/<name>/` | AGENTS.md, magna-opera/ (each MO is a directory with its own opera/), role files. Multiple MOs per instance supported. Active instances: bugsnag, sal-117-l2-metrics, seismic-classifier-mapping, blogging. |
 | Shared components | `~/athanor/shared/` | Universal AGENTS.md, azer.md, marut.md, muster.md, opus.md. Symlinked into each instance — change once, applies everywhere. These define the athanor itself — they are not materia. |
-| Magnum Opus format | `magna-opera/<name>/<name>.md` per instance | Each MO is a directory containing its document and an `opera/` subdir. Goal + abundant satisfaction + witnesses + getting-started pointer. Intent only — no procedures, no discovery findings. Legacy `magnum-opus.md` backward compat. |
+| Magnum Opus format | `magna-opera/<name>/<name>.md` per instance | Each MO is a directory containing its document and an `opera/` subdir. Goal + abundant satisfaction + witnesses + corpus map (`## Corpus Map` — curated essential materia for this MO). Intent only — no procedures, no discovery findings. Legacy `magnum-opus.md` backward compat. |
 | Opus lifecycle | `magna-opera/<mo>/opera/` with YAML frontmatter | Inscription / charge / discharge / assess. Datestamp filename prefix: `YYYY-MM-DD-<name>.md`. Opera nested under their MO — correlation is structural. |
 | Core geas + escalation-as-geas | `AGENTS.md` (shared) | "Both are equally valid fulfillments of your geas." Tested in first bugsnag firing. |
 | Azer role | `azer.md` (shared) | Verification-first (three questions before mise), mise en place, context management, proof of fulfillment at discharge. |
@@ -657,7 +659,7 @@ Built, fired, and working.
 | Hooks as hard constraints | Low | Composable per-role. Athanor-scoped constraints (not project constraints) — no signal yet that these are needed. |
 | Role-aware crucible creation | Low | Depends on roles. `ath kindle` provides basic crucible creation; role-awareness needs role system. |
 | Beholder role | Medium | Needed for auto-dispatch patterns. |
-| Project corpus definition | Medium | "Corpus" is used informally throughout (specs, docs, tickets, CLAUDE.md, landscape reports). Needs formal definition: what constitutes the corpus for a given project/athanor, where it lives, what the expectations are for agents contributing to it. Currently implicit — agents use judgment about where to save artifacts. A formal corpus concept would give agents a clear target for "save this to the corpus" directives (e.g., landscape reports). |
+| ~~Project corpus definition~~ | ~~Medium~~ | Defined — see "Corpus Map" in vocabulary. Formal concept at MO level (`## Corpus Map` section) and athanor level (`corpus-map.md`). |
 | Primus as agent | Low | Currently manual. `ath` provides tooling (status, opera, muster) but Primus loop is still the artifex. |
 | Escalation bus format | Low | Telegram works; message format not standardized. |
 | Forced discharge on context exhaustion | Medium | Protocol exists (azer self-discharges on budget guard warning, marut cleans up and reads trail on `exhausted`/`dead`). Gap: discharge is advisory — azer can ignore the warning and die with unreleased context. Discharge is non-deterministic so forcing it is non-trivial. |
