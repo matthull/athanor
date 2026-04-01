@@ -629,6 +629,7 @@ Built, fired, and working.
 | Marut role | `marut.md` (shared) | Operational loop, assessment opera, monitoring/stall detection, reforging. |
 | Muster protocol | `muster.md` (shared) | Crucible kindling, reforging, monitoring, cleanup. Marut → azer dispatch. |
 | Assessment opus pattern | `AGENTS.md` + `opus.md` | Inscribed when no opera exist. Dual purpose: (1) determine what's next, (2) walk the trail as archivist. |
+| Assessment enhancement | `specs/assessment-enhancement/spec.md` | Redesign of assessment as generative/jovian process. Sephirotic hierarchy (Chokmah+Binah → Chesed/Geburah → Tiphereth → Yesod → Malkuth), manifold generation formula, landscape report, witness-perspective legs. Draft. |
 | Verification-first | `azer.md` (shared) | Three questions before mise: prove fulfillment, communicate proof, ensure actualization. |
 | Elicited acceptance | `azer.md` (shared) | Stakeholder feeling as valid evidence when deliberately elicited. Alchemized UAT. |
 | Proof of fulfillment | `opus.md` (shared) | Third required discharge element: evidence the intent was met and the work is actualized. |
