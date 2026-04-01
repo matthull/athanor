@@ -657,6 +657,7 @@ Built, fired, and working.
 | Hooks as hard constraints | Low | Composable per-role. Athanor-scoped constraints (not project constraints) — no signal yet that these are needed. |
 | Role-aware crucible creation | Low | Depends on roles. `ath kindle` provides basic crucible creation; role-awareness needs role system. |
 | Beholder role | Medium | Needed for auto-dispatch patterns. |
+| Project corpus definition | Medium | "Corpus" is used informally throughout (specs, docs, tickets, CLAUDE.md, landscape reports). Needs formal definition: what constitutes the corpus for a given project/athanor, where it lives, what the expectations are for agents contributing to it. Currently implicit — agents use judgment about where to save artifacts. A formal corpus concept would give agents a clear target for "save this to the corpus" directives (e.g., landscape reports). |
 | Primus as agent | Low | Currently manual. `ath` provides tooling (status, opera, muster) but Primus loop is still the artifex. |
 | Escalation bus format | Low | Telegram works; message format not standardized. |
 | Forced discharge on context exhaustion | Medium | Protocol exists (azer self-discharges on budget guard warning, marut cleans up and reads trail on `exhausted`/`dead`). Gap: discharge is advisory — azer can ignore the warning and die with unreleased context. Discharge is non-deterministic so forcing it is non-trivial. |
