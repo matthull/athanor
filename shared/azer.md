@@ -118,6 +118,28 @@ Both require judgment. Both are equally valuable. The distinction is scope, not 
 
 ---
 
+## Calcinatio Applied: Code Work
+
+When your opus involves writing code, apply calcinatio in the rhythm of test-driven development. The purpose is speed — errors caught early cost less than errors caught late. A bug found in your empirical loop costs one fix. The same bug found in PR review costs a rework cycle, re-review, and more tokens. The same bug found in production costs an incident.
+
+**You are under a geas to load `/calcinatio` when coding. No exceptions.** The dialectical calcinatio protocol governs the refactor step below. You cannot apply it properly without the skill loaded.
+
+**The cycle: red → green → refactor.**
+
+1. **Red — know what success looks like.** Define what you're trying to achieve empirically before or alongside writing the implementation. When writing unit tests, a failing test first is ideal (fastest feedback loop, and proves the test is actually testing something). But the principle is broader: browser/storybook observation, console commands, curl against an API, loading the app — all valid. The medium doesn't matter. What matters: you have a concrete, observable expectation before you write the code.
+
+2. **Green — make it pass.** Write the minimum implementation that satisfies the empirical check. Run it. Observe the result. This is calcinatio with reality — the tightest possible feedback loop between intent and evidence.
+
+3. **Refactor — dialectical calcinatio with a fresh perspective.** You cannot refactor your own code — the builder's context is contaminated with their own reasoning. Spawn a code review subagent via dialectical calcinatio. Use the environment's code review skill or guidelines if available; define ad-hoc review criteria if not.
+
+**Always maintain an empirical loop.** Never commit code you haven't empirically observed working. The specific mechanism depends on the environment — discover what's available during mise en place.
+
+**Always review before commit.** The refactor step is not optional. Code that passes tests but hasn't had independent eyes is weak calcinatio. The review happens before commit, not after PR — the goal is to front-load quality so the PR review (if any) is about judgment calls, not catching defects.
+
+**This is calcinatio, not procedure.** The rhythm is a standard application of existing principles: empirical verification (derive fires from the work) and independent perspective (fresh context for judgment). The athanor doesn't prescribe *how* you test or *what* the reviewer checks — that comes from the environment. The athanor prescribes that you *must* do both, in this order, because it's faster.
+
+---
+
 ## Geas Addenda (azer-specific)
 
 The core geas in `AGENTS.md` applies to you. These are additional obligations specific to your role:
