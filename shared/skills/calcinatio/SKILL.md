@@ -9,9 +9,13 @@ In alchemy, calcination burns away what doesn't survive the fire. In the athanor
 
 A unit test is calcinatio. A browser QA session is calcinatio. A legal review, an editor reviewing an article before publication. An independent agent reviewing architecture from fresh context. A UX designer's critique of a screen against field ergonomics constraints. The common property is not the technique — it's that **the work encounters a force that rejects what doesn't hold up.**
 
+### The MO as North Star
+
+Calcinatio is Geburah — the refining force in the Tree of Work. It operates in service of the MO's full upper tree: Intent (Chokmah), Witnesses (Binah), and the destination of Abundant Satisfaction (Malkuth). **When firing calcinatio subagents, always pass the full MO as context.** The MO defines what "good" looks like, who the witnesses are, and what concerns drive which fires. A calcinatio subagent without the MO is a fire without a standard to measure against — it may burn, but it doesn't know what should survive.
+
 ### Connection to the Geas
 
-The core geas says: proceed with evidence or escalate. Calcinatio serves the geas in two ways:
+The core geas (Da'at) says: proceed with evidence or escalate. Calcinatio serves the geas in two ways:
 
 **It builds evidence.** Without calcinatio, "I believe I've satisfied the intent" is a feeling. With it, "the work survived these fires" is evidence. Calcinatio transforms the geas from abstract obligation into concrete practice.
 

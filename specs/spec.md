@@ -69,6 +69,28 @@ Two loose naming registers: **monster manual** for agents (creatures with purpos
 
 ## How Work Flows
 
+### The Generative Mechanism — The Tree of Work
+
+The athanor's architecture maps to the Kabbalistic Tree of Life. This isn't decorative — the tree names the forces that generate work and their relationships. Understanding the tree is understanding why each element of the system matters and what happens when one is neglected.
+
+**Keter — The Artifex's Will.** The crown, the source. Everything flows from the artifex's intent to change something in the world. The artifex is the only one who can kindle a Magnum Opus or make final judgments.
+
+**The Supernal Dyad — Direction:**
+- **Chokmah (Intent)** — the flash of creative will. What change is demanded in the witnesses' experience. The MO's `## Intent` section.
+- **Binah (Witnesses)** — understanding, form. Who experiences and judges the change. The MO's `## Witnesses` section.
+
+**Da'at — The Geas.** The hidden sephirah, the bridge between the supernals and the lower tree. The geas is how all the MO's principles are articulated into behavioral compulsion. It doesn't belong to any single energy — it channels them all. "Pursue this with integrity and abundantly satisfy the Magnum Opus" transmits intent, witness concerns, calcinatio requirements, everything, into the agent's felt obligation to act.
+
+**The Alignment Dyad — Expansion and Constraint:**
+- **Chesed (Generative Expansion)** — the drive to seek what bountifully serves. Orthogonal emanation, manifold generation, the expansive exploration of possibility space. The energy that asks "what is the MOST VALUABLE thing I can do?" Not just an answer — the richest answer.
+- **Geburah (Calcinatio)** — the refining force. Fires that burn away what doesn't hold up. Tests, QA, independent review, professional critique. The MO's `## Calcinatio` section defines the concerns; the environment and the agent's generativity provide the fires.
+
+**The Lower Tree — Environment.** CLAUDE.md, CI pipelines, project conventions, test suites, specs, tools, the trail. The material world the athanor operates within. The environment materializes the upper tree's principles: calcinatio concerns become actual test suites; generative principles become available skills and formulas.
+
+**Malkuth — Abundant Satisfaction.** The kingdom, the final manifestation. Everything above precipitates toward this: the state where witnesses feel served, the artifex can forget about it, and the work is actually done in the world — not just technically complete but shipped, visible, deployed, communicated. All work in the athanor drives toward Malkuth.
+
+**The hierarchy is clear.** The geas and MO are non-negotiable. Follow them, or escalate if you strongly believe the guidance is wrong. Silently ignoring the geas or MO — rationalizing past a calcinatio gate, skipping a witness, proceeding without evidence — is a total failure of the system, regardless of how reasonable the justification sounds. The environment carries weight proportional to its clarity: when there is clear, non-conflicting, emphatic guidance ("must", "never", "always") in the environment, follow it. When environment guidance conflicts with itself or is ambiguous, use judgment. When it conflicts with the geas or MO, the geas and MO win — or escalate if unsure.
+
 ### The Magnum Opus — Top-Level Goals
 
 A **Magnum Opus** (MO) is a top-level goal container. Each athanor can have multiple Magna Opera, and each gets its own marut supervisor.

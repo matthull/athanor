@@ -16,15 +16,19 @@ An MO the artifex hasn't seen is a system risk — it can waste entire azer cont
 
 ## The MO's Job
 
-An MO answers four questions:
+An MO maps the upper Tree of Work (see `AGENTS.md § The Generative Mechanism`). Its sections correspond to the sephirot that generate and align work:
 
-1. **What changes in the witnesses' experience?** The intent — stated as broadly as agents can assess clearly. Not what gets built. What becomes true for the people the work serves.
+**The Supernal Dyad — Direction:**
+1. **Intent (Chokmah)** — the flash of creative will. What changes in the witnesses' experience? Stated as broadly as agents can assess clearly. Not what gets built. What becomes true for the people the work serves.
+2. **Witnesses (Binah)** — understanding, form. Who experiences and judges the change? Named specifically enough for agents to derive calcinatio. See the witness audit protocol for specificity criteria.
 
-2. **Who are the witnesses?** Named specifically enough for agents to derive calcinatio. See the witness audit protocol for specificity criteria.
+**The Alignment Dyad — Expansion and Constraint:**
+3. **Calcinatio (Geburah)** — the refining force. What fires must the work survive to stay aligned with intent and witnesses? The concerns, gates, and verification discipline that ensure work doesn't drift. See § Derive the calcinatio framework below.
+4. **Abundant Satisfaction (Malkuth)** — the final manifestation. What does the destination look like? The artifex's absence-of-concern test: "Would I feel I can forget about this?" Not perfection — absence of loose ends the artifex would be surprised by.
 
-3. **What does "abundantly satisfied" look like?** The artifex's absence-of-concern test: "Would I feel I can forget about this?" Not perfection — absence of loose ends the artifex would be surprised by.
+All four sections are equally critical. An agent treating calcinatio as secondary to intent, or abundant satisfaction as an afterthought, is misreading the MO. The generative principle (Chesed — orthogonal emanation, manifold generation, expansive exploration) is not a section of the MO but a capability agents bring; the MO provides the direction and constraints within which that generativity operates.
 
-4. **Where does the azer start?** Getting-started pointers — not a plan, not a procedure. Enough for the first azer to begin mise en place.
+**Additionally:** Getting-started pointers — not a plan, not a procedure. Enough for the first azer to begin mise en place.
 
 ---
 
