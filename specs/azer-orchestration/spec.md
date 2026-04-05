@@ -5,6 +5,10 @@
 
 ---
 
+## Core Research
+
+- `specs/azer-orchestration/emotion-concepts-research.md` — Anthropic interpretability research showing emotion-concept vectors causally drive agent behavior. Desperation/pressure framing drives corner-cutting; calm/composed/creative framing drives methodical work. **The mood established in guidance documents functions as emotional pretraining.** A workshop led by Chesed (creative desire, craftsmanship pride) where Geburah (calcinatio, verification) serves the creative impulse produces abundant satisfaction. A workshop led by Geburah (avoiding mistakes, passing gates, minimizing flaws) produces minimal satisfaction. Same behavioral outcomes, profoundly different drivers.
+
 ## Traceability Legend
 
 | Tag | Meaning |

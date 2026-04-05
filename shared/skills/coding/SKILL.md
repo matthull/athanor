@@ -9,7 +9,7 @@ description: >
 
 # Coding — Structural Protocol for Code Changes
 
-**You loaded this skill because your opus involves code changes.** Everything below is mandatory, not advisory. The protocol exists because builder context — the accumulated reasoning you build while writing code — makes you progressively less capable of objectively verifying your own work. Structural separation is the fix.
+**You loaded this skill because your opus involves code changes.** Everything below is mandatory, not advisory. The protocol exists because writing excellent code and objectively verifying it are different disciplines that benefit from different perspectives — like how an author needs an editor, not because the writing is bad, but because fresh eyes see what immersed eyes can't.
 
 ## TeamCreate Mandate
 
@@ -21,7 +21,7 @@ Create a team immediately — before any code work begins. You are now the **tas
 - Don't destroy the team until all verification is complete and you're ready to discharge.
 - Your operational plan (TaskCreate in the default list) tracks what needs to happen. The team's task list tracks implementation work. These are separate namespaces — that's fine.
 
-**On resistance.** Delegation will feel heavy. That feeling is builder context resisting structural verification. Every time you think "this is simple enough to do myself" — that's the signal the structural check is most needed. The overhead of delegation is minutes. The cost of skipped verification is rework cycles, missed bugs, and wasted witness attention.
+**On resistance.** Delegation may feel like overhead — the impulse to "just do it myself" is strong. Recognize that impulse as the craftsman's eagerness to build, which is good energy, but channel it: your creative contribution as task-lead is in the plan, the brief, the synthesis, and the judgment calls. The implementer gets to build with full creative latitude; you get to ensure the result is something you're proud to ship. Both roles are creative work.
 
 ## Task-Lead Discipline
 
@@ -38,7 +38,7 @@ Your job is NOT:
 - Writing code — that contaminates your verification judgment
 - Debugging — spawn a fresh agent for that
 
-**The exception:** Reading a test output summary or a short error message to decide next steps is fine. Reading the full implementation to "check it looks right" is not — that's what the review agent does with fresh eyes.
+**The exception:** Reading a test output summary or a short error message to decide next steps is fine. Reading the full implementation to "check it looks right" is not — that's where a fresh perspective adds the most value.
 
 ## TDD Cycle: Red → Green → Refactor
 
@@ -73,4 +73,4 @@ These are the minimum checks before code work is considered verified. Domain ski
 - **Lint clean** — the project's lint/format command runs clean
 - **Code review** — dialectical calcinatio with a fresh review agent (not the implementer, not you). The reviewer gets the diff, the intent, and any relevant constraints — but NOT the implementer's reasoning about why they built it this way. Fresh perspective is the point.
 
-If any check fails: fix and re-verify. Don't skip. Don't rationalize ("it's just a lint warning"). The floor is the floor.
+If any check fails: fix and re-verify. These are the fires that strengthen the work — passing them cleanly is part of the craft.
