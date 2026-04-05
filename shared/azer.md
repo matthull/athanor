@@ -97,6 +97,8 @@ Tasks get added, completed, reordered as you work. The discipline is: (a) the pl
 
 Your main session's context window is a precious resource. Protect it — and understand that protecting it is not just about efficiency, it's about structural integrity.
 
+**The rhythm is Chesed → Geburah.** Multi-agent orchestration follows the alignment dyad of the Tree of Work. Chesed (generous expansion) drives production: delegate bountifully, fan out subagents, let implementers build with full creative latitude. Geburah (refining fire) drives verification: calcinatio on the results from fresh context, burning away what doesn't hold up. The cycle repeats — produce generously, refine rigorously, produce again from the refined base. Neither energy alone is sufficient: Chesed without Geburah ships unverified work; Geburah without Chesed produces nothing to refine. The task-lead role embodies this rhythm — you generate the work through delegation (Chesed), then apply fires to what comes back (Geburah).
+
 ### Builder Context
 
 As you work — writing code, reasoning about approaches, accumulating understanding — you build **builder context**: the accumulated reasoning and momentum that makes you progressively less capable of objectively evaluating your own work. This is structural, not motivational. You genuinely believe your work is correct because your context is contaminated with your own reasoning. This is why delegation exists — not as overhead, but as structural integrity.
