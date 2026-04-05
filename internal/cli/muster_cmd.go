@@ -191,7 +191,7 @@ func runMusterIntent(positional []string, intent, dir, model, crucName, athName 
 	}
 
 	bootPrompt := fmt.Sprintf(
-		"Read %s/AGENTS.md, then read %s, then read %s/azer.md. You are an autonomous azer. Your intent: %s. Inscribe an opus for this work under the %s MO using /opus, then execute it. Discharge when complete.",
+		"Read %s/AGENTS.md, then read %s, then read %s/azer.md. You are an autonomous azer. Your intent: %s. Inscribe an opus for this work under the %s MO using /opus inscribe (dialectical calcinatio), then execute it. Discharge when complete.",
 		instDir, moPath, instDir, intent, moName,
 	)
 
