@@ -16,10 +16,10 @@ The athanor runs as a constellation of Claude Code processes inside tmux session
 
 | Agent | Launch | Session Mode | Permission Mode | Lifecycle | Termination |
 |-------|--------|-------------|-----------------|-----------|-------------|
-| **Marut** | `ath kindle` | Interactive | `--permission-mode auto` | Long-lived, restartable via `ath reforge` | Manual (`kill-window`) or context exhaustion → reforge |
-| **Azer** | `ath muster` | Interactive | `--permission-mode auto` | Medium-lived, bound to opus | Self-discharge → marut cleanup |
-| **Homunculus** | Manual | Interactive | Default (manual) | Persistent, artifex's workbench | Manual |
-| **Craft session** | `ath craft` | Interactive | Default (manual) | Artifex-directed | Manual discharge |
+| **Marut** | `ath kindle` | Interactive | Default | Long-lived, restartable via `ath reforge` | Manual (`kill-window`) or context exhaustion → reforge |
+| **Azer** | `ath muster` | Interactive | Default | Medium-lived, bound to opus | Self-discharge → marut cleanup |
+| **Homunculus** | Manual | Interactive | Default | Persistent, artifex's workbench | Manual |
+| **Craft session** | `ath craft` | Interactive | Default | Artifex-directed | Manual discharge |
 
 ---
 

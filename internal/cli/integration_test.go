@@ -415,6 +415,45 @@ This is a test opus created by the QA harness.
 		}
 	})
 
+	// ─── Phase 8b: ath muster --intent (autonomous azer from intent) ─
+
+	t.Run("muster intent creates azer crucible", func(t *testing.T) {
+		out, err := runAth("muster", "qa-goal", "intent-test",
+			"--intent", "fix the widget loader",
+			"--athanor", "qa-test", "--dir", "/tmp")
+		if err != nil {
+			t.Fatalf("ath muster --intent failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-intent-test")
+
+		if !strings.Contains(out, "azer-intent-test") {
+			t.Errorf("expected crucible name in output, got: %s", out)
+		}
+		if !strings.Contains(out, "fix the widget loader") {
+			t.Errorf("expected intent in output, got: %s", out)
+		}
+
+		time.Sleep(500 * time.Millisecond)
+
+		windows := listSessionWindows(t, qaSession)
+		if !containsExact(windows, "azer-intent-test") {
+			t.Errorf("expected tmux window 'azer-intent-test' in session %s, got: %v", qaSession, windows)
+		}
+	})
+
+	t.Run("muster intent without name errors", func(t *testing.T) {
+		cmd := exec.Command(athBin, "muster", "qa-goal",
+			"--intent", "do something", "--athanor", "qa-test")
+		cmd.Env = append(os.Environ(), "ATHANOR_HOME="+tmpHome)
+		out, err := cmd.CombinedOutput()
+		if err == nil {
+			t.Fatal("expected error when name not provided with --intent")
+		}
+		if !strings.Contains(string(out), "crucible name required") {
+			t.Errorf("expected 'crucible name required' error, got: %s", out)
+		}
+	})
+
 	// ─── Phase 9: ath whisper between windows ────────────────────────
 	// Create a plain bash window to whisper to (easier to verify than
 	// a claude session which has its own TUI)
@@ -468,6 +507,13 @@ This is a test opus created by the QA harness.
 		out, err := runAth("cleanup", "azer-qa-fix-something", "--athanor", "qa-test")
 		if err != nil {
 			t.Fatalf("second cleanup should succeed (idempotent): %v\n%s", err, out)
+		}
+	})
+
+	t.Run("cleanup intent azer crucible", func(t *testing.T) {
+		out, err := runAth("cleanup", "azer-intent-test", "--athanor", "qa-test")
+		if err != nil {
+			t.Fatalf("ath cleanup intent azer failed: %v\n%s", err, out)
 		}
 	})
 

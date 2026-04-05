@@ -103,7 +103,7 @@ Babysits permission prompts across all athanor panes. Kill when done supervising
 
 ```bash
 # From the marut's crucible (~/code/musashi):
-claude --model sonnet --permission-mode auto "Read $ATHANOR/AGENTS.md, then read $ATHANOR/magna-opera/<mo-name>.md, then read $ATHANOR/marut.md, then read $ATHANOR/muster.md. You are the marut for this athanor. Start /loop 5m and begin your operational cycle."
+claude --model sonnet "Read $ATHANOR/AGENTS.md, then read $ATHANOR/magna-opera/<mo-name>.md, then read $ATHANOR/marut.md, then read $ATHANOR/muster.md. You are the marut for this athanor. Start /loop 5m and begin your operational cycle."
 ```
 
 Then use /config to enable autocompact, since we don't have an automated primus to spawn maruts yet.
@@ -116,7 +116,7 @@ When the marut session dies (context exhaustion, crash, drift):
 
 ```bash
 # In the marut's crucible (~/code/musashi) — kill the old session, start fresh:
-claude --model sonnet --permission-mode auto "Read $ATHANOR/AGENTS.md, then read $ATHANOR/magna-opera/<mo-name>.md, then read $ATHANOR/marut.md, then read $ATHANOR/muster.md. You are the marut for this athanor. Check opera/ for in-progress work and the trail. Start /loop 5m and resume your operational cycle."
+claude --model sonnet "Read $ATHANOR/AGENTS.md, then read $ATHANOR/magna-opera/<mo-name>.md, then read $ATHANOR/marut.md, then read $ATHANOR/muster.md. You are the marut for this athanor. Check opera/ for in-progress work and the trail. Start /loop 5m and resume your operational cycle."
 ```
 
 The crucible endures. The session is reforged. Durable state lives in the opera files.
@@ -207,7 +207,7 @@ Track gaps the marut escalates about — these become the artifex's build-out wo
 | Date | Gap | Source | Resolution |
 |------|-----|--------|------------|
 | 2026-03-21 | No production data access | Pre-launch audit | Need read-only SQL user + sandboxed console concept |
-| 2026-03-21 | Permission prompts blocking azers | First firing observation | Added `--permission-mode auto` to muster.md launch commands. Explore overlap with `/permission-manager` — auto mode may make the perms watcher redundant for azers. Need to test whether auto mode handles all azer operations (docker compose, gh, git push) without prompts. |
+| 2026-03-21 | Permission prompts blocking azers | First firing observation | Initially added `--permission-mode auto` but removed — feature not reliably available across Anthropic account types. Rely on `.claude/settings.json` allowlists instead. |
 | 2026-03-21 | Worktree cleanup not automated | First firing observation | Each azer creates a worktree with its own Docker env. Without automated cleanup after opus discharge, disk and Docker resources will exhaust quickly. Need `wtp remove` integrated into the marut's post-discharge flow or a separate cleanup protocol. |
 | 2026-03-21 | specs/ cross-worktree sync | First firing observation | Azer discharges invisible to marut. **Fixed:** azer.md now includes `git -C specs push` on discharge; muster.md includes `git -C specs pull` before checking discharge state. |
 | 2026-03-21 | `gh pr create` heredoc rejection | First firing observation | bash-allowlist-coach hook rejects heredoc/command-substitution patterns. **Fixed:** azer.md now instructs writing PR body to temp file + `--body-file`. |

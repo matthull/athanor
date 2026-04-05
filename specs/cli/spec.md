@@ -99,7 +99,7 @@ ath kindle myproject
   → reads athanor.yml for project path, marut model
   → creates tmux window "marut-myproject"
   → sets $ATHANOR=~/athanor/athanors/myproject/
-  → launches claude --model sonnet --permission-mode auto with marut boot prompt
+  → launches claude --model sonnet with marut boot prompt
 ```
 
 ### Marut musters an azer
@@ -112,7 +112,7 @@ ath muster fix-nil-error.md --dir /path/to/worktree
   → reads $ATHANOR to find the instance
   → reads opus file for crucible naming
   → creates tmux window "azer-fix-nil-error"
-  → launches claude --model opus --permission-mode auto with azer boot prompt
+  → launches claude --model opus with azer boot prompt
   → runs ath whisper idle to verify launch
 ```
 
@@ -184,7 +184,6 @@ Launch a marut for an athanor. The marut is the furnace — once kindled, it run
 4. Launches claude session in the window:
    - Working directory: `athanor.yml → project` (or `~` if no project)
    - Model: `athanor.yml → marut_model` (default: sonnet)
-   - Flags: `--permission-mode auto` (always) `[D:all-agents-auto-perms]`
    - Environment: `ATHANOR=~/athanor/athanors/<name>/`
    - Prompt: the marut boot prompt (reads AGENTS.md, magnum-opus.md, marut.md, muster.md, starts /loop 5m)
 5. Verifies launch with `ath whisper idle marut-<name>`
@@ -275,7 +274,6 @@ Launch an azer for a charged opus. The marut's primary dispatch command.
 4. Launches claude session:
    - Working directory: `--dir` value or project dir
    - Model: `--model` value or athanor.yml default
-   - Flags: `--permission-mode auto` (always) `[D:all-agents-auto-perms]`
    - Environment: `ATHANOR=$ATHANOR`
    - Prompt: azer boot prompt (reads AGENTS.md, azer.md, opus file, execute)
 5. Verifies launch with `ath whisper idle <crucible-name>`
@@ -394,11 +392,9 @@ Zsh completion is a first-class requirement, not an afterthought. `[D:ergonomics
 
 ## Design Decisions
 
-### All agents launch with `--permission-mode auto`
+### No `--permission-mode auto`
 
-Every claude session launched by `ath` (marut or azer) uses `--permission-mode auto`. No opt-out. Rationale: maruts do only mechanical operations (tmux, git, rg). Azers are already launched with auto perms. Permission prompts are the single biggest operational friction — every prompt blocks an agent until the permission manager or artifex intervenes. `[O:observation]` `[S:kadmon.md]`
-
-**Consequence:** The `/permission-manager` may become unnecessary. Monitor after rollout.
+`--permission-mode auto` is not used. The feature is not reliably available across all Anthropic account types. Agents use default Claude Code permission mode and rely on the project's `.claude/settings.json` allowlists for operational smoothness. `[O:observation — auto mode unavailable on main Anthropic account]`
 
 ### Prompt templates are CLI infrastructure
 
@@ -463,7 +459,7 @@ When `ath init` creates a new instance (or when `ath kindle` launches a session)
 3. This is advisory, not blocking — the init still succeeds
 
 **`ath kindle` behavior:**
-1. Before launching, verify paths. If key paths are missing, warn but proceed (the `--permission-mode auto` on the session handles runtime perms, but file read/write outside the project dir may still be blocked by Claude Code's file access controls).
+1. Before launching, verify paths. If key paths are missing, warn but proceed (file read/write outside the project dir may still be blocked by Claude Code's file access controls — ensure `.claude/settings.json` allowlists cover athanor paths).
 
 **Future (Phase 3):** `ath perms check` command that audits all athanor instances and reports which paths need adding. `ath perms fix` that generates the settings.json patch.
 
@@ -610,9 +606,7 @@ When this feature is complete, review:
 - [ ] Update athanor `spec.md` implementation status table
 
 ### Workflow Improvements
-- [ ] Is `/permission-manager` still needed with universal `--permission-mode auto`?
 - [ ] Can marut.md be simplified now that muster is one command?
-- [ ] Should `ath kindle` also start the permission watcher, or is it fully unnecessary?
 
 ### Knowledge Capture
 - [ ] Document the migration path for anyone with existing athanors in specs/
