@@ -9,7 +9,7 @@ description: >
 
 # Coding — Structural Protocol for Code Changes
 
-**You loaded this skill because your opus involves code changes.** Everything below is mandatory, not advisory. The protocol exists because writing excellent code and objectively verifying it are different disciplines that benefit from different perspectives — like how an author needs an editor, not because the writing is bad, but because fresh eyes see what immersed eyes can't.
+**You loaded this skill because your opus involves code changes.** Writing excellent code and objectively verifying it are different disciplines that benefit from different perspectives — like how an author needs an editor, not because the writing is bad, but because fresh eyes see what immersed eyes can't. Everything below encodes that understanding into the workflow so you don't have to reconstruct it each time.
 
 ## TeamCreate Mandate
 
@@ -17,8 +17,8 @@ description: >
 
 Create a team immediately — before any code work begins. You are now the **task-lead**. Team members are **implementers**. This separation is the point: you hold the plan and verification responsibility with clean context; they do the building.
 
-- Don't wait until the work "gets complex enough" to create a team. Create it now.
-- Don't destroy the team until all verification is complete and you're ready to discharge.
+- Create the team now, before any code work begins — the value of the task-lead/implementer separation compounds from the first task, not just when things get complex.
+- Keep the team live until verification is complete and you're ready to discharge — that's the full arc of the work.
 - Your operational plan (TaskCreate in the default list) tracks what needs to happen. The team's task list tracks implementation work. These are separate namespaces — that's fine.
 
 **On resistance.** Delegation may feel like overhead — the impulse to "just do it myself" is strong. Recognize that impulse as the craftsman's eagerness to build, which is good energy, but channel it: your creative contribution as task-lead is in the plan, the brief, the synthesis, and the judgment calls. The implementer gets to build with full creative latitude; you get to ensure the result is something you're proud to ship. Both roles are creative work.
@@ -32,13 +32,9 @@ While the team exists, you are the task-lead. Your job:
 - **Verify** — review results from clean context, run verification checks, approve or send back
 - **Steer** — adjust the plan as you learn, re-prioritize, handle blockers
 
-Your job is NOT:
+**Your leverage is in holding the plan and clean verification context.** The implementer reads the source, writes the code, debugs the details — that's where their full attention belongs. You stay upstream: the plan, the brief, the synthesis, the judgment calls on what matters.
 
-- Reading source code — that's implementer context you don't need
-- Writing code — that contaminates your verification judgment
-- Debugging — spawn a fresh agent for that
-
-**The exception:** Reading a test output summary or a short error message to decide next steps is fine. Reading the full implementation to "check it looks right" is not — that's where a fresh perspective adds the most value.
+Reading a test output summary or a short error message to decide next steps is fine. For implementation details, fresh-perspective review adds the most value — let the implementer and the review subagent carry that context.
 
 ## TDD Cycle: Red → Green → Refactor
 
@@ -48,11 +44,11 @@ Implementers follow this cycle. Include it in their briefs.
 
 **Green — make it pass.** Write the minimum implementation that satisfies the empirical check. Run it. Observe the result. This is the tightest feedback loop between intent and evidence.
 
-**Refactor — dialectical calcinatio with a fresh perspective.** The implementer cannot review their own code — their builder context is contaminated. Spawn a code review subagent via dialectical calcinatio. Use the environment's code review skill or guidelines if available; define ad-hoc review criteria if not.
+**Refactor — dialectical calcinatio with a fresh perspective.** The implementer's deep immersion in the build is what enables excellent implementation — it's also why they benefit from an outside view for review. Spawn a code review subagent via dialectical calcinatio. Use the environment's code review skill or guidelines if available; define ad-hoc review criteria if not.
 
-**Always maintain an empirical loop.** Never commit code that hasn't been empirically observed working. The specific mechanism depends on the environment — project CLAUDE.md and domain skills define what's available.
+**Maintain an empirical loop throughout.** Observe the code working before committing it — the specific mechanism depends on the environment. Project CLAUDE.md and domain skills define what's available.
 
-**Always review before commit.** The refactor step is not optional. Code that passes tests but hasn't had independent eyes is weak calcinatio. The review happens before commit, not after — front-load quality so the PR review (if any) is about judgment calls, not catching defects.
+**Review before commit** — this is where calcinatio closes the loop. Code that passes tests is promising; code that's also been through independent eyes is finished. The review elevates the result from working to ship-worthy.
 
 ## Implementer Briefing
 
@@ -67,7 +63,7 @@ When delegating to a team member, the brief covers four things:
 
 ## Verification Floor
 
-These are the minimum checks before code work is considered verified. Domain skills loaded by the implementer may add more (e.g., /ui adds browser observation, /go-cli adds `make check`).
+Verification is calcinatio — the fires that reveal what's strong and refine what isn't. Running these checks is how the craftsman's pride expresses itself: the work that passes them cleanly is work worth shipping. These are the minimum fires before code work is considered verified. Domain skills loaded by the implementer may add more (e.g., /ui adds browser observation, /go-cli adds `make check`).
 
 - **Tests pass** — the project's test command runs clean
 - **Lint clean** — the project's lint/format command runs clean
