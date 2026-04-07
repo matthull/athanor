@@ -14,7 +14,7 @@ const (
 	// AthanorsDir is the subdirectory containing athanor instances.
 	AthanorsDir = "athanors"
 
-	// SharedDir is the subdirectory containing shared components (agent roles, protocols).
+	// SharedDir is the subdirectory containing shared agent definitions in the source repo.
 	SharedDir = "shared"
 
 	// MagnaOperaDir is the subdirectory containing magna opera (top-level goals).
@@ -48,9 +48,26 @@ func InstanceDir(home, name string) string {
 	return filepath.Join(home, AthanorsDir, name)
 }
 
-// SharedPath returns the path to the shared components directory.
-func SharedPath(home string) string {
-	return filepath.Join(home, SharedDir)
+// RepoDir resolves the athanor source repository path.
+// Checks $ATHANOR_REPO first, then falls back to ~/code/athanor.
+func RepoDir() (string, error) {
+	if r := os.Getenv("ATHANOR_REPO"); r != "" {
+		return expandHome(r)
+	}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("resolving home directory: %w", err)
+	}
+	return filepath.Join(home, "code", "athanor"), nil
+}
+
+// SharedPath returns the path to the shared agent definitions in the source repo.
+func SharedPath() (string, error) {
+	repo, err := RepoDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(repo, SharedDir), nil
 }
 
 // ListInstances returns the names of all athanor instances.
@@ -78,7 +95,6 @@ func EnsureHome(home string) error {
 	dirs := []string{
 		home,
 		filepath.Join(home, AthanorsDir),
-		filepath.Join(home, SharedDir),
 	}
 	for _, d := range dirs {
 		if err := os.MkdirAll(d, 0755); err != nil {

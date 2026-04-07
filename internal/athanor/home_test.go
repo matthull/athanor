@@ -33,6 +33,33 @@ func TestHome(t *testing.T) {
 	})
 }
 
+func TestRepoDir(t *testing.T) {
+	t.Run("uses ATHANOR_REPO when set", func(t *testing.T) {
+		tmp := t.TempDir()
+		t.Setenv("ATHANOR_REPO", tmp)
+		got, err := RepoDir()
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if got != tmp {
+			t.Errorf("RepoDir() = %q, want %q", got, tmp)
+		}
+	})
+
+	t.Run("falls back to ~/code/athanor", func(t *testing.T) {
+		t.Setenv("ATHANOR_REPO", "")
+		got, err := RepoDir()
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		home, _ := os.UserHomeDir()
+		want := filepath.Join(home, "code", "athanor")
+		if got != want {
+			t.Errorf("RepoDir() = %q, want %q", got, want)
+		}
+	})
+}
+
 func TestEnsureHome(t *testing.T) {
 	t.Parallel()
 	tmp := t.TempDir()
@@ -43,7 +70,7 @@ func TestEnsureHome(t *testing.T) {
 	}
 
 	// Verify directories exist
-	for _, sub := range []string{"", AthanorsDir, SharedDir} {
+	for _, sub := range []string{"", AthanorsDir} {
 		path := filepath.Join(home, sub)
 		info, err := os.Stat(path)
 		if err != nil {

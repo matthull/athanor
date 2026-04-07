@@ -57,15 +57,23 @@ func TestWriteReadConfig(t *testing.T) {
 }
 
 func TestInitInstance(t *testing.T) {
-	t.Parallel()
 	tmp := t.TempDir()
 	home := filepath.Join(tmp, "athanor")
+	repoDir := filepath.Join(tmp, "repo")
 
-	// Set up home and shared components
+	// Set ATHANOR_REPO to temp repo dir
+	t.Setenv("ATHANOR_REPO", repoDir)
+
+	// Set up home
 	if err := EnsureHome(home); err != nil {
 		t.Fatal(err)
 	}
-	sharedDir := SharedPath(home)
+
+	// Set up shared components in the repo
+	sharedDir := filepath.Join(repoDir, SharedDir)
+	if err := os.MkdirAll(sharedDir, 0755); err != nil {
+		t.Fatal(err)
+	}
 	for _, f := range SharedFiles {
 		if err := os.WriteFile(filepath.Join(sharedDir, f), []byte("# "+f), 0644); err != nil {
 			t.Fatal(err)
@@ -84,7 +92,7 @@ func TestInitInstance(t *testing.T) {
 		t.Fatalf("instance directory not created")
 	}
 
-	// Verify symlinks
+	// Verify symlinks point to absolute repo paths
 	for _, f := range SharedFiles {
 		path := filepath.Join(instDir, f)
 		target, err := os.Readlink(path)
@@ -92,7 +100,7 @@ func TestInitInstance(t *testing.T) {
 			t.Errorf("expected symlink for %s: %v", f, err)
 			continue
 		}
-		expectedTarget := filepath.Join("..", "..", SharedDir, f)
+		expectedTarget := filepath.Join(sharedDir, f)
 		if target != expectedTarget {
 			t.Errorf("symlink %s -> %q, want %q", f, target, expectedTarget)
 		}

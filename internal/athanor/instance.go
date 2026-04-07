@@ -75,17 +75,18 @@ func InitInstance(home, name, project string) error {
 		return fmt.Errorf("creating instance directory: %w", err)
 	}
 
-	// Symlink shared components
-	sharedDir := SharedPath(home)
+	// Symlink shared agent definitions from source repo
+	sharedDir, err := SharedPath()
+	if err != nil {
+		return fmt.Errorf("resolving shared path: %w", err)
+	}
 	for _, f := range SharedFiles {
 		src := filepath.Join(sharedDir, f)
 		if _, err := os.Stat(src); err != nil {
-			return fmt.Errorf("shared component %q not found at %s (run setup first?)", f, src)
+			return fmt.Errorf("shared component %q not found at %s (is the athanor repo checked out?)", f, src)
 		}
-		// Use relative symlink: ../shared/<file>
-		relSrc := filepath.Join("..", "..", SharedDir, f)
 		dst := filepath.Join(instDir, f)
-		if err := os.Symlink(relSrc, dst); err != nil {
+		if err := os.Symlink(src, dst); err != nil {
 			return fmt.Errorf("symlinking %s: %w", f, err)
 		}
 	}

@@ -39,13 +39,17 @@ func runInit(args []string) int {
 		return 1
 	}
 
-	// Check shared components exist
-	sharedPath := athanor.SharedPath(home)
+	// Check shared components exist in source repo
+	sharedPath, err := athanor.SharedPath()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		return 1
+	}
 	for _, f := range athanor.SharedFiles {
 		path := fmt.Sprintf("%s/%s", sharedPath, f)
 		if _, err := os.Stat(path); os.IsNotExist(err) {
 			fmt.Fprintf(os.Stderr, "error: shared component %q not found at %s\n", f, sharedPath)
-			fmt.Fprintf(os.Stderr, "Copy shared components to %s first.\n", sharedPath)
+			fmt.Fprintf(os.Stderr, "Ensure the athanor repo is checked out (or set $ATHANOR_REPO).\n")
 			return 1
 		}
 	}

@@ -39,12 +39,14 @@ func TestATHFullLifecycle(t *testing.T) {
 	_ = exec.Command("tmux", "kill-session", "-t", athanor.SessionName("qa-test")).Run()
 	_ = exec.Command("tmux", "kill-session", "-t", athanor.SessionName("qa-warn-test")).Run()
 
-	// Set up temporary athanor home
+	// Set up temporary athanor home and repo
 	tmpHome := t.TempDir()
+	tmpRepo := t.TempDir()
 	t.Setenv("ATHANOR_HOME", tmpHome)
+	t.Setenv("ATHANOR_REPO", tmpRepo)
 
-	// Set up shared components (minimal test files)
-	sharedDir := filepath.Join(tmpHome, athanor.SharedDir)
+	// Set up shared components in the repo
+	sharedDir := filepath.Join(tmpRepo, athanor.SharedDir)
 	if err := os.MkdirAll(sharedDir, 0755); err != nil {
 		t.Fatal(err)
 	}
@@ -61,7 +63,7 @@ func TestATHFullLifecycle(t *testing.T) {
 	// Helper to run ath commands and capture output
 	runAth := func(args ...string) (string, error) {
 		cmd := exec.Command(athBin, args...)
-		cmd.Env = append(os.Environ(), "ATHANOR_HOME="+tmpHome)
+		cmd.Env = append(os.Environ(), "ATHANOR_HOME="+tmpHome, "ATHANOR_REPO="+tmpRepo)
 		out, err := cmd.CombinedOutput()
 		return string(out), err
 	}
@@ -116,8 +118,9 @@ func TestATHFullLifecycle(t *testing.T) {
 			if err != nil {
 				t.Errorf("expected symlink for %s: %v", f, err)
 			}
-			if !strings.Contains(target, "shared") {
-				t.Errorf("symlink %s points to %q, expected shared/", f, target)
+			expectedTarget := filepath.Join(sharedDir, f)
+			if target != expectedTarget {
+				t.Errorf("symlink %s points to %q, want %q", f, target, expectedTarget)
 			}
 		}
 
@@ -444,7 +447,7 @@ This is a test opus created by the QA harness.
 	t.Run("muster intent without name errors", func(t *testing.T) {
 		cmd := exec.Command(athBin, "muster", "qa-goal",
 			"--intent", "do something", "--athanor", "qa-test")
-		cmd.Env = append(os.Environ(), "ATHANOR_HOME="+tmpHome)
+		cmd.Env = append(os.Environ(), "ATHANOR_HOME="+tmpHome, "ATHANOR_REPO="+tmpRepo)
 		out, err := cmd.CombinedOutput()
 		if err == nil {
 			t.Fatal("expected error when name not provided with --intent")
