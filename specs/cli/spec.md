@@ -42,7 +42,7 @@ The athanor CLI (`ath`) is the operational backbone of the athanor system. It re
 |------|-----------|
 | **Athanor home** | `~/athanor/` (or `$ATH_HOME`). Root directory for all athanor state — shared components, instance directories, global config. Lives outside any project repo. |
 | **Instance** | A single athanor scoped to one Magnum Opus. Directory at `~/athanor/athanors/<name>/`. Contains config, opera, and symlinked shared components. |
-| **Shared components** | Role files, geas, protocols shared across all instances. Live at `~/athanor/shared/` and are symlinked into each instance. |
+| **Shared components** | Role files, geas, protocols shared across all instances. Live in the source repo's `shared/` directory and are symlinked directly into each instance. Repo location: `$ATHANOR_REPO` (default `~/code/athanor`). |
 | **Crucible** | A tmux window where an agent session runs. Named `marut-<athanor>` or `azer-<opus>`. |
 | **Kindle** | Launch a marut for an athanor — create crucible, start session. |
 | **Muster** | Launch an azer for an opus — create crucible, start session, verify. |
@@ -56,25 +56,21 @@ The athanor CLI (`ath`) is the operational backbone of the athanor system. It re
 ```
 ~/athanor/                          # ATH_HOME
 ├── config.yml                      # Global config (defaults, preferences)
-├── shared/                         # Shared components (symlinked into instances)
-│   ├── AGENTS.md
-│   ├── azer.md
-│   ├── marut.md
-│   ├── muster.md
-│   └── opus.md
 └── athanors/                       # All instances
     ├── bugsnag/
     │   ├── athanor.yml             # Instance config (project path, models, etc.)
-    │   ├── AGENTS.md               → ../shared/AGENTS.md
+    │   ├── AGENTS.md               → $ATHANOR_REPO/shared/AGENTS.md
     │   ├── magnum-opus.md          # Authored per-instance (the goal)
-    │   ├── marut.md                → ../shared/marut.md
-    │   ├── azer.md                 → ../shared/azer.md
-    │   ├── opus.md                 → ../shared/opus.md
-    │   ├── muster.md               → ../shared/muster.md
+    │   ├── marut.md                → $ATHANOR_REPO/shared/marut.md
+    │   ├── azer.md                 → $ATHANOR_REPO/shared/azer.md
+    │   ├── opus.md                 → $ATHANOR_REPO/shared/opus.md
+    │   ├── muster.md               → $ATHANOR_REPO/shared/muster.md
     │   └── opera/                  # All opera (YAML frontmatter for status)
     └── sal-117/
         └── ...
 ```
+
+Shared agent definitions live in the source repo (`$ATHANOR_REPO`, default `~/code/athanor`) under `shared/`. Each instance symlinks directly to the repo — no intermediate directory.
 
 **Key change from current system:** Athanors move from `specs/athanors/<name>/` (inside a project's specs repo) to `~/athanor/athanors/<name>/` (standalone). This eliminates the cross-worktree sync problem — all agents access the same filesystem path regardless of which worktree they run in. No more `git -C specs pull/push` dance. `[O:observation]` `[S:kadmon.md]`
 
@@ -145,7 +141,6 @@ Model defaults: marut=sonnet, azer=opus. Override per-instance when needed. `[D:
 
 ```yaml
 home: ~/athanor                      # Redundant but explicit
-shared: ~/athanor/shared             # Shared components location
 defaults:
   marut_model: sonnet
   azer_model: opus
@@ -164,7 +159,7 @@ Create a new athanor instance.
 **What it does:**
 1. Creates `~/athanor/athanors/<name>/`
 2. Creates `opera/` subdirectory
-3. Symlinks all shared components from `~/athanor/shared/`
+3. Symlinks all shared components from the source repo (`$ATHANOR_REPO/shared/`)
 4. Writes `athanor.yml` with name and project path (if provided)
 5. Writes template `magnum-opus.md` with placeholder sections
 6. Prints: "Athanor initialized. Edit magnum-opus.md, then `ath kindle <name>`."
@@ -488,9 +483,8 @@ Rename the GitHub repo: `github.com/matthull/whisper` → `github.com/matthull/a
 ### From specs/athanors/ to ~/athanor/
 
 1. Create `~/athanor/` directory structure
-2. Move `specs/athanors/shared/` → `~/athanor/shared/`
-3. Move each instance (`specs/athanors/<name>/`) → `~/athanor/athanors/<name>/`
-4. Update symlinks to point to new shared location
+2. Move each instance (`specs/athanors/<name>/`) → `~/athanor/athanors/<name>/`
+3. Update symlinks to point to source repo shared location (`$ATHANOR_REPO/shared/`)
 5. Write `athanor.yml` for each instance
 6. Initialize `~/athanor/` as a git repo
 7. Update `marut.md` and `muster.md` references from `$ATHANOR` (still works — just points to new path)
@@ -574,7 +568,7 @@ Currently the athanor runs exclusively on Claude via Claude Max accounts. As aut
 
 The current athanor structure is ad-hoc — built for experimentation during bootstrap. Now that the system has its legs under it, a ground-up architecture pass is needed. Key questions:
 
-- **Where do agent roles live?** Currently `~/athanor/shared/` (marut.md, azer.md). Are these the right abstractions? Should roles be more composable? Should they live in the `ath` binary itself (as embedded templates) vs. as editable files?
+- **Where do agent roles live?** Currently in the source repo's `shared/` directory (marut.md, azer.md), symlinked into instances. Are these the right abstractions? Should roles be more composable? Should they live in the `ath` binary itself (as embedded templates) vs. as editable files?
 - **What's the right split between CLI and materia?** Boot prompts are moving into the CLI (prompt-as-infrastructure). What else should migrate from markdown specs to code?
 - **Instance config vs. global config vs. embedded defaults?** Currently three layers (global config.yml, instance athanor.yml, CLI defaults). Is this the right layering?
 - **Opera storage and trail management.** Flat directory + YAML frontmatter works. Does it scale? Do we need indexing, search, archival?

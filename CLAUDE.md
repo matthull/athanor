@@ -57,8 +57,7 @@ internal/tmux/        # Tmux interaction library (from whisper)
 ## Athanor Home
 
 `~/athanor/` (or `$ATHANOR_HOME`) contains all athanor state:
-- `shared/` — role files symlinked into each instance
-- `athanors/<name>/` — per-instance directories with config, magna-opera, opera
+- `athanors/<name>/` — per-instance directories with config, magna-opera, opera. Agent role files (AGENTS.md, azer.md, etc.) are symlinked directly from this repo's `shared/` directory.
 - Initialized as a git repo for trail durability
 
 ## The Workshop Model

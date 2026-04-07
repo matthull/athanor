@@ -275,7 +275,7 @@ Phase 1 addresses environment guidance drift with a meaningful structural interv
 
 **1. azer.md updates — planning, multi-agent orchestration, and builder context**
 
-Changes to `~/athanor/shared/azer.md`:
+Changes to `shared/azer.md` (in the source repo):
 
 - **Operational planning with TaskCreate.** Sketch the plan before starting, track it externally, check it before discharge. Lightweight, fluid, not rigid.
 

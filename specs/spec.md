@@ -268,7 +268,7 @@ These are locked architectural decisions. Changing them requires explicit artife
 
 - **No agent may run `/orchestrate`** — its long-lived coordinator model conflicts with the opera/trail model
 - **No agent may read the system blueprint** — this spec and related design docs are the artifex's working space, not the materialized system
-- **No agent may modify the athanor's shared components** (`~/athanor/shared/` — agent roles, protocols, opus lifecycle) — agents read these files but never write to them. The athanor does not understand itself well enough to self-modify. System changes are the artifex's domain.
+- **No agent may modify the athanor's shared components** (agent roles, protocols, opus lifecycle in the source repo's `shared/` directory) — agents read these files but never write to them. The athanor does not understand itself well enough to self-modify. System changes are the artifex's domain.
 - **The artifex is Primus, the Forge Lord for now** — manually launching, monitoring, restarting. No automated primus until there are multiple Magna Opera to supervise
 - **Plans are optional context, not first-order** — goals + geas are the success guarantee. Many planning styles can succeed with clear goals
 - **Provide minimal materia, test escalation** — the first test is whether the marut escalates cleanly when it hits gaps vs. guessing/hallucinating
@@ -610,7 +610,7 @@ Opera already marked `assessed` are skipped.
 └── corpus-map.md      ← curated map to essential materia for this athanor (living, per-instance)
 ```
 
-Shared files (`AGENTS.md`, role files, `opus.md`, `muster.md`) are symlinked from `~/athanor/shared/`. `corpus-map.md` is per-instance (not shared) — each athanor's world is different. Each MO is a directory under `magna-opera/` containing its document and an `opera/` subdirectory — correlation between opera and MOs is structural. Each MO gets its own marut. Legacy instances with a single `magnum-opus.md` are still supported.
+Shared files (`AGENTS.md`, role files, `opus.md`, `muster.md`) are symlinked directly from the source repo (`shared/` directory, resolved via `$ATHANOR_REPO` or `~/code/athanor`). `corpus-map.md` is per-instance (not shared) — each athanor's world is different. Each MO is a directory under `magna-opera/` containing its document and an `opera/` subdirectory — correlation between opera and MOs is structural. Each MO gets its own marut. Legacy instances with a single `magnum-opus.md` are still supported.
 
 ### What Agents See vs. What the Artifex Sees
 
@@ -645,7 +645,7 @@ Built, fired, and working.
 | Concept | Where It Lives | Notes |
 |---------|---------------|-------|
 | Athanor instance pattern | `~/athanor/athanors/<name>/` | AGENTS.md, magna-opera/ (each MO is a directory with its own opera/), role files. Multiple MOs per instance supported. Active instances: bugsnag, sal-117-l2-metrics, seismic-classifier-mapping, blogging. |
-| Shared components | `~/athanor/shared/` | Universal AGENTS.md, azer.md, marut.md, muster.md, opus.md. Symlinked into each instance — change once, applies everywhere. These define the athanor itself — they are not materia. |
+| Shared components | Source repo `shared/` | Universal AGENTS.md, azer.md, marut.md, muster.md, opus.md. Symlinked directly from the source repo into each instance — change once, applies everywhere. These define the athanor itself — they are not materia. Source of truth is the repo at `$ATHANOR_REPO` (default `~/code/athanor`). |
 | Magnum Opus format | `magna-opera/<name>/<name>.md` per instance | Each MO is a directory containing its document and an `opera/` subdir. Goal + abundant satisfaction + witnesses + corpus map (`## Corpus Map` — curated essential materia for this MO). Intent only — no procedures, no discovery findings. Legacy `magnum-opus.md` backward compat. |
 | Opus lifecycle | `magna-opera/<mo>/opera/` with YAML frontmatter | Inscription / charge / discharge / assess. Datestamp filename prefix: `YYYY-MM-DD-<name>.md`. Opera nested under their MO — correlation is structural. |
 | Core geas + escalation-as-geas | `AGENTS.md` (shared) | "Both are equally valid fulfillments of your geas." Tested in first bugsnag firing. |

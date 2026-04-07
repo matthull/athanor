@@ -58,15 +58,7 @@ The artifex acts as Primus, the Forge Lord — responsible for launching and res
 
 When kindling a brand-new athanor instance:
 
-**2. Symlink shared files (each must be a separate command):**
-
-```bash
-ln -s ../shared/AGENTS.md specs/athanors/$ATHANOR/AGENTS.md
-ln -s ../shared/azer.md specs/athanors/$ATHANOR/azer.md
-ln -s ../shared/marut.md specs/athanors/$ATHANOR/marut.md
-ln -s ../shared/muster.md specs/athanors/$ATHANOR/muster.md
-ln -s ../shared/opus.md specs/athanors/$ATHANOR/opus.md
-```
+**2. Use `ath init` to create the instance** — it handles symlinking shared agent definitions from the source repo automatically. If doing it manually, symlink each shared file from `$ATHANOR_REPO/shared/` (default `~/code/athanor/shared/`) into the instance directory.
 
 **3. Create magna opera** — write MO files in `magna-opera/`. Required sections per MO:
 - **Goal** — what the athanor is pursuing
