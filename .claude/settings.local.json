@@ -26,7 +26,10 @@
       "Bash(ath whisper:*)",
       "Bash(tmux list-windows:*)",
       "Bash(claude-stall-scan:*)",
-      "Bash(tmux display-message:*)"
+      "Bash(tmux display-message:*)",
+      "Bash(pip3 install:*)",
+      "Bash(/tmp/svsi-env/bin/pip install:*)",
+      "Bash(nvr:*)"
     ]
   }
 }
