@@ -1,0 +1,219 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 3297.01it/s]
+[1mBertModel LOAD REPORT[0m from: sentence-transformers/all-MiniLM-L6-v2
+Key                     | Status     |  | 
+------------------------+------------+--+-
+embeddings.position_ids | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+Embedding 78 arcana + inputs...
+
+========================================================================
+  QUALITY-BASED SVSI RENDERER
+  text → 78 arcana → qualities → visual
+  78 arcana, 60 qualities
+========================================================================
+
+────────────────────────────────────────────────────────────────────────
+  Artifex witness (Alignment)
+  Top arcana: Justice (0.32)  Judgement (0.28)  High Priestess (0.27)  
+  Shape: circle, Sym: bilateral, Color: white/white, Density: moderate, Dynamic: stillness, Element: fire
+  Top qualities: force(0.22), hot(0.19), swiftness(0.18), fire(0.17), dry(0.17), air(0.17)
+
+    [97m◇       ◇[0m
+    [97m△ △ △ △ △[0m
+    [97m△ △ △ △ △[0m
+    [97m○○·◉·◉·○○[0m
+    [97m○○◉·◉·◉○○[0m
+    [97m○○·◉·◉·○○[0m
+    [97m△ △ △ △ △[0m
+    [97m△ △ △ △ △[0m
+    [97m◇       ◇[0m
+
+  Stochastic variant (0.3):
+    [97m◉       ◉[0m
+    [97m△ △ △ △ △[0m
+    [97m△ △ △ △ △[0m
+    [97m○○·◉·◉·○○[0m
+    [97m○○◉·◉·◉○○[0m
+    [97m○○·◉·◉·○○[0m
+    [97m△ △ △ △ △[0m
+    [97m△ △ △ △ △[0m
+    [97m◉       ◉[0m
+
+────────────────────────────────────────────────────────────────────────
+  Artifex witness (Harvest)
+  Top arcana: The Magician (0.39)  Strength (0.35)  The Sun (0.33)  
+  Shape: circle, Sym: bilateral, Color: white/white, Density: dense, Dynamic: flowing, Element: fire
+  Top qualities: force(0.20), fire(0.17), water(0.17), hot(0.16), dry(0.16), swiftness(0.15)
+
+    [97m▽◉◉◉◉◉◉◉▽[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m○○≈○≈○≈○○[0m
+    [97m○○○≈○≈○○○[0m
+    [97m○○≈○≈○≈○○[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m▽◉◉◉◉◉◉◉▽[0m
+
+  Stochastic variant (0.3):
+    [97m◉◉◉◉◉◉◉◉◉[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m○○≈◉≈◉≈○○[0m
+    [97m○○○≈○≈○○○[0m
+    [97m○○≈○≈○≈○○[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m◉◉◉◉◉◉◉◉◉[0m
+
+────────────────────────────────────────────────────────────────────────
+  Horse Owners witness
+  Top arcana: The Hanged Man (0.38)  Five of Cups (0.31)  Knight of Cups (0.31)  
+  Shape: circle, Sym: bilateral, Color: white/white, Density: moderate, Dynamic: flowing, Element: water
+  Top qualities: force(0.19), water(0.19), fire(0.17), hot(0.16), swiftness(0.16), wet(0.15)
+
+    [97m△       △[0m
+    [97m▽ ▽ ▽ ▽ ▽[0m
+    [97m▽ ▽ ▽ ▽ ▽[0m
+    [97m○○≈◉≈◉≈○○[0m
+    [97m○○◉≈◉≈◉○○[0m
+    [97m○○≈◉≈◉≈○○[0m
+    [97m▽ ▽ ▽ ▽ ▽[0m
+    [97m▽ ▽ ▽ ▽ ▽[0m
+    [97m△       △[0m
+
+  Stochastic variant (0.3):
+    [97m◉       ◉[0m
+    [97m▽ ▽ ▽ ▽ ▽[0m
+    [97m▽ ▽ ▽ ▽ ▽[0m
+    [97m○○≈◉≈◉≈○○[0m
+    [97m○○◉≈◉≈◉○○[0m
+    [97m○○≈◉≈◉≈○○[0m
+    [97m▽ ▽ ▽ ▽ ▽[0m
+    [97m▽ ▽ ▽ ▽ ▽[0m
+    [97m◉       ◉[0m
+
+────────────────────────────────────────────────────────────────────────
+  Calcinatio: Behavioral audit
+  Top arcana: Justice (0.31)  The Magician (0.31)  Judgement (0.28)  
+  Shape: circle, Sym: bilateral, Color: white/white, Density: moderate, Dynamic: flowing, Element: fire
+  Top qualities: force(0.22), hot(0.20), fire(0.19), swiftness(0.18), water(0.18), air(0.17)
+
+    [97m▽       ▽[0m
+    [97m△ △ △ △ △[0m
+    [97m△ △ △ △ △[0m
+    [97m○○≈◉≈◉≈○○[0m
+    [97m○○◉≈◉≈◉○○[0m
+    [97m○○≈◉≈◉≈○○[0m
+    [97m△ △ △ △ △[0m
+    [97m△ △ △ △ △[0m
+    [97m▽       ▽[0m
+
+  Stochastic variant (0.3):
+    [97m◉       ◉[0m
+    [97m△ △ △ △ △[0m
+    [97m△ △ △ △ △[0m
+    [97m○○≈◉≈◉≈○○[0m
+    [97m○○◉≈◉≈◉○○[0m
+    [97m○○≈◉≈◉≈○○[0m
+    [97m△ △ △ △ △[0m
+    [97m△ △ △ △ △[0m
+    [97m◉       ◉[0m
+
+────────────────────────────────────────────────────────────────────────
+  Calcinatio: Customer outcome
+  Top arcana: Justice (0.26)  The World (0.21)  The Lovers (0.20)  
+  Shape: circle, Sym: bilateral, Color: white/white, Density: moderate, Dynamic: flowing, Element: water
+  Top qualities: water(0.21), force(0.20), air(0.20), bilateral(0.19), hot(0.19), clarity(0.18)
+
+    [97m◇       ◇[0m
+    [97m▽ ▽ ▽ ▽ ▽[0m
+    [97m▽ ▽ ▽ ▽ ▽[0m
+    [97m○○≈◉≈◉≈○○[0m
+    [97m○○◉≈◉≈◉○○[0m
+    [97m○○≈◉≈◉≈○○[0m
+    [97m▽ ▽ ▽ ▽ ▽[0m
+    [97m▽ ▽ ▽ ▽ ▽[0m
+    [97m◇       ◇[0m
+
+  Stochastic variant (0.3):
+    [97m◉       ◉[0m
+    [97m▽ ▽ ▽ ▽ ▽[0m
+    [97m▽ ▽ ▽ ▽ ▽[0m
+    [97m○○≈◉≈◉≈○○[0m
+    [97m○○◉≈◉≈◉○○[0m
+    [97m○○≈◉≈◉≈○○[0m
+    [97m▽ ▽ ▽ ▽ ▽[0m
+    [97m▽ ▽ ▽ ▽ ▽[0m
+    [97m◉       ◉[0m
+
+────────────────────────────────────────────────────────────────────────
+  Intent: Alignment
+  Top arcana: The Magician (0.35)  The Chariot (0.30)  The World (0.25)  
+  Shape: circle, Sym: bilateral, Color: white/white, Density: dense, Dynamic: ascending, Element: fire
+  Top qualities: force(0.24), hot(0.21), swiftness(0.21), fire(0.20), dry(0.17), air(0.16)
+
+    [97m◇◉◉◉◉◉◉◉◇[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m○○↑○↑○↑○○[0m
+    [97m○○○↑○↑○○○[0m
+    [97m○○↑○↑○↑○○[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m◇◉◉◉◉◉◉◉◇[0m
+
+  Stochastic variant (0.3):
+    [97m◉◉◉◉◉◉◉◉◉[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m○○↑◉↑◉↑○○[0m
+    [97m○○○↑○↑○○○[0m
+    [97m○○↑○↑○↑○○[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m◉◉◉◉◉◉◉◉◉[0m
+
+────────────────────────────────────────────────────────────────────────
+  Tempering: Stabilization
+  Top arcana: The Star (0.24)  The Magician (0.22)  Temperance (0.22)  
+  Shape: circle, Sym: bilateral, Color: white/white, Density: dense, Dynamic: flowing, Element: fire
+  Top qualities: force(0.22), hot(0.18), fire(0.18), swiftness(0.18), dry(0.17), water(0.14)
+
+    [97m▽◉◉◉◉◉◉◉▽[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m○○≈○≈○≈○○[0m
+    [97m○○○≈○≈○○○[0m
+    [97m○○≈○≈○≈○○[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m▽◉◉◉◉◉◉◉▽[0m
+
+  Stochastic variant (0.3):
+    [97m◉◉◉◉◉◉◉◉◉[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m○○≈◉≈◉≈○○[0m
+    [97m○○○≈○≈○○○[0m
+    [97m○○≈○≈○≈○○[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m△◉△◉△◉△◉△[0m
+    [97m◉◉◉◉◉◉◉◉◉[0m
+
+========================================================================
+  QUALITY-SPACE SIMILARITY
+========================================================================
+
+  Pair                                                Sim
+  ──────────────────────────────────────────────────────────
+  Artifex/Alignment vs Artifex/Harvest             0.978 ███████████████████░
+  Artifex/Alignment vs Calcinatio:Audit            0.992 ███████████████████░
+  Artifex vs Horse Owners                          0.978 ███████████████████░
+  Calcinatio:Audit vs Calcinatio:Customer          0.983 ███████████████████░
+  Artifex witness vs Intent:Alignment              0.992 ███████████████████░
+  Intent:Alignment vs Tempering:Stabilization      0.992 ███████████████████░
+

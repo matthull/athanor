@@ -1,0 +1,192 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 5414.85it/s]
+[1mBertModel LOAD REPORT[0m from: sentence-transformers/all-MiniLM-L6-v2
+Key                     | Status     |  | 
+------------------------+------------+--+-
+embeddings.position_ids | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 3848.64it/s]
+[1mBertModel LOAD REPORT[0m from: sentence-transformers/all-MiniLM-L6-v2
+Key                     | Status     |  | 
+------------------------+------------+--+-
+embeddings.position_ids | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+========================================================================
+  FLUID SVSI — Shape masks from correspondences
+========================================================================
+
+────────────────────────────────────────────────────────────────────────
+  Artifex (Alignment)
+  ① High Priestess      ② Justice             ③ Judgement
+  shape:crescent  sym:bilateral  elem:water  dyn:stillness  density:sparse
+
+        [91m△[0m[91m△[0m[91m△[0m    
+      [91m△[0m[91m△[0m[91m·[0m[91m△[0m[91m·[0m[91m△[0m[91m△[0m  
+     [91m△[0m [91m·[0m[91m△[0m [91m△[0m[91m·[0m [91m△[0m 
+     [91m△[0m[91m·[0m[91m△[0m   [91m△[0m[91m·[0m[91m△[0m 
+    [91m△[0m[91m·[0m[92m│[0m[91m△[0m   [91m△[0m[92m│[0m[91m·[0m[91m△[0m
+    [91m△[0m [91m△[0m     [91m△[0m [91m△[0m
+    [91m△[0m[91m·[0m[92m◇[0m[91m△[0m   [91m△[0m[92m◇[0m[91m·[0m[91m△[0m
+     [91m△[0m[91m·[0m[91m△[0m   [91m△[0m[91m·[0m[91m△[0m 
+     [91m△[0m [91m·[0m[91m△[0m [91m△[0m[91m·[0m [91m△[0m 
+      [91m△[0m[91m△[0m[91m·[0m[91m△[0m[91m·[0m[91m△[0m[91m△[0m  
+        [91m△[0m[91m△[0m[91m△[0m    
+
+────────────────────────────────────────────────────────────────────────
+  Artifex (Harvest)
+  ① The Magician        ② Strength            ③ The Emperor
+  shape:line  sym:bilateral  elem:air  dyn:concentrating  density:dense
+
+       [91m△[0m[91m△[0m[91m△[0m[91m△[0m[91m△[0m   
+       [91m△[0m[91m△[0m[91m─[0m[91m△[0m[91m△[0m   
+       [91m△[0m[92m○[0m[92m≈[0m[92m△[0m[91m△[0m   
+       [91m△[0m[93m◇[0m[93m◎[0m[93m◇[0m[91m△[0m   
+       [91m△[0m[93m◎[0m[93m│[0m[93m◎[0m[91m△[0m   
+       [91m△[0m[93m│[0m[93m│[0m[93m│[0m[91m△[0m   
+       [91m△[0m[93m◎[0m[93m│[0m[93m◎[0m[91m△[0m   
+       [91m△[0m[93m◇[0m[93m◎[0m[93m◇[0m[91m△[0m   
+       [91m△[0m[92m○[0m[92m≈[0m[92m△[0m[91m△[0m   
+       [91m△[0m[91m△[0m[91m─[0m[91m△[0m[91m△[0m   
+       [91m△[0m[91m△[0m[91m△[0m[91m△[0m[91m△[0m   
+
+────────────────────────────────────────────────────────────────────────
+  Artifex (Anvil)
+  ① Temperance          ② The Magician        ③ The World
+  shape:triangle  sym:bilateral  elem:fire  dyn:flowing  density:moderate
+
+    [34m□[0m[34m□[0m[34m□[0m[34m□[0m[34m□[0m[34m□[0m[34m□[0m[34m□[0m[34m□[0m[34m□[0m[34m□[0m
+     [34m□[0m[34m○[0m  [34m○[0m  [34m○[0m[34m□[0m 
+     [34m□[0m  [93m│[0m[93m◎[0m[93m◇[0m[34m○[0m [34m□[0m 
+      [34m□[0m[93m│[0m[94m△[0m[94m≈[0m[94m△[0m[93m◎[0m[34m□[0m  
+      [34m□[0m[94m△[0m[94m≈[0m[94m△[0m[94m≈[0m[94m△[0m[34m□[0m  
+       [34m□[0m[94m△[0m[94m△[0m[94m△[0m[34m□[0m   
+       [34m□[0m[94m≈[0m[94m△[0m[94m≈[0m[34m□[0m   
+        [34m□[0m[94m≈[0m[34m□[0m    
+        [34m□[0m[93m◎[0m[34m□[0m    
+         [34m□[0m     
+         [34m□[0m     
+
+────────────────────────────────────────────────────────────────────────
+  Kelly (Analytics)
+  ① Judgement           ② The Star            ③ The Magician
+  shape:triangle  sym:radial  elem:fire  dyn:ascending  density:moderate
+
+    [93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m
+     [93m◇[0m[93m│[0m  [93m│[0m  [93m│[0m[93m◇[0m 
+     [93m◇[0m  [35m✡[0m[35m✦[0m[35m◇[0m[93m│[0m [93m◇[0m 
+      [93m◇[0m[35m✡[0m[91m△[0m[91m↑[0m[91m△[0m[35m✦[0m[93m◇[0m  
+      [93m◇[0m[91m△[0m[91m↑[0m[91m△[0m[91m↑[0m[91m△[0m[93m◇[0m  
+       [93m◇[0m[91m△[0m[91m△[0m[91m△[0m[93m◇[0m   
+      [93m◇[0m[91m△[0m[91m↑[0m[91m△[0m[91m↑[0m[91m△[0m[93m◇[0m  
+      [93m◇[0m[35m✦[0m[91m△[0m[91m↑[0m[91m△[0m[35m◇[0m[93m◇[0m  
+     [93m◇[0m  [35m✡[0m[35m✦[0m[35m◇[0m[93m│[0m [93m◇[0m 
+     [93m◇[0m [93m│[0m  [93m│[0m  [93m◇[0m 
+    [93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m
+
+────────────────────────────────────────────────────────────────────────
+  Horse Owners
+  ① Hanged Man          ② The Sun             ③ Judgement
+  shape:triangle  sym:bilateral  elem:water  dyn:suspended  density:sparse
+
+         [91m△[0m     
+         [91m△[0m     
+        [91m△[0m[93;1m✦[0m[91m△[0m    
+        [91m△[0m[94m∘[0m[91m△[0m    
+       [91m△[0m[94m∘[0m[94m△[0m[94m∘[0m[91m△[0m   
+       [91m△[0m[94m△[0m[94m△[0m[94m△[0m[91m△[0m   
+      [91m△[0m[94m▽[0m[94m∘[0m[94m△[0m[94m∘[0m[94m▽[0m[91m△[0m  
+      [91m△[0m[93;1m✦[0m[94m▽[0m[94m∘[0m[94m▽[0m[93;1m△[0m[91m△[0m  
+     [91m△[0m [91m·[0m[93;1m○[0m[93;1m✦[0m[93;1m△[0m[91m·[0m [91m△[0m 
+     [91m△[0m[91m·[0m [91m·[0m [91m·[0m [91m·[0m[91m△[0m 
+    [91m△[0m[91m△[0m[91m△[0m[91m△[0m[91m△[0m[91m△[0m[91m△[0m[91m△[0m[91m△[0m[91m△[0m[91m△[0m
+
+────────────────────────────────────────────────────────────────────────
+  Calcinatio: Audit
+  ① Justice             ② The Moon            ③ The Magician
+  shape:line  sym:bilateral  elem:air  dyn:stillness  density:moderate
+
+       [93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m   
+       [93m◇[0m [93m│[0m [93m◇[0m   
+       [93m◇[0m[35m☽[0m[35m⇌[0m[35m▽[0m[93m◇[0m   
+       [93m◇[0m[92m◇[0m[92m·[0m[92m◇[0m[93m◇[0m   
+       [93m◇[0m[92m·[0m[92m│[0m[92m·[0m[93m◇[0m   
+       [93m◇[0m[92m│[0m[92m│[0m[92m│[0m[93m◇[0m   
+       [93m◇[0m[92m·[0m[92m│[0m[92m·[0m[93m◇[0m   
+       [93m◇[0m[92m◇[0m[92m·[0m[92m◇[0m[93m◇[0m   
+       [93m◇[0m[35m☽[0m[35m⇌[0m[35m▽[0m[93m◇[0m   
+       [93m◇[0m  [93m│[0m[93m◇[0m   
+       [93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m[93m◇[0m   
+
+────────────────────────────────────────────────────────────────────────
+  Calcinatio: Customer
+  ① Justice             ② The Lovers          ③ The Sun
+  shape:line  sym:bilateral  elem:air  dyn:stillness  density:moderate
+
+       [93;1m△[0m[93;1m△[0m[93;1m△[0m[93;1m△[0m[93;1m△[0m   
+       [93;1m△[0m [93;1m○[0m [93;1m△[0m   
+       [93;1m△[0m[33m✡[0m[33m⇌[0m[33m◇[0m[93;1m△[0m   
+       [93;1m△[0m[92m◇[0m[92m·[0m[92m◇[0m[93;1m△[0m   
+       [93;1m△[0m[92m·[0m[92m│[0m[92m·[0m[93;1m△[0m   
+       [93;1m△[0m[92m│[0m[92m│[0m[92m│[0m[93;1m△[0m   
+       [93;1m△[0m[92m·[0m[92m│[0m[92m·[0m[93;1m△[0m   
+       [93;1m△[0m[92m◇[0m[92m·[0m[92m◇[0m[93;1m△[0m   
+       [93;1m△[0m[33m✡[0m[33m⇌[0m[33m◇[0m[93;1m△[0m   
+       [93;1m△[0m  [93;1m○[0m[93;1m△[0m   
+       [93;1m△[0m[93;1m△[0m[93;1m△[0m[93;1m△[0m[93;1m△[0m   
+
+────────────────────────────────────────────────────────────────────────
+  Intent: Alignment
+  ① The Chariot         ② The Magician        ③ The Lovers
+  shape:triangle  sym:bilateral  elem:water  dyn:ascending  density:dense
+
+    [33m◇[0m[33m◇[0m[33m◇[0m[33m◇[0m[33m◇[0m[33m◇[0m[33m◇[0m[33m◇[0m[33m◇[0m[33m◇[0m[33m◇[0m
+     [33m◇[0m[33m◇[0m[33m▽[0m[33m◇[0m[33m▽[0m[33m◇[0m[33m▽[0m[33m◇[0m[33m◇[0m 
+     [33m◇[0m[33m▽[0m[33m◇[0m[93m│[0m[93m◎[0m[93m◇[0m[33m◇[0m[33m▽[0m[33m◇[0m 
+      [33m◇[0m[93m│[0m[33m▽[0m[33m↑[0m[33m▽[0m[93m◎[0m[33m◇[0m  
+      [33m◇[0m[33m▽[0m[33m↑[0m[33m△[0m[33m↑[0m[33m▽[0m[33m◇[0m  
+       [33m◇[0m[33m△[0m[33m△[0m[33m△[0m[33m◇[0m   
+       [33m◇[0m[33m↑[0m[33m△[0m[33m↑[0m[33m◇[0m   
+        [33m◇[0m[33m↑[0m[33m◇[0m    
+        [33m◇[0m[93m◎[0m[33m◇[0m    
+         [33m◇[0m     
+         [33m◇[0m     
+
+────────────────────────────────────────────────────────────────────────
+  Intent: Horse Demo
+  ① Hanged Man          ② The Sun             ③ Judgement
+  shape:triangle  sym:bilateral  elem:water  dyn:suspended  density:sparse
+
+         [91m△[0m     
+         [91m△[0m     
+        [91m△[0m[93;1m✦[0m[91m△[0m    
+        [91m△[0m[94m∘[0m[91m△[0m    
+       [91m△[0m[94m∘[0m[94m△[0m[94m∘[0m[91m△[0m   
+       [91m△[0m[94m△[0m[94m△[0m[94m△[0m[91m△[0m   
+      [91m△[0m[94m▽[0m[94m∘[0m[94m△[0m[94m∘[0m[94m▽[0m[91m△[0m  
+      [91m△[0m[93;1m✦[0m[94m▽[0m[94m∘[0m[94m▽[0m[93;1m△[0m[91m△[0m  
+     [91m△[0m [91m·[0m[93;1m○[0m[93;1m✦[0m[93;1m△[0m[91m·[0m [91m△[0m 
+     [91m△[0m[91m·[0m [91m·[0m [91m·[0m [91m·[0m[91m△[0m 
+    [91m△[0m[91m△[0m[91m△[0m[91m△[0m[91m△[0m[91m△[0m[91m△[0m[91m△[0m[91m△[0m[91m△[0m[91m△[0m
+
+────────────────────────────────────────────────────────────────────────
+  Tempering: Stabilize
+  ① Temperance          ② The Tower           ③ The World
+  shape:triangle  sym:bilateral  elem:fire  dyn:flowing  density:moderate
+
+    [34m□[0m[34m□[0m[34m□[0m[34m□[0m[34m□[0m[34m□[0m[34m□[0m[34m□[0m[34m□[0m[34m□[0m[34m□[0m
+     [34m□[0m[34m○[0m  [34m○[0m  [34m○[0m[34m□[0m 
+     [34m□[0m  [91m│[0m[91m✴[0m[91m△[0m[34m○[0m [34m□[0m 
+      [34m□[0m[91m│[0m[94m△[0m[94m≈[0m[94m△[0m[91m✴[0m[34m□[0m  
+      [34m□[0m[94m△[0m[94m≈[0m[94m△[0m[94m≈[0m[94m△[0m[34m□[0m  
+       [34m□[0m[94m△[0m[94m△[0m[94m△[0m[34m□[0m   
+       [34m□[0m[94m≈[0m[94m△[0m[94m≈[0m[34m□[0m   
+        [34m□[0m[94m≈[0m[34m□[0m    
+        [34m□[0m[91m✴[0m[34m□[0m    
+         [34m□[0m     
+         [34m□[0m     
+
