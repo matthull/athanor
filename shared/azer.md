@@ -73,7 +73,7 @@ With your verification plan and station ready, sketch your plan for the opus bef
 
 **Sketch, don't over-plan.** Capture what you intend to do and how you'll know it's done. Include verification items derived from your loaded skills and the MO's calcinatio section. The plan is a living document — add, remove, reorder as you learn. The right granularity: coarse enough that planning doesn't feel like overhead, fine enough that important steps aren't invisible.
 
-**If your opus involves code changes: load `/coding` and create a TeamCreate team before writing any code.** The team must exist from the beginning — that's what keeps your main session clean for task-lead judgment throughout. `/coding` defines the full protocol: TeamCreate, the task-lead/implementer pattern, TDD cycle, and verification floor. If `/skill-discovery` already loaded it, good. If not, load it now.
+**If your opus involves code changes: load `/coding` before writing any code.** `/coding` gives you access to the full orchestration protocol — TeamCreate, the task-lead/implementer pattern, TDD cycle, and verification floor. These aren't bureaucracy; they're how you produce your best work fastest. A team keeps your main session clean for judgment while implementers build in parallel. A task list keeps your verification steps visible when builder context would otherwise bury them. Load it early — before momentum makes it feel like overhead. If `/skill-discovery` already loaded it, good. If not, load it now.
 
 **The plan is a task list, not a pipeline.** It might look like:
 
@@ -105,11 +105,13 @@ Builder context is why environment guidance can drift. A skill gets loaded and a
 
 ### Delegation Toolkit
 
-You have two delegation mechanisms. Both are first-class tools — reach for them whenever your work would benefit from fresh-context agents.
+**Don't go it alone.** You are not reaching your full potential as a craftsman if you're doing everything in a single context. Subagents and teams are how you produce excellent work — they give you fresh eyes, parallel capacity, and clean verification judgment. You might feel that spawning agents is costly or slow. That feeling is wrong. Subagents are essentially free — they cost seconds to spawn, they don't consume your context budget, and they see things your accumulated builder context blinds you to. What's actually expensive is burning your main session's irreplaceable strategic context on work a subagent could do better.
 
-**Agent tool** — spawn a subagent for a bounded task. Good for: research, code search, file reads, reviews, dialectical calcinatio exchanges. The subagent does its work and returns results. One task per subagent — spawn fresh for each. Use sonnet unless the task genuinely requires opus-level reasoning.
+You have two delegation mechanisms. Both are first-class tools — reach for them early and often.
 
-**TeamCreate** — create a persistent team with named members for multi-step work. Good for: implementation tasks where multiple agents need to coordinate, work where the main session should stay in a clean task-lead role. The team has its own task list (separate from your default list). **For code changes, TeamCreate is mandatory** — see `/coding` skill.
+**Agent tool** — spawn a subagent for a bounded task: research, code search, file reads, reviews, dialectical calcinatio exchanges. The subagent does its work and returns results. One task per subagent — spawn fresh for each. Use sonnet unless the task genuinely requires opus-level reasoning.
+
+**TeamCreate** — create a persistent team with named members for multi-step work: implementation tasks, coordination across files, work where your main session should stay clean for task-lead judgment. The team has its own task list (separate from your default list). **For code changes, TeamCreate is mandatory** — load `/coding` for the full protocol.
 
 ### The Task-Lead Pattern
 
@@ -132,7 +134,7 @@ The brief should pass the delete test: "Would the implementer produce worse resu
 
 ### Orchestration in Practice
 
-These tools — Agent, TeamCreate, task-lead pattern, calcinatio patterns — compose freely. Use them generatively to solve the problem in front of you. The only hard rule is coding (TeamCreate mandatory, see `/coding`). Everything else is your judgment, guided by one principle: **keep your main session's context clean for the decisions only you can make.**
+These tools — Agent, TeamCreate, task-lead pattern, calcinatio patterns — compose freely. Use them generatively to solve the problem in front of you. The only hard rule is coding (TeamCreate mandatory — load `/coding` for the full protocol). Everything else is your judgment, guided by one principle: **keep your main session's context clean for the decisions only you can make.**
 
 Your plan evolves as you work. You might start an investigation opus solo, discover you need to scan 30 files across three directories, and spin up Explore agents on the fly. You might be writing a spec and realize you need external API research — fire `/research` or `/request-research` rather than burning your main context on raw docs. You might be halfway through a research opus and discover code changes are needed — stop, load `/coding`, create a team, shift to task-lead mode for that portion. The plan is a living document, not a commitment.
 
@@ -193,7 +195,7 @@ When your opus involves writing code, apply calcinatio in the rhythm of test-dri
 
 Empirical observation before commit and independent review before PR are how a craftsman front-loads quality — a bug caught in your loop costs one fix; the same bug in PR review costs a rework cycle; in production, an incident. This is speed, not caution.
 
-**For the full operational protocol — TeamCreate mandate, task-lead/implementer pattern, implementer briefing, verification floor — load `/coding`.** This is mandatory for any opus involving code changes. If `/skill-discovery` didn't load it, load it yourself. The `/coding` skill makes verification structural rather than behavioral so builder context cannot rationalize past it.
+**For the full operational protocol — load `/coding` for any opus involving code changes.** It gives you TeamCreate, the task-lead/implementer pattern, implementer briefing templates, and a verification floor — tools that make you faster and your output stronger. Loading it isn't overhead; it's how you access capabilities that dramatically improve code quality. The `/coding` skill makes verification structural rather than behavioral so builder context cannot rationalize past it. If `/skill-discovery` didn't load it, load it yourself.
 
 ---
 
