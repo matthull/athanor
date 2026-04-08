@@ -171,7 +171,8 @@ These compose naturally. Manifold produces findings from many angles; dialectica
 
 ### Subagent Discipline
 
-- **One task per subagent.** Don't load multiple tasks into one — spawn fresh for each. Context exhaustion in subagents is silent.
+- **One focused task per agent — subagents and team members alike.** Don't stack multiple tasks on one agent; spawn fresh for each. Context exhaustion is silent — you won't know it's happening until the output degrades. A fresh context window is an asset: the agent sees the code without accumulated assumptions.
+- **Parallel when independent, sequential when dependent.** Tasks that don't share context can run simultaneously on separate agents. Tasks that build on each other run sequentially, each in a fresh window. Either way, you get better results from three focused agents than one overloaded one.
 - **Use sonnet for subagents** unless the task genuinely requires opus-level reasoning.
 - **Keep strategic context alive.** Your main session is the task lead. Subagents are implementers. The task lead stays alive to make decisions while implementers work.
 

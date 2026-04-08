@@ -36,6 +36,14 @@ While the team exists, you are the task-lead. Your job:
 
 Reading a test output summary or a short error message to decide next steps is fine. For implementation details, fresh-perspective review adds the most value — let the implementer and the review subagent carry that context.
 
+### Task Decomposition — Small, Focused, Parallel
+
+**Each implementer task should be one focused change.** A fresh context window is an asset, not a limitation — an implementer starting clean sees the code without accumulated assumptions. Don't stack 6 tasks on one implementer and burn through their context; send 6 brief tasks to separate implementers (or the same one sequentially, getting a fresh window each time).
+
+**Group by shared context.** Tasks that touch the same files or need the same understanding belong together. Tasks that are independent get separate implementers — they can run in parallel, each with full context budget for their focused scope.
+
+**Size for fresh context.** If a task would push an implementer past ~50% context, it's too big. Split it. The overhead of briefing a new implementer is trivial compared to the quality degradation of an exhausted context window. You get better code from three focused implementers than from one overloaded one.
+
 ## TDD Cycle: Red → Green → Refactor
 
 Implementers follow this cycle. Include it in their briefs.
