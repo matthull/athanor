@@ -37,15 +37,22 @@ _ath_athanor_names() {
     compadd -- "${names[@]}"
 }
 
-_ath_opus_files() {
-    local athanor_dir
-    athanor_dir="${ATHANOR:-}"
-    if [[ -z "$athanor_dir" ]]; then
-        return
-    fi
-    local -a files
-    files=( ${(f)"$(ls "$athanor_dir/magna-opera"/*/opera/ 2>/dev/null)"} )
-    compadd -- "${files[@]}"
+_ath_charged_opus_files() {
+    local athanor_dir="$1"
+    local -a charged charged_d
+    local opera_dir mo_name f name opus_status
+    for opera_dir in "$athanor_dir"/magna-opera/*/opera(N/); do
+        mo_name="${${opera_dir:h}:t}"
+        for f in "$opera_dir"/*.md(N); do
+            name="${f:t}"
+            opus_status=$(awk '/^---$/{if(n++)exit}n&&/^status:/{print $2}' "$f")
+            if [[ "$opus_status" == "charged" ]]; then
+                charged+=("$name")
+                charged_d+=("[$mo_name] ${name%.md}")
+            fi
+        done
+    done
+    (( ${#charged} )) && compadd -V charged -d charged_d -- "${charged[@]}"
 }
 
 _ath_tmux_windows() {
@@ -168,9 +175,65 @@ _ath() {
             fi
             ;;
         muster)
-            if (( CURRENT == 3 )); then
-                _ath_opus_files
+            # Resolve athanor dir from --athanor flag or $ATHANOR
+            local _ath_muster_dir="${ATHANOR:-}"
+            local -i _ath_flag_idx=${words[(I)--athanor]}
+            if (( _ath_flag_idx && _ath_flag_idx + 1 < CURRENT )); then
+                _ath_muster_dir="$HOME/athanor/athanors/${words[$(( _ath_flag_idx + 1 ))]}"
             fi
+
+            # Complete flag values
+            case "${words[$(( CURRENT - 1 ))]}" in
+                --athanor) _ath_athanor_names; return ;;
+                --dir) _directories; return ;;
+                --model) compadd -- sonnet opus haiku; return ;;
+                --name|--intent) return ;;
+            esac
+
+            # Count positional args (skip flags and their values)
+            local -i _pos=0 _i _skip=0
+            for (( _i = 3; _i < CURRENT; _i++ )); do
+                if (( _skip )); then _skip=0; continue; fi
+                case "${words[$_i]}" in
+                    --athanor|--dir|--model|--name|--intent) _skip=1 ;;
+                    -*) ;;
+                    *) (( _pos++ )) ;;
+                esac
+            done
+
+            # Collect available flags (exclude already-used ones)
+            local -a _mflags=(--athanor --dir --model --name --intent)
+            for (( _i = 3; _i < CURRENT; _i++ )); do
+                _mflags=("${(@)_mflags:#${words[$_i]}}")
+            done
+
+            # Positional completions depend on mode
+            if (( ${words[(I)--intent]} )); then
+                # Intent mode: <mo> <name> --intent <text>
+                case $_pos in
+                    0)
+                        if [[ -n "$_ath_muster_dir" && -d "$_ath_muster_dir" ]]; then
+                            _ath_mo_names "${_ath_muster_dir:t}"
+                        else
+                            _message 'MO name (use --athanor <name> first)'
+                        fi
+                        ;;
+                    1) _message 'session name' ;;
+                esac
+            else
+                # Opus mode: <opus-file>
+                case $_pos in
+                    0)
+                        if [[ -n "$_ath_muster_dir" && -d "$_ath_muster_dir" ]]; then
+                            _ath_charged_opus_files "$_ath_muster_dir"
+                        else
+                            _message 'opus file (use --athanor <name> or set $ATHANOR)'
+                        fi
+                        ;;
+                esac
+            fi
+            # Always offer remaining flags
+            (( ${#_mflags} )) && compadd -- "${_mflags[@]}"
             ;;
         check)
             if (( CURRENT == 3 )); then
