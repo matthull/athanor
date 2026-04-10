@@ -142,6 +142,7 @@ Produce a complete MO document following the structure observed in the calling a
 - Abundant satisfaction description
 - Getting started pointers
 - Type (task-based or state-based)
+- Landscape Freshness Threshold (default: 1 day — how often the marut triggers a full assessment. Higher-cadence MOs may set shorter thresholds, e.g. "8 hours" for fast-moving work)
 - Tempering section (empty by default — the marut fills this)
 
 If refining, include a Refinement History entry.

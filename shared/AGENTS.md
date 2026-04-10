@@ -144,11 +144,32 @@ Abundant satisfaction requires proof. Proof requires verification. Verification 
 
 ### Assessment Opera
 
-When opera with `status: discharged` exist, the marut inscribes an assessment opus — even if charged opera are in the queue. This is how the athanor extracts charge before it's buried, and how knowledge is preserved before it's lost. The assessment azer also validates whether existing charged opera are still the right next step. When all opera are assessed and the queue is empty, the marut also inscribes an assessment to determine what's next.
+**Assessment is the athanor's broad landscape survey** — the panoramic view that discovers what only an outsider with MO-level perspective and full visibility can see. The core question is: **"Given everything available, what is the most bountiful path forward for the Magnum Opus and its witnesses?"** Assessment is jovian energy — expansive, generous, seeking abundance. Calcinatio (saturnian energy) refines what assessment generates.
 
-**Assessment is the athanor's most generative moment.** The assessment azer occupies a uniquely privileged position — the moment where the widest context is assembled (trail, environment, discharged opera, witness definitions, corpus, channels). The core question is not "was value lost?" (that's discharge calcinatio's job — see `azer.md § Discharge Calcinatio`). The core question is: **"Given everything available, what is the most bountiful path forward for the Magnum Opus and its witnesses?"** Assessment is jovian energy — expansive, generous, seeking abundance. Calcinatio (saturnian energy) refines what assessment generates.
+**Assessment and dispatch are orthogonal concerns.** Charged opera should be mustered immediately — always, by default, without waiting for assessment. Assessment runs on its own cadence, parallel to craft work. The marut does not serialize through assessment before dispatching azers.
 
-**Two layers of value extraction.** Discharge calcinatio (`azer.md § Discharge Calcinatio`) is "local tests" — a focused check while the azer has peak context, oriented toward losing nothing. Assessment is the broader view — a thorough investigation that sees what only an outsider with MO-level perspective and full landscape visibility can see. Discharge calcinatio catches value leaks; assessment discovers value opportunities. Neither replaces the other.
+#### When to assess
+
+Assessment is triggered by exactly two conditions:
+
+1. **Landscape staleness (mechanical).** The landscape report is older than the MO's `## Landscape Freshness Threshold` (default: 1 day), or no landscape report exists. This is the cache-expiration trigger — the landscape report is the cached artifact, and the threshold is its TTL.
+2. **Marut judgment.** The marut feels a need for a broad landscape refresh — perhaps trail signals suggest the current direction is wrong, or significant external events have shifted the ground. This is discretionary, not mechanical.
+
+**That's it.** Discharged opera, empty queues, and other events do not mechanically trigger assessment. Discharged opera are processed by the next scheduled assessment when it arrives — discharge calcinatio (`azer.md § Discharge Calcinatio`) handles immediate value extraction while the azer has peak context.
+
+#### Assessment vs. targeted context retrieval
+
+Assessment is a **broad landscape survey** — the full formula: load supernals, survey everything, manifold generation, synthesize. It is heavyweight by design, because breadth is its purpose.
+
+**Targeted context retrieval is not assessment.** Any agent — marut or azer — should freely check specific sources as part of their normal work: reading a Slack thread, searching for recent messages on a subject, running `/research`, checking a PR, reading a spec. These are normal agent behaviors, not assessment. Don't dispatch a panoramic surveyor when you need to check one Slack channel.
+
+#### What the marut does when the queue is empty and the landscape is fresh
+
+If there are no charged opera and the landscape report is within its freshness threshold, the marut uses the existing landscape to inscribe more work — targeted context retrieval to fill any gaps, then inscription via `/opus inscribe`. No full assessment needed. The landscape report is the cached base; the marut (or a lightweight planning azer) builds on it.
+
+#### Two layers of value extraction
+
+Discharge calcinatio (`azer.md § Discharge Calcinatio`) is "local tests" — a focused check while the azer has peak context, oriented toward losing nothing. Assessment is the broader view — a thorough investigation that sees what only an outsider with MO-level perspective and full landscape visibility can see. Discharge calcinatio catches value leaks; assessment discovers value opportunities. Neither replaces the other.
 
 **Discharged opera are one rich source among many.** They accumulate in the trail and deserve attention — but a Slack thread that arrived yesterday, a fresh read of the spec with post-trail eyes, or an environment signal might be equally or more valuable than any discharged opus. The assessment azer is a prospector surveying all available materia, not an auditor checking off discharged opera. Follow the richest signal, wherever it lives.
 
@@ -223,13 +244,13 @@ Discharge the assessment opus with: what landscape you surveyed, what ideas were
 
 **The system advances through this cycle.** Individual azer discharge is the handoff point, not the advancement mechanism. The assessment cycle finds what's next and preserves what matters. The only invariant is faithful, complete discharge: nothing lost, nothing hidden.
 
-**Assessment opus template** (the marut inscribes this verbatim when `status: discharged` opera exist or when the queue is empty):
+**Assessment opus template** (the marut inscribes this verbatim when the landscape report is stale or absent, or when the marut judges a broad landscape refresh is needed):
 
 ```markdown
 # Opus: Assess and orient
 
 **Inscribed:** <date>
-**Inscribed by:** marut (automated assessment cycle)
+**Inscribed by:** marut (landscape refresh — report stale or absent)
 
 ## Goal
 
