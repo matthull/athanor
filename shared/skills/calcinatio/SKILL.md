@@ -102,6 +102,18 @@ Decompose → fan out in parallel → synthesize: deduplicate, identify agreemen
 
 **See `resources/manifold-calcinatio.md` for the full protocol, decomposition guidance, and illustrative examples.**
 
+### Viewpoint-Based Manifold Calcinatio
+
+A specialization of manifold calcinatio with a structured **perspective derivation process**. Instead of improvising which perspectives to fan out, derive them from three sources:
+
+1. **Witness-derived** — Extract each witness's *task-specific* stake (not their general concern). Professional proxy applies.
+2. **Research-derived** — Find authoritative external viewpoints the system doesn't inherently have. Articles, docs, reference architectures each become a subagent's lens. The most generative source — brings perspectives nobody thought to define.
+3. **Task-intrinsic** — Cross-cutting concerns, domain angles, or stakeholder needs not formally defined that the work's nature demands.
+
+This is the formula to reach for when the work sits at the intersection of multiple domains, when stakeholder concerns are diverse, or when you want to ensure no relevant perspective is missed before the work reaches witnesses.
+
+**See `resources/viewpoint-based-manifold-calcinatio.md` for the full protocol, perspective derivation process, and illustrative examples.**
+
 ### Composition
 
 These patterns compose naturally. Manifold calcinatio produces findings from many angles; dialectical calcinatio resolves those findings through iterative exchange with the builder. The cycle can repeat — manifold→dialectical→manifold→... — until convergence. Research might fan out manifold, then each finding gets dialectically refined against domain knowledge. The patterns are building blocks, not standalone processes.
