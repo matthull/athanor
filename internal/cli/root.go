@@ -73,7 +73,7 @@ Usage:
   ath init <name> [--project <path>]        Create a new athanor instance
   ath kindle <name> [<mo-name>]            Launch a marut for a magnum opus
   ath reforge <name> [<mo-name>]           Kill and relaunch a marut
-  ath muster <opus-file> [--dir <path>]    Launch an azer for an opus
+  ath muster <opus-file> [--worktree-path <path>]    Launch an azer for an opus
   ath muster <mo> <name> --intent <text>   Launch autonomous azer from intent
   ath craft <athanor> <mo> <name>           Interactive session with the artifex
   ath craft-mo <athanor>                   Create a new Magnum Opus interactively

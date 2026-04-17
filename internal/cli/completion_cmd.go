@@ -185,7 +185,7 @@ _ath() {
             # Complete flag values
             case "${words[$(( CURRENT - 1 ))]}" in
                 --athanor) _ath_athanor_names; return ;;
-                --dir) _directories; return ;;
+                --worktree-path) _directories; return ;;
                 --model) compadd -- sonnet opus haiku; return ;;
                 --name|--intent) return ;;
             esac
@@ -195,14 +195,14 @@ _ath() {
             for (( _i = 3; _i < CURRENT; _i++ )); do
                 if (( _skip )); then _skip=0; continue; fi
                 case "${words[$_i]}" in
-                    --athanor|--dir|--model|--name|--intent) _skip=1 ;;
+                    --athanor|--worktree-path|--model|--name|--intent) _skip=1 ;;
                     -*) ;;
                     *) (( _pos++ )) ;;
                 esac
             done
 
             # Collect available flags (exclude already-used ones)
-            local -a _mflags=(--athanor --dir --model --name --intent)
+            local -a _mflags=(--athanor --worktree-path --model --name --intent)
             for (( _i = 3; _i < CURRENT; _i++ )); do
                 _mflags=("${(@)_mflags:#${words[$_i]}}")
             done

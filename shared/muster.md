@@ -19,10 +19,12 @@ When the marut has a charged opus that needs execution:
 **2. Muster the azer:**
 
 ```bash
-ath muster <opus-file> --dir <worktree-path> --athanor <name>
+ath muster <opus-file> --worktree-path <path> --athanor <name>
 ```
 
-This creates the crucible (tmux window) and launches Claude with the correct boot prompt, model, and role files. If `--dir` is omitted, uses the project directory from athanor config.
+This creates the crucible (tmux window) and launches Claude with the correct boot prompt, model, and role files.
+
+**`--worktree-path`** — pass this whenever the azer should run somewhere other than the athanor's default project directory. The most common case is a git worktree for isolating code changes, but the flag is generic: any temporary or alternate workspace (a sibling clone, a sandboxed copy, a Docker-mounted directory) goes here. Omit the flag and the azer runs in the project directory from athanor config.
 
 **3. Verify launch:**
 

@@ -104,7 +104,7 @@ ath kindle myproject
 [marut decides an opus needs an azer]
 [marut calls wtp add branch-name if code work — project-specific, not ath's job]
 
-ath muster fix-nil-error.md --dir /path/to/worktree
+ath muster fix-nil-error.md --worktree-path /path/to/worktree
   → reads $ATHANOR to find the instance
   → reads opus file for crucible naming
   → creates tmux window "azer-fix-nil-error"
@@ -250,7 +250,7 @@ Opera:
 
 ### Azer Management (called by marut)
 
-#### `ath muster <opus-file> [--dir <path>] [--model <model>] [--name <name>]`
+#### `ath muster <opus-file> [--worktree-path <path>] [--model <model>] [--name <name>]`
 
 Launch an azer for a charged opus. The marut's primary dispatch command.
 
@@ -258,7 +258,7 @@ Launch an azer for a charged opus. The marut's primary dispatch command.
 
 **Arguments:**
 - `<opus-file>` — Opus filename (resolved relative to `$ATHANOR/opera/`) or absolute path
-- `--dir <path>` — Working directory for the azer. Default: project dir from athanor.yml. Use this to point to a worktree.
+- `--worktree-path <path>` — Working directory for the azer. Default: project dir from athanor.yml. Use this to point to a git worktree or any other temporary workspace outside the athanor's project dir. The name "worktree" is generic — it applies to any alternate workspace, not just `git worktree`.
 - `--model <model>` — Model override. Default: `athanor.yml → azer_model` (default: opus)
 - `--name <name>` — Crucible name override. Default: `azer-<opus-slug>` derived from filename
 
@@ -267,14 +267,14 @@ Launch an azer for a charged opus. The marut's primary dispatch command.
 2. Derives crucible name from opus filename (strips date prefix and .md)
 3. Creates tmux window with crucible name
 4. Launches claude session:
-   - Working directory: `--dir` value or project dir
+   - Working directory: `--worktree-path` value or project dir
    - Model: `--model` value or athanor.yml default
    - Environment: `ATHANOR=$ATHANOR`
    - Prompt: azer boot prompt (reads AGENTS.md, azer.md, opus file, execute)
 5. Verifies launch with `ath whisper idle <crucible-name>`
 6. Prints: crucible name and verification status
 
-**Sandbox creation is NOT part of muster.** The marut handles sandbox creation (e.g., `wtp add`) before calling `ath muster`, then passes the worktree path via `--dir`. This keeps project-specific tooling out of the athanor CLI. `[D:separation — ath is athanor ops, wtp is project ops]`
+**Sandbox creation is NOT part of muster.** The marut handles sandbox creation (e.g., `wtp add`) before calling `ath muster`, then passes the worktree path via `--worktree-path`. This keeps project-specific tooling out of the athanor CLI. `[D:separation — ath is athanor ops, wtp is project ops]`
 
 **Exit codes:** 0=azer launched and verified, 1=launch failed, 2=usage error
 
@@ -418,7 +418,7 @@ $ATHANOR/opera/<opus-file>.md. Read it and execute.
 
 ### Sandbox creation is external
 
-`ath muster` does NOT create worktrees, Docker environments, or any project-specific sandbox. The marut handles sandbox creation separately (e.g., `wtp add`), then passes the path to `ath muster --dir <path>`. This keeps `ath` project-agnostic. `[D:separation]`
+`ath muster` does NOT create worktrees, Docker environments, or any project-specific sandbox. The marut handles sandbox creation separately (e.g., `wtp add`), then passes the path to `ath muster --worktree-path <path>`. This keeps `ath` project-agnostic. `[D:separation]`
 
 ### `$ATHANOR` as agent context
 
@@ -542,7 +542,7 @@ Rename the GitHub repo: `github.com/matthull/whisper` → `github.com/matthull/a
 | `ath kindle` with missing magnum-opus.md | Refuses with clear error |
 | `ath kindle` with template-only magnum-opus.md | Warns that goal hasn't been written |
 | `ath muster` from agent context | Reads `$ATHANOR`, creates crucible, launches azer, verifies |
-| `ath muster --dir` points azer to worktree | Azer session starts in specified directory |
+| `ath muster --worktree-path` points azer to worktree | Azer session starts in specified directory |
 | `ath muster` derives crucible name from opus | `2026-03-24-fix-nil-error.md` → `azer-fix-nil-error` |
 | `ath whisper send` delivers message | Identical behavior to current whisper send |
 | `ath whisper idle` detects idle | Identical behavior to current whisper idle |

@@ -13,17 +13,17 @@ import (
 
 func runMuster(args []string) int {
 	var (
-		dir      string
-		model    string
-		crucName string
-		athName  string
-		intent   string
+		worktreePath string
+		model        string
+		crucName     string
+		athName      string
+		intent       string
 	)
 
 	positional, flagArgs := splitArgs(args)
 
 	fs := flag.NewFlagSet("muster", flag.ContinueOnError)
-	fs.StringVar(&dir, "dir", "", "working directory for the azer (e.g. worktree path)")
+	fs.StringVar(&worktreePath, "worktree-path", "", "working directory for the azer — use for git worktrees or other workspace outside the athanor's project dir")
 	fs.StringVar(&model, "model", "", "model override for the azer")
 	fs.StringVar(&crucName, "name", "", "crucible name override")
 	fs.StringVar(&athName, "athanor", "", "athanor name (if $ATHANOR not set)")
@@ -36,17 +36,17 @@ func runMuster(args []string) int {
 
 	// Dispatch based on mode: --intent means intent-driven autonomous azer
 	if intent != "" {
-		return runMusterIntent(positional, intent, dir, model, crucName, athName)
+		return runMusterIntent(positional, intent, worktreePath, model, crucName, athName)
 	}
-	return runMusterOpus(positional, dir, model, crucName, athName)
+	return runMusterOpus(positional, worktreePath, model, crucName, athName)
 }
 
 // runMusterOpus launches an azer for a pre-inscribed opus file.
-// Usage: ath muster <opus-file> [--dir <path>] [--model <model>] [--athanor <name>]
-func runMusterOpus(positional []string, dir, model, crucName, athName string) int {
+// Usage: ath muster <opus-file> [--worktree-path <path>] [--model <model>] [--athanor <name>]
+func runMusterOpus(positional []string, worktreePath, model, crucName, athName string) int {
 	if len(positional) < 1 {
 		fmt.Fprintln(os.Stderr, "error: opus file required")
-		fmt.Fprintln(os.Stderr, "usage: ath muster <opus-file> [--dir <path>] [--model <model>]")
+		fmt.Fprintln(os.Stderr, "usage: ath muster <opus-file> [--worktree-path <path>] [--model <model>]")
 		fmt.Fprintln(os.Stderr, "       ath muster <mo> <name> --intent <text>")
 		return 2
 	}
@@ -97,12 +97,12 @@ func runMusterOpus(positional []string, dir, model, crucName, athName string) in
 		crucName = "azer-" + base
 	}
 
-	if dir == "" {
-		dir = cfg.Project
+	if worktreePath == "" {
+		worktreePath = cfg.Project
 	}
-	if dir == "" {
+	if worktreePath == "" {
 		h, _ := os.UserHomeDir()
-		dir = h
+		worktreePath = h
 	}
 
 	if model == "" {
@@ -127,11 +127,11 @@ func runMusterOpus(positional []string, dir, model, crucName, athName string) in
 
 	claudeArgs := fmt.Sprintf(
 		"cd %s && ATHANOR=%s claude --model %q %q",
-		dir, instDir, model, bootPrompt,
+		worktreePath, instDir, model, bootPrompt,
 	)
 
 	athSessionName := athanor.SessionName(athanor.AthanorName(instDir))
-	if err := launchCrucible(athSessionName, crucName, dir, claudeArgs); err != nil {
+	if err := launchCrucible(athSessionName, crucName, worktreePath, claudeArgs); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		return 1
 	}
@@ -139,14 +139,14 @@ func runMusterOpus(positional []string, dir, model, crucName, athName string) in
 	fmt.Printf("Azer mustered in crucible %q\n", crucName)
 	fmt.Printf("  Opus: %s\n", opusPath)
 	fmt.Printf("  Model: %s\n", model)
-	fmt.Printf("  Working dir: %s\n", dir)
+	fmt.Printf("  Working dir: %s\n", worktreePath)
 
 	return 0
 }
 
 // runMusterIntent launches an autonomous azer that inscribes its own opus from intent.
-// Usage: ath muster <mo> <name> --intent <text> [--dir <path>] [--model <model>] [--athanor <name>]
-func runMusterIntent(positional []string, intent, dir, model, crucName, athName string) int {
+// Usage: ath muster <mo> <name> --intent <text> [--worktree-path <path>] [--model <model>] [--athanor <name>]
+func runMusterIntent(positional []string, intent, worktreePath, model, crucName, athName string) int {
 	if len(positional) < 2 {
 		fmt.Fprintln(os.Stderr, "error: MO name and crucible name required with --intent")
 		fmt.Fprintln(os.Stderr, "usage: ath muster <mo> <name> --intent <text>")
@@ -174,12 +174,12 @@ func runMusterIntent(positional []string, intent, dir, model, crucName, athName 
 		return 1
 	}
 
-	if dir == "" {
-		dir = cfg.Project
+	if worktreePath == "" {
+		worktreePath = cfg.Project
 	}
-	if dir == "" {
+	if worktreePath == "" {
 		h, _ := os.UserHomeDir()
-		dir = h
+		worktreePath = h
 	}
 
 	if model == "" {
@@ -197,11 +197,11 @@ func runMusterIntent(positional []string, intent, dir, model, crucName, athName 
 
 	claudeArgs := fmt.Sprintf(
 		"cd %s && ATHANOR=%s claude --model %q %q",
-		dir, instDir, model, bootPrompt,
+		worktreePath, instDir, model, bootPrompt,
 	)
 
 	athSessionName := athanor.SessionName(athanor.AthanorName(instDir))
-	if err := launchCrucible(athSessionName, crucName, dir, claudeArgs); err != nil {
+	if err := launchCrucible(athSessionName, crucName, worktreePath, claudeArgs); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		return 1
 	}
@@ -210,7 +210,7 @@ func runMusterIntent(positional []string, intent, dir, model, crucName, athName 
 	fmt.Printf("  Intent: %s\n", intent)
 	fmt.Printf("  MO: %s\n", moName)
 	fmt.Printf("  Model: %s\n", model)
-	fmt.Printf("  Working dir: %s\n", dir)
+	fmt.Printf("  Working dir: %s\n", worktreePath)
 
 	return 0
 }

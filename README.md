@@ -98,7 +98,7 @@ From within a running marut session (or manually):
 
 ```bash
 # Muster an azer for a charged opus
-ath muster 2026-03-25-fix-nil-error.md --athanor bugsnag --dir ~/code/musashi-worktree
+ath muster 2026-03-25-fix-nil-error.md --athanor bugsnag --worktree-path ~/code/musashi-worktree
 
 # Check opera status
 ath opera bugsnag

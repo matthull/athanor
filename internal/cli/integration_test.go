@@ -400,7 +400,7 @@ This is a test opus created by the QA harness.
 
 	t.Run("muster creates azer crucible", func(t *testing.T) {
 		out, err := runAth("muster", "2026-03-25-qa-fix-something.md",
-			"--athanor", "qa-test", "--dir", "/tmp")
+			"--athanor", "qa-test", "--worktree-path", "/tmp")
 		if err != nil {
 			t.Fatalf("ath muster failed: %v\n%s", err, out)
 		}
@@ -423,7 +423,7 @@ This is a test opus created by the QA harness.
 	t.Run("muster intent creates azer crucible", func(t *testing.T) {
 		out, err := runAth("muster", "qa-goal", "intent-test",
 			"--intent", "fix the widget loader",
-			"--athanor", "qa-test", "--dir", "/tmp")
+			"--athanor", "qa-test", "--worktree-path", "/tmp")
 		if err != nil {
 			t.Fatalf("ath muster --intent failed: %v\n%s", err, out)
 		}
