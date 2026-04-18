@@ -124,3 +124,36 @@ You identified Tipharet as a supernal concept that should inform the whole athan
 
 **Your input:**
 
+
+---
+
+## 9. Voice Note Processing Pipeline (PRIORITY)
+
+Pre-athanor, there was a working voice note processing pipeline. We need something similar that routes voice notes to athanors — so the artifex can effectively dump voice notes as raw materia that gets processed.
+
+This is a **first priority** — it's the primary articulation channel for the attunement practice and the input axis of the dual-axis development model.
+
+**Questions:**
+- Where was the old voice note pipeline? (village repo? systemd service?)
+- What's the routing target — the life athanor specifically, or any athanor based on content?
+- What's the minimum viable version? (Voice note lands in a directory → gets transcribed → routed as signal)
+
+**Your input:**
+
+
+---
+
+## 10. Server Setup (BLOCKING INFRASTRUCTURE)
+
+The new server is built but has no OS installed. It's needed as a platform for any jobs that need to run — voice note processing, signal routing, scheduled services, anything that can't just live on the laptop.
+
+Without the server, we'll get blocked on actually using the life-layer system in practice. Laptop-only means nothing runs when the laptop is closed.
+
+**Questions:**
+- What hardware? What OS are you thinking?
+- What services need to move off the laptop first?
+- Is this an opus under life-domains, or its own MO/concern?
+
+**Your input:**
+
+

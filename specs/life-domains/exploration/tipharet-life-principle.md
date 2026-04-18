@@ -1,6 +1,7 @@
 # Tipharet as Life Principle — Brief for Further Exploration
 
 **Status:** Seed — capture for later development
+**Motto:** "Beautifully channeled chaos"
 **Created:** 2026-04-18
 **Origin:** Interactive session, artifex direction
 
@@ -47,6 +48,12 @@ The athanor is one expression of Tipharet: months of expansive thinking refined 
 - **How to relate to work** — the David Spielman insight: if it's not compatible with your neurology, the answer is doing something different. Tipharet is finding the thing that IS compatible AND ambitious
 - **How to handle the stimulation need** — not suppressing it (leads to shutdown) or chasing it (leads to exhaustion), but finding the stimulation that is both alive and sustainable
 - **How to deal with the gap between vision and execution** — the pain that drives most ND burnout. Tipharet says the gap isn't real if you find the right form
+
+## The Difficulty IS the Practice
+
+A key part of the Tipharet principle: acknowledging how hard it is to strike these balances. Not as a caveat — as the heart of the whole endeavor. Every piece of the system has to be carefully tuned based on principles AND real outcomes. Interoceptive practice, notification protocols, agent behavior, scope decisions — each one is a Tipharet challenge. Getting it right once doesn't mean it stays right. The tuning is ongoing, the balance shifts, the neurology fluctuates.
+
+This needs to be at the heart of everything we build. Not "we'll get it right" but "we'll get it approximately right, notice when it drifts, and retune." The system's relationship to the artifex is a continuous calibration, not a configuration problem with a solution.
 
 ## Connection to Attunement
 
