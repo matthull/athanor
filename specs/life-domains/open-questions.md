@@ -127,7 +127,26 @@ You identified Tipharet as a supernal concept that should inform the whole athan
 
 ---
 
-## 9. Voice Note Processing Pipeline (PRIORITY)
+## 9. Hierarchy of Needs and Non-Negotiables (URGENT — FOUNDATIONAL)
+
+The web Claude conversation develops a concept of hierarchy of needs and non-negotiables. **Defining these is urgent and foundational** — they inform the goals of the entire system. What gets protected? What can flex? What's the floor below which the system escalates rather than accommodates?
+
+Even 30 minutes of exploration can produce a good enough foundation to inform everything happening right now. Serving this hierarchy is a primary aim of the life-layer system.
+
+This is upstream of the first slice, the orientation layer, the attendant's geas — all of it. The hierarchy of needs defines what the system is *for* at the most concrete level. Without it, the system has principles but no grounding in "what actually matters today."
+
+**Questions:**
+- What are the non-negotiables? (Meds? Kids' safety? Basic self-care?)
+- What's the hierarchy — what gets protected first when capacity is limited?
+- How does this relate to the life-athanor spec's "hierarchy of awareness" (attunement → physiology → regulation → what wants to happen)?
+- Is this something you want to explore interactively, or would you like a manifold-generated draft to react to?
+
+**Your input:**
+
+
+---
+
+## 10. Voice Note Processing Pipeline (PRIORITY)
 
 Pre-athanor, there was a working voice note processing pipeline. We need something similar that routes voice notes to athanors — so the artifex can effectively dump voice notes as raw materia that gets processed.
 
