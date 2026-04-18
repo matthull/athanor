@@ -1,7 +1,7 @@
 # Tipharet as Life Principle — Brief for Further Exploration
 
 **Status:** Seed — capture for later development
-**Motto:** "Beautifully channeled chaos"
+**Motto:** "Beautifully flowing chaos"
 **Created:** 2026-04-18
 **Origin:** Interactive session, artifex direction
 
