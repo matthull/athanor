@@ -141,6 +141,8 @@ This is upstream of the first slice, the orientation layer, the attendant's geas
 - How does this relate to the life-athanor spec's "hierarchy of awareness" (attunement → physiology → regulation → what wants to happen)?
 - Is this something you want to explore interactively, or would you like a manifold-generated draft to react to?
 
+**Recommendation:** A manifold-generated draft would let you react rather than originate — lower EF cost, and the web Claude docs have enough raw material to produce a meaningful starting point. 30 minutes of a next session could produce a draft hierarchy you refine.
+
 **Your input:**
 
 
@@ -162,7 +164,7 @@ This is a **first priority** — it's the primary articulation channel for the a
 
 ---
 
-## 10. Server Setup (BLOCKING INFRASTRUCTURE)
+## 11. Server Setup (BLOCKING INFRASTRUCTURE)
 
 The new server is built but has no OS installed. It's needed as a platform for any jobs that need to run — voice note processing, signal routing, scheduled services, anything that can't just live on the laptop.
 
