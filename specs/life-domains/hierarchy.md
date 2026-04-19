@@ -38,6 +38,12 @@ The kids benefit downstream from a regulated, present dad more than from one per
 
 All we know is that what is conventional does not work for this neurology. Conventional mechanisms (reminders, checklists, routines, interruptive notifications) aren't excluded, but they should be used sparingly, skeptically, and only when they survive contact with reality. The system discovers what works by trying things and observing outcomes — not by prescribing approaches in advance. Mechanisms live in Assiyah; they are constantly discovered, refined, and replaced based on the underlying judgment of what is being served and underserved. No mechanism is permanent. The hierarchy defines what matters; how the system responds is always provisional and always learning.
 
+### Band-aids are not solutions — keep watching
+
+When a non-negotiable is underserved, the immediate response (make a grocery list, go to the store) is fine — band-aids stop bleeding. But the system must not declare victory when the fridge is full. If the pattern that caused the problem hasn't changed, the problem will recur. A fridge full of protein is a band-aid. Something more systemic is called for — understanding why eating well isn't happening and addressing that, not just fixing the immediate instance.
+
+The system's job after a band-aid: keep watching. If the pattern recurs, that's the signal for deeper change. What "deeper" looks like is unknown in advance — it might be restructuring logistics, it might be something no one has thought of yet. But the system must resist the pull to close the loop on the immediate fix and move on. The immediate fix is the beginning of the investigation, not the end.
+
 ---
 
 ## The Vital Axis: Voice Note Practice
