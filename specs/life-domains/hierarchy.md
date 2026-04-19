@@ -97,7 +97,7 @@ High protein, real meals. Not "ate something." Implies logistics — shopping, s
 
 ### 3. Creative Pursuit
 
-If creative work isn't happening, that's a critical signal. Creative pursuit is where vitality lives — not productivity, not obligation, but the thing that makes life feel like it has a point. Some room exists for mechanical support (making time for the boring setup parts, clearing logistical blockers). But if creative engagement drops to zero, that's not a logistics problem — it's a signal that something fundamental needs to change to make space.
+The first non-negotiable that isn't about survival. Meds and eating keep the body functional — creative pursuit is what makes the effort worth it. If creative work isn't happening, that's a critical signal. Creative pursuit is where vitality lives — not productivity, not obligation, but the thing that makes life feel like it has a point. Some room exists for mechanical support (making time for the boring setup parts, clearing logistical blockers). But if creative engagement drops to zero, that's not a logistics problem — it's a signal that something fundamental needs to change to make space.
 
 | Signal type | What it looks like |
 |---|---|
