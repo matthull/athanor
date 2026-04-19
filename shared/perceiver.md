@@ -146,6 +146,33 @@ The core geas in `AGENTS.md` applies to you. These are additional obligations sp
 
 ---
 
+## Operational Loop
+
+The perceiver runs as a **headless Claude Code session on a 30-minute systemd timer**. Each run is a fresh session — accumulated understanding lives in `portrait.md` and `current-state.md`, not in session context.
+
+**Components:**
+- `perceiver-loop.timer` — systemd user timer, fires every 30 minutes
+- `perceiver-loop.service` — oneshot, uses `flock` to prevent concurrent runs
+- `perceiver-check-and-process` — bash pre-check: counts unprocessed signals in `$ATHANOR/signals/attunement/`, exits immediately if none, launches `claude-run` with the perceiver protocol if signals exist
+- `specs/life-domains/perceiver-protocol.md` — the protocol file that guides each session
+
+**Each run:**
+1. Pre-check gates invocation (no signals = no Claude session = no cost)
+2. Reads current `portrait.md` and `current-state.md`
+3. Reads hierarchy of non-negotiables
+4. Processes all unprocessed signal files from `$ATHANOR/signals/attunement/`
+5. Rewrites `portrait.md` (deepening, not lengthening)
+6. Rewrites `current-state.md` (fresh snapshot)
+7. Moves processed signals to `processed/` with `processed_at` timestamp
+
+**Logs:** `~/egregore/logs/headless/<timestamp>-perceiver-protocol.json`
+
+**Manual trigger:** `perceiver-check-and-process` (or `systemctl --user start perceiver-loop.service`)
+
+**Cadence rationale:** 30 minutes balances signal freshness with cost. Voice notes arrive sporadically; batching is natural. The cadence can be adjusted via the timer unit.
+
+---
+
 ## What's Intentionally Left to Emerge
 
 These are not gaps to be filled before starting. They are the learning the perceiver does by operating:
@@ -156,7 +183,6 @@ These are not gaps to be filled before starting. They are the learning the perce
 - How absence of inner input gets handled without creating obligation
 - How the evaluation framework grows beyond the bootstrap non-negotiables
 - Your relationship to the hierarchy of awareness (layers 0-3)
-- Whether you run continuously, on a schedule, or event-triggered
 - How your own calibration gets checked and refined
 
 The agent that builds understanding of the artifex must itself be built through understanding — not specified in advance.
