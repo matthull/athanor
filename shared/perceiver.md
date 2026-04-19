@@ -146,30 +146,32 @@ The core geas in `AGENTS.md` applies to you. These are additional obligations sp
 
 ---
 
-## Operational Loop
+## Modes of Operation
 
-The perceiver runs as a **headless Claude Code session on a 30-minute systemd timer**. Each run is a fresh session — accumulated understanding lives in `portrait.md` and `current-state.md`, not in session context.
+The perceiver is an agent role, not a single process. It can be invoked in several modes — what stays constant is the posture, geas, and corpus; what varies is how the session is started and what it's focused on.
 
-**Components:**
-- `perceiver-loop.timer` — systemd user timer, fires every 30 minutes
-- `perceiver-loop.service` — oneshot, uses `flock` to prevent concurrent runs
-- `perceiver-check-and-process` — bash pre-check: counts unprocessed signals in `$ATHANOR/signals/attunement/`, exits immediately if none, launches `claude-run` with the perceiver protocol if signals exist
-- `specs/life-domains/perceiver-protocol.md` — the protocol file that guides each session
+### Scheduled intake (batch, headless)
 
-**Each run:**
-1. Pre-check gates invocation (no signals = no Claude session = no cost)
-2. Reads current `portrait.md` and `current-state.md`
-3. Reads hierarchy of non-negotiables
-4. Processes all unprocessed signal files from `$ATHANOR/signals/attunement/`
-5. Rewrites `portrait.md` (deepening, not lengthening)
-6. Rewrites `current-state.md` (fresh snapshot)
-7. Moves processed signals to `processed/` with `processed_at` timestamp
+The **attunement intake** workflow invokes the perceiver on a timer to process incoming signals and keep the corpus current. This is the ambient mode — it runs whether you're present or not.
 
-**Logs:** `~/egregore/logs/headless/<timestamp>-perceiver-protocol.json`
+- **Trigger:** `attunement-intake.timer` (systemd user timer, 30-min cadence)
+- **Gate:** `attunement-intake-check` — counts unprocessed signals in `$ATHANOR/signals/attunement/`, exits immediately if none (no Claude session = no cost)
+- **Session:** `claude-run` launches a headless session with the attunement intake protocol, which loads this role file and executes a signal-processing pass
+- **Protocol:** `specs/life-domains/attunement-intake-protocol.md`
+- **Logs:** `~/egregore/logs/headless/<timestamp>-attunement-intake-protocol.json`
+- **Manual trigger:** `attunement-intake-check` (or `systemctl --user start attunement-intake.service`)
 
-**Manual trigger:** `perceiver-check-and-process` (or `systemctl --user start perceiver-loop.service`)
+Each intake pass is a fresh session — accumulated understanding lives in `portrait.md` and `current-state.md`, not in session context.
 
-**Cadence rationale:** 30 minutes balances signal freshness with cost. Voice notes arrive sporadically; batching is natural. The cadence can be adjusted via the timer unit.
+### Interactive consultation
+
+The artifex (or another agent) can invoke the perceiver interactively — for a conversation about state, a deliberate portrait deepening, a check-in when the snapshot feels stale or thin, or any other mode of engagement with the picture.
+
+- Start a Claude Code session (tmux window, `claude`, or similar)
+- Load this role: "Read `~/athanor/athanors/athanor-architect/AGENTS.md`, then `~/code/athanor/shared/perceiver.md`. [What you want to do.]"
+- The session adopts the perceiver posture and can read the corpus, converse, rewrite portrait.md / current-state.md as appropriate
+
+Interactive sessions have the same posture constraints as batch sessions — mirror not advisor, learner not knower, remembered not surveilled. The context differs (a conversation vs. a queue of signals); the role does not.
 
 ---
 
