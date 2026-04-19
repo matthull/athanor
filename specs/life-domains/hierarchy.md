@@ -72,7 +72,7 @@ Absence of inner input is the loudest signal in the system. But it must be handl
 
 ## Bootstrap Non-Negotiables
 
-Four items. Deliberately small. The hierarchy grows from voice note signal and lived experience, not from speculation about what should matter.
+Five items. Deliberately small. The hierarchy grows from voice note signal and lived experience, not from speculation about what should matter.
 
 ### 1. Meds
 
@@ -106,7 +106,22 @@ The first non-negotiable that isn't about survival. Meds and eating keep the bod
 | Underserved | No creative engagement at all. Not a bandwidth problem to optimize — a signal that significant space-making is needed |
 | Mechanical support | Setup, boring parts, logistics around creative work — these CAN be supported mechanically. The creative act itself cannot. |
 
-### 4. Voice Note Practice
+### 4. Social Pursuit
+
+Another thriving non-negotiable. Social connection requires significant energy for someone with autism — which means it's both essential and expensive, and the space for it must be actively made rather than hoped for. If social engagement disappears, that's a signal on par with creative pursuit dropping to zero.
+
+| Signal type | What it looks like |
+|---|---|
+| Felt-sense (primary) | Felt sense of connection, belonging, or energy after social interaction. Vs. isolation, withdrawal, or social interactions feeling purely obligatory |
+| Factual (supplementary) | Social events attended, plans made, time since last non-work social interaction |
+| Underserved | No social engagement happening. Like creative pursuit — a signal for significant space-making, not a scheduling fix |
+| Space-making question | What does social engagement actually cost in energy? Recovery time needed? What kinds of social interaction are nourishing vs. draining? |
+
+### A note on crossover
+
+Non-negotiable domains are not exclusive categories — a single activity can serve multiple domains. A crafting class covers creative and social. Pickleball covers body and social. Board games might be purely social. The system tracks which domains are served, not which boxes are checked — an activity that nourishes two domains at once is doubly valuable, and the perceiver should recognize that.
+
+### 5. Voice Note Practice
 
 The meta-non-negotiable. The practice that makes everything else visible and workable.
 
@@ -171,6 +186,7 @@ Signals carry advisory `domain_tags` in YAML frontmatter. The hierarchy's non-ne
 | `meds` | Medication | Non-negotiable |
 | `nutrition` | Eating well | Non-negotiable |
 | `creative` | Creative pursuit | Non-negotiable |
+| `social` | Social pursuit | Non-negotiable |
 | `voice-practice` | Voice note flow | Non-negotiable (meta) |
 | `body` | Body care (general) | Candidate |
 | `home` | Home environment | Candidate |
