@@ -166,7 +166,7 @@ func (r *Runner) EnsureSession(name string) error {
 // NewWindow creates a new tmux window in the specified session.
 // Session must already exist (call EnsureSession first).
 func (r *Runner) NewWindow(session, name, dir string) error {
-	args := []string{"new-window", "-t", session + ":", "-n", name}
+	args := []string{"new-window", "-d", "-t", session + ":", "-n", name}
 	if dir != "" {
 		args = append(args, "-c", dir)
 	}
