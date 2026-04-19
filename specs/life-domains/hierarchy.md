@@ -70,34 +70,33 @@ Absence of inner input is the loudest signal in the system. But it must be handl
 
 ---
 
-## Bootstrap Non-Negotiables
+## Non-Negotiable Areas
 
-Five items. Deliberately small. The hierarchy grows from voice note signal and lived experience, not from speculation about what should matter.
+Broad areas of life that must be served. Each contains components with varying urgency — priority is implicit and doesn't need rigid ranking. The areas are stable; the components within them will grow and shift as the system learns. The hierarchy grows from voice note signal and lived experience, not from speculation.
 
-### 1. Meds
+### A note on crossover
 
-The most concrete non-negotiable. Daily, checkboxable — but the checkbox is just the mechanism, not the success.
+Areas are not exclusive categories — a single activity can serve multiple areas. A crafting class covers creative and social. Pickleball covers body and social. Board games might be purely social. The system tracks which areas are served, not which boxes are checked — an activity that nourishes two areas at once is doubly valuable.
+
+### 1. Body
+
+The survival floor. Keeping the body functional so everything else is possible.
+
+**Components:**
+- **Meds** — The most urgent component. Missing even one day matters. Daily, checkboxable — but the checkbox is just the mechanism, not the success. Felt-sense: noticing medicated vs. unmedicated state. Factual: confirmation event present or absent.
+- **Nutrition** — High protein, real meals (diabetic invariant). Implies logistics — shopping, meal prep — with real EF cost. Less urgent than meds day-to-day but degrades fast over a week. Felt-sense: energy, clarity, physical comfort. Factual: meal gaps, what was eaten.
+- **Exercise/movement** — Enduring anchor, not a checkbox. Less urgent in the short term — a couple weeks without is going to happen and that's fine. But sustained absence is a signal. Felt-sense: embodiment, physical vitality. Factual: movement happening or not.
 
 | Signal type | What it looks like |
 |---|---|
-| Felt-sense (primary) | Noticing medicated vs unmedicated state in the body. Does the artifex register the difference? |
-| Factual (supplementary) | Confirmation event present or absent |
-| Underserved | Missed doses accumulating; no felt-sense distinction between medicated/unmedicated states (interoceptive gap) |
+| Felt-sense (primary) | Overall physical state — energy, clarity, comfort, embodiment |
+| Factual (supplementary) | Meds confirmed, meals happening, movement happening |
+| Underserved | Any component absent, with urgency varying: meds (days), nutrition (week), exercise (weeks) |
+| Space-making question | What does body care actually cost in EF? Shopping, meal prep, getting to exercise. Where can it be streamlined? What's the irreducible floor? |
 
-### 2. Eat Well
+### 2. Creative Pursuit
 
-High protein, real meals. Not "ate something." Implies logistics — shopping, some meal prep — with real executive function cost that must be accounted for honestly.
-
-| Signal type | What it looks like |
-|---|---|
-| Felt-sense (primary) | Energy, clarity, physical comfort mentioned in voice notes. Felt sense of body being nourished vs running on fumes |
-| Factual (supplementary) | Meal-related mentions in voice notes, time gaps between eating, what was eaten |
-| Underserved | Pattern of skipped meals, carb-heavy/convenience eating, energy crashes, no grocery shopping happening |
-| Space-making question | What does eating well actually cost in EF? Shopping frequency, prep time, decision load. Where can it be streamlined? What's the irreducible floor? |
-
-### 3. Creative Pursuit
-
-The first non-negotiable that isn't about survival. Meds and eating keep the body functional — creative pursuit is what makes the effort worth it. If creative work isn't happening, that's a critical signal. Creative pursuit is where vitality lives — not productivity, not obligation, but the thing that makes life feel like it has a point. Some room exists for mechanical support (making time for the boring setup parts, clearing logistical blockers). But if creative engagement drops to zero, that's not a logistics problem — it's a signal that something fundamental needs to change to make space.
+The first area that isn't about survival — this is what makes the effort worth it. Creative pursuit is where vitality lives — not productivity, not obligation, but the thing that makes life feel like it has a point. Some room exists for mechanical support (making time for the boring setup parts, clearing logistical blockers). But if creative engagement drops to zero, that's not a logistics problem — it's a signal that something fundamental needs to change to make space. The measure is that *something* is happening, not any specific project.
 
 | Signal type | What it looks like |
 |---|---|
@@ -106,30 +105,30 @@ The first non-negotiable that isn't about survival. Meds and eating keep the bod
 | Underserved | No creative engagement at all. Not a bandwidth problem to optimize — a signal that significant space-making is needed |
 | Mechanical support | Setup, boring parts, logistics around creative work — these CAN be supported mechanically. The creative act itself cannot. |
 
-### 4. Social Pursuit
+### 3. Social Pursuit
 
-Another thriving non-negotiable. Social connection requires significant energy for someone with autism — which means it's both essential and expensive, and the space for it must be actively made rather than hoped for. If social engagement disappears, that's a signal on par with creative pursuit dropping to zero.
+Social connection requires significant energy for someone with autism — which means it's both essential and expensive, and the space for it must be actively made rather than hoped for. If social engagement disappears, that's a signal on par with creative pursuit dropping to zero.
 
 | Signal type | What it looks like |
 |---|---|
 | Felt-sense (primary) | Felt sense of connection, belonging, or energy after social interaction. Vs. isolation, withdrawal, or social interactions feeling purely obligatory |
 | Factual (supplementary) | Social events attended, plans made, time since last non-work social interaction |
-| Underserved | No social engagement happening. Like creative pursuit — a signal for significant space-making, not a scheduling fix |
+| Underserved | No social engagement happening. A signal for significant space-making, not a scheduling fix |
 | Space-making question | What does social engagement actually cost in energy? Recovery time needed? What kinds of social interaction are nourishing vs. draining? |
 
-### A note on crossover
+### 4. Interoception Practice
 
-Non-negotiable domains are not exclusive categories — a single activity can serve multiple domains. A crafting class covers creative and social. Pickleball covers body and social. Board games might be purely social. The system tracks which domains are served, not which boxes are checked — an activity that nourishes two domains at once is doubly valuable, and the perceiver should recognize that.
+The meta-area — the practice of noticing and articulating internal state. This makes all other areas visible and workable. Without interoception, the system goes blind and every other area degrades silently.
 
-### 5. Voice Note Practice
-
-The meta-non-negotiable. The practice that makes everything else visible and workable.
+**Components:**
+- **Voice note practice** — The primary mechanism right now. Simultaneously data input, interoceptive exercise (articulating IS noticing), anti-rumination, and working memory offload. Absence is the loudest signal in the system — but must be handled indirectly, never as a reminder. If it stops, the practice has become obligatory and something needs to change.
+- **Other interoceptive practices** — Will emerge. Check-ins, body scans, whatever develops. Voice notes are the bootstrap; the area is broader than any single practice.
 
 | Signal type | What it looks like |
 |---|---|
-| Primary signal | Flow rate — are voice notes happening? Absence is the loudest signal |
-| Quality signal | Specificity and felt-sense content increasing over time (interoceptive development) |
-| Underserved | Inner input goes quiet. Handled indirectly — never as a reminder |
+| Primary signal | Is articulation happening? Flow rate of voice notes. Absence is the loudest signal |
+| Quality signal | Specificity and felt-sense content increasing over time — noticing sharpening |
+| Underserved | Inner input goes quiet. Handled indirectly — never as a reminder. Creating conditions for articulation rather than prompting it |
 
 ---
 
@@ -181,17 +180,18 @@ Signals are consumed by the **perceiver** agent (working name) — the attunemen
 
 Signals carry advisory `domain_tags` in YAML frontmatter. The hierarchy's non-negotiable domains provide the canonical tag vocabulary:
 
-| Tag | Domain | Status |
-|---|---|---|
-| `meds` | Medication | Non-negotiable |
-| `nutrition` | Eating well | Non-negotiable |
-| `creative` | Creative pursuit | Non-negotiable |
-| `social` | Social pursuit | Non-negotiable |
-| `voice-practice` | Voice note flow | Non-negotiable (meta) |
-| `body` | Body care (general) | Candidate |
-| `home` | Home environment | Candidate |
-| `money` | Financial resources | Candidate |
-| `movement` | Embodiment/movement | Candidate |
-| `sleep` | Sleep | Candidate |
+| Tag | Area | Component | Status |
+|---|---|---|---|
+| `body` | Body | (area-level) | Non-negotiable |
+| `meds` | Body | Medication | Non-negotiable |
+| `nutrition` | Body | Eating well | Non-negotiable |
+| `exercise` | Body | Exercise/movement | Non-negotiable |
+| `creative` | Creative | (area-level) | Non-negotiable |
+| `social` | Social | (area-level) | Non-negotiable |
+| `interoception` | Interoception | (area-level) | Non-negotiable |
+| `voice-practice` | Interoception | Voice note practice | Non-negotiable |
+| `home` | — | Home environment | Candidate |
+| `money` | — | Financial resources | Candidate |
+| `sleep` | — | Sleep | Candidate |
 
-Tags are advisory — they help downstream agents (the perceiver/attunement agent) pattern-match signal to domain. As the hierarchy grows, new tags are added. Candidate tags exist because the domains were identified in exploration but are not yet non-negotiable.
+Tags are advisory — they help downstream agents (the perceiver/attunement agent) pattern-match signal to area and component. A signal can carry both area and component tags (e.g., `[body, nutrition]`). As the hierarchy grows, new areas and components are added. Candidate tags exist because the domains were identified in exploration but aren't yet non-negotiable areas.
