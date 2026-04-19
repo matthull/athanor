@@ -72,7 +72,7 @@ Absence of inner input is the loudest signal in the system. But it must be handl
 
 ## Bootstrap Non-Negotiables
 
-Three items. Deliberately small. The hierarchy grows from voice note signal and lived experience, not from speculation about what should matter.
+Four items. Deliberately small. The hierarchy grows from voice note signal and lived experience, not from speculation about what should matter.
 
 ### 1. Meds
 
@@ -95,7 +95,18 @@ High protein, real meals. Not "ate something." Implies logistics — shopping, s
 | Underserved | Pattern of skipped meals, carb-heavy/convenience eating, energy crashes, no grocery shopping happening |
 | Space-making question | What does eating well actually cost in EF? Shopping frequency, prep time, decision load. Where can it be streamlined? What's the irreducible floor? |
 
-### 3. Voice Note Practice
+### 3. Creative Pursuit
+
+If creative work isn't happening, that's a critical signal. Creative pursuit is where vitality lives — not productivity, not obligation, but the thing that makes life feel like it has a point. Some room exists for mechanical support (making time for the boring setup parts, clearing logistical blockers). But if creative engagement drops to zero, that's not a logistics problem — it's a signal that something fundamental needs to change to make space.
+
+| Signal type | What it looks like |
+|---|---|
+| Felt-sense (primary) | Energy and aliveness when creating. Felt sense of "I'm doing the thing I'm here for" vs. everything being obligation-shaped |
+| Factual (supplementary) | Time spent in creative work, projects touched, output produced |
+| Underserved | No creative engagement at all. Not a bandwidth problem to optimize — a signal that significant space-making is needed |
+| Mechanical support | Setup, boring parts, logistics around creative work — these CAN be supported mechanically. The creative act itself cannot. |
+
+### 4. Voice Note Practice
 
 The meta-non-negotiable. The practice that makes everything else visible and workable.
 
@@ -159,6 +170,7 @@ Signals carry advisory `domain_tags` in YAML frontmatter. The hierarchy's non-ne
 |---|---|---|
 | `meds` | Medication | Non-negotiable |
 | `nutrition` | Eating well | Non-negotiable |
+| `creative` | Creative pursuit | Non-negotiable |
 | `voice-practice` | Voice note flow | Non-negotiable (meta) |
 | `body` | Body care (general) | Candidate |
 | `home` | Home environment | Candidate |
