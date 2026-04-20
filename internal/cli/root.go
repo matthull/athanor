@@ -71,7 +71,7 @@ func printUsage() {
 
 Usage:
   ath init <name> [--project <path>]        Create a new athanor instance
-  ath kindle <name> [<mo-name>]            Launch a marut for a magnum opus
+  ath kindle <name> [<mo-name>] [--role <r>] Launch a presence-driven role
   ath reforge <name> [<mo-name>]           Kill and relaunch a marut
   ath muster <opus-file> [--worktree-path <path>]    Launch an azer for an opus
   ath muster <mo> <name> --intent <text>   Launch autonomous azer from intent
@@ -79,7 +79,7 @@ Usage:
   ath craft-mo <athanor>                   Create a new Magnum Opus interactively
   ath check <crucible>                      Check crucible health
   ath cleanup <crucible>                   Clean up after a discharged opus
-  ath quiesce <name> [<mo-name>] [--force] Graceful shutdown
+  ath quiesce <name> [<mo-name>] [--role <r>] [--force] Graceful shutdown
   ath status [<name>]                      Show athanor health
   ath view <athanor> <mo> [<opus>]          Open MO or opus in $EDITOR
   ath opera [<name>] [--mo <mo-name>]      List opera with status

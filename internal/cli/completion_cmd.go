@@ -111,7 +111,7 @@ _ath() {
         'init:Create a new athanor instance'
         'craft:Interactive session with the artifex'
         'craft-mo:Create a new Magnum Opus interactively'
-        'kindle:Launch a marut for an athanor'
+        'kindle:Launch a presence-driven role for an athanor'
         'reforge:Kill and relaunch a marut'
         'muster:Launch an azer for an opus'
         'check:Check crucible health'
@@ -145,7 +145,43 @@ _ath() {
                 _ath_athanor_names
             fi
             ;;
-        kindle|reforge|quiesce)
+        kindle|quiesce)
+            # Complete flag values
+            case "${words[$(( CURRENT - 1 ))]}" in
+                --role)
+                    local _ath_name="${words[3]}"
+                    local _ath_inst_dir="$HOME/athanor/athanors/$_ath_name"
+                    if [[ -d "$_ath_inst_dir" ]]; then
+                        local -a _roles
+                        for f in "$_ath_inst_dir"/*.md(N); do
+                            local _bn="${${f:t}%.md}"
+                            # Skip non-role files
+                            [[ "$_bn" == "AGENTS" || "$_bn" == "opus" || "$_bn" == "muster" ]] && continue
+                            _roles+=("$_bn")
+                        done
+                        compadd -- "${_roles[@]}"
+                    else
+                        compadd -- marut perceiver attendant
+                    fi
+                    return
+                    ;;
+                --mo)
+                    _ath_mo_names "${words[3]}"
+                    return
+                    ;;
+            esac
+            if (( CURRENT == 3 )); then
+                _ath_athanor_names
+            elif (( CURRENT == 4 )); then
+                _ath_mo_names "${words[3]}"
+            else
+                # Offer flags
+                local -a _kflags=(--role --mo)
+                [[ "${words[2]}" == "quiesce" ]] && _kflags+=(--force)
+                compadd -- "${_kflags[@]}"
+            fi
+            ;;
+        reforge)
             if (( CURRENT == 3 )); then
                 _ath_athanor_names
             elif (( CURRENT == 4 )); then

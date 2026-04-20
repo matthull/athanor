@@ -258,6 +258,94 @@ func MarutCrucibleName(athanorName, moName string) string {
 	return fmt.Sprintf("marut-%s-%s", athanorName, moName)
 }
 
+// RoleCrucibleName returns the crucible name for any presence-driven role.
+// For legacy (single MO), pass empty moName to get "<role>-<athanor>".
+// For multi-MO, pass the MO name to get "<role>-<athanor>-<mo>".
+func RoleCrucibleName(role, athanorName, moName string) string {
+	if moName == "" {
+		return fmt.Sprintf("%s-%s", role, athanorName)
+	}
+	return fmt.Sprintf("%s-%s-%s", role, athanorName, moName)
+}
+
+// KindledDir returns the kindled-state sidecar directory for an MO.
+// Presence of <role> file inside IS the kindled state for that role.
+func KindledDir(instanceDir, moName string) string {
+	return filepath.Join(instanceDir, MagnaOperaDir, moName, "kindled")
+}
+
+// SetKindled marks a role as kindled for an MO by creating an empty sidecar file.
+// Idempotent: no error if the role was already kindled.
+func SetKindled(instanceDir, moName, role string) error {
+	dir := KindledDir(instanceDir, moName)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("creating kindled dir: %w", err)
+	}
+	path := filepath.Join(dir, role)
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return fmt.Errorf("creating kindled file %s: %w", path, err)
+	}
+	return f.Close()
+}
+
+// ClearKindled removes the kindled sidecar for a role.
+// Idempotent: no error if the role was not kindled.
+func ClearKindled(instanceDir, moName, role string) error {
+	path := filepath.Join(KindledDir(instanceDir, moName), role)
+	if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("removing kindled file %s: %w", path, err)
+	}
+	return nil
+}
+
+// ClearAllKindled removes every kindled sidecar for an MO.
+// Idempotent: no error if the kindled dir does not exist.
+func ClearAllKindled(instanceDir, moName string) error {
+	dir := KindledDir(instanceDir, moName)
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return fmt.Errorf("reading kindled dir: %w", err)
+	}
+	for _, e := range entries {
+		path := filepath.Join(dir, e.Name())
+		if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+			return fmt.Errorf("removing kindled file %s: %w", path, err)
+		}
+	}
+	return nil
+}
+
+// ListKindled returns the role names currently marked kindled for an MO.
+// Returns an empty slice (not nil error) when the kindled dir does not exist.
+func ListKindled(instanceDir, moName string) ([]string, error) {
+	dir := KindledDir(instanceDir, moName)
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return []string{}, nil
+		}
+		return nil, fmt.Errorf("reading kindled dir: %w", err)
+	}
+	names := make([]string, 0, len(entries))
+	for _, e := range entries {
+		if !e.IsDir() {
+			names = append(names, e.Name())
+		}
+	}
+	return names, nil
+}
+
+// IsKindled returns true if the role's kindled sidecar exists for an MO.
+func IsKindled(instanceDir, moName, role string) bool {
+	path := filepath.Join(KindledDir(instanceDir, moName), role)
+	_, err := os.Stat(path)
+	return err == nil
+}
+
 // SessionName returns the tmux session name for an athanor.
 // Convention: athanor-<name>. All crucibles for this athanor live in this session.
 func SessionName(athanorName string) string {

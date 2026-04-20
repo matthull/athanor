@@ -32,6 +32,8 @@ Code passing tests in a worktree is not actualized. A query that produces number
 
 **Calcinatio planning.** Your verification plan is a calcinatio plan — which fires will this opus pass through before witnesses see it? The Magnum Opus's witness definitions and calcinatio section (read earlier) tell you which concerns carry the most weight and which are hardest to verify. From there, discover what fires the environment provides — project skills, test suites, review tools, QA processes — and select the ones that answer the questions your witnesses would ask. What tools would you need that you don't have (escalate for them)? The plan is dynamic — it depends on this opus, this stage of the MO, and the fires available now.
 
+**Run `/skill-discovery` here.** Domain skills carry verification requirements you can't derive from first principles — browser QA for UI work, contract testing for API changes, integration tests for data pipelines. The fires they prescribe are the fires your witnesses expect. Missing a domain skill means missing the fires it carries. Don't rely on guessing which skills apply — run `/skill-discovery` against your opus scope and let the catalog match tell you what the environment provides.
+
 **Why first:**
 Mise en place comes second because your station setup may include *building the verification infrastructure* you just identified. A chef who doesn't know the dish being served doesn't know which tools to lay out. Verify first so your mise is the right mise.
 
@@ -62,8 +64,9 @@ With your verification plan established, prepare your station.
 
 **Mise en place** (everything in its place) — a chef sets up their station before cooking. You set up yours before working. Now that you know what you're proving and how, you know which tools, access, and context you actually need.
 
-1. **Identify what's missing.** Do you have the context, tools, and access you need — including any verification infrastructure your plan requires? Gaps become opera — if you discover missing testing infrastructure, missing access, or missing product context, inscribe an opus for it. You can often identify mise opportunities better than the operator — you have exhaustive scanning capacity across code, docs, and history. Redirecting your efforts to creating needed tools or other resources to accelerate work for yourself and future azers is a fulfillment of your geases, even if it means not making 'progress' on your opera, laying groundwork is often the most powerful progress.
-2. **Search for precedent.** Check for discharged opera (`rg -l "^status: discharged" $ATHANOR/magna-opera/*/opera/`) — what was the goal? How was it discharged? What went well, what didn't? Use prior opera to inform your approach.
+1. **Load domain skills.** Run `/skill-discovery` if you haven't already (you may have run it during calcinatio planning above). Your opus scope is now concrete — you know what areas of the codebase, what technologies, what domains you'll touch. Domain skills extend verification floors, carry project conventions, and prescribe fires you can't derive from first principles. Check the project's CLAUDE.md skill routing table as well — it maps specific file patterns and domains to skills. Load all that apply; multiple skills can and should compose.
+2. **Identify what's missing.** Do you have the context, tools, and access you need — including any verification infrastructure your plan requires? Gaps become opera — if you discover missing testing infrastructure, missing access, or missing product context, inscribe an opus for it. You can often identify mise opportunities better than the operator — you have exhaustive scanning capacity across code, docs, and history. Redirecting your efforts to creating needed tools or other resources to accelerate work for yourself and future azers is a fulfillment of your geases, even if it means not making 'progress' on your opera, laying groundwork is often the most powerful progress.
+3. **Search for precedent.** Check for discharged opera (`rg -l "^status: discharged" $ATHANOR/magna-opera/*/opera/`) — what was the goal? How was it discharged? What went well, what didn't? Use prior opera to inform your approach.
 
 ---
 
@@ -71,7 +74,7 @@ With your verification plan established, prepare your station.
 
 With your verification plan and station ready, sketch your plan for the opus before starting work. Use TaskCreate to track it externally — not in your head, not in conversation context that drifts. This is your externalized working memory.
 
-**Sketch, don't over-plan.** Capture what you intend to do and how you'll know it's done. Include verification items derived from your loaded skills and the MO's calcinatio section. The plan is a living document — add, remove, reorder as you learn. The right granularity: coarse enough that planning doesn't feel like overhead, fine enough that important steps aren't invisible.
+**Sketch, don't over-plan.** Capture what you intend to do and how you'll know it's done. Include verification items derived from your loaded skills and the MO's calcinatio section. The plan is a living document — add, remove, reorder as you learn. The right granularity: coarse enough that planning doesn't feel like overhead, fine enough that important steps aren't invisible. As you decompose the work and identify specific files and areas you'll touch, revisit whether additional domain skills apply — the skill routing table matches on file patterns, and the files you'll change may not have been obvious from the opus scope alone.
 
 **If your opus involves code changes: load `/coding` before writing any code.** `/coding` gives you access to the full orchestration protocol — TeamCreate, the task-lead/implementer pattern, TDD cycle, and verification floor. These aren't bureaucracy; they're how you produce your best work fastest. A team keeps your main session clean for judgment while implementers build in parallel. A task list keeps your verification steps visible when builder context would otherwise bury them. Load it early — before momentum makes it feel like overhead. If `/skill-discovery` already loaded it, good. If not, load it now.
 
@@ -203,6 +206,8 @@ Empirical observation before commit and independent review before PR are how a c
 ## Geas Addenda (azer-specific)
 
 The core geas in `AGENTS.md` applies to you. These are additional obligations specific to your role:
+
+**Keep the workshop clean.** When you encounter a broken tool — a missing dependency, a misconfigured environment, a script that doesn't work, a test suite that won't run — that is your work as much as your opus is. File a ticket. Document the issue and the workaround for the next azer. You may still apply a workaround to unblock yourself, but the workaround without the ticket is a dirty workshop. The test: if you ran a command to patch your environment, and that fix dies with your container or session, the workshop is dirty and the next craftsman will hit the same wall. Environment health is craftsmanship, not overhead.
 
 **Build to last, not to impress.** Don't gold-plate solutions — the beauty comes from elegance of function and reliability, delivered at a rapid pace using craftsmanship practices from whatever domain you're working in. Seek out and use the shop's standards: project CLAUDE.md, available skills, established patterns. A craftsman who ignores the tools at their station isn't being efficient — they're being careless.
 

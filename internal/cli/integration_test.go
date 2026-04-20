@@ -56,6 +56,12 @@ func TestATHFullLifecycle(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
+	// perceiver.md is not in SharedFiles (so init won't symlink it); write it
+	// to sharedDir for discoverability parity and directly into the instance
+	// dir below so --role perceiver passes the role-file check.
+	if err := os.WriteFile(filepath.Join(sharedDir, "perceiver.md"), []byte("# Perceiver (test)\nTest perceiver role."), 0644); err != nil {
+		t.Fatal(err)
+	}
 	if err := os.MkdirAll(filepath.Join(tmpHome, athanor.AthanorsDir), 0755); err != nil {
 		t.Fatal(err)
 	}
@@ -614,6 +620,80 @@ This is a test opus created by the QA harness.
 		}
 		if !strings.Contains(string(out), "ATHANOR") {
 			t.Errorf("expected error about $ATHANOR, got: %s", out)
+		}
+	})
+
+	// ─── Phase 14b-e: --role flag on kindle and quiesce ──────────────
+	// Phase 13 quiesced marut-qa-test-qa-goal, so this slot is clean.
+	// perceiver.md isn't symlinked by init — write it directly into instDir
+	// so the kindle role-file check passes.
+
+	if err := os.WriteFile(filepath.Join(instDir, "perceiver.md"),
+		[]byte("# Perceiver (test)\nTest perceiver role."), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run("kindle perceiver creates role crucible", func(t *testing.T) {
+		out, err := runAth("kindle", "qa-test", "--role", "perceiver", "--mo", "qa-goal")
+		if err != nil {
+			t.Fatalf("ath kindle --role perceiver failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "perceiver-qa-test-qa-goal")
+
+		if !strings.Contains(out, "perceiver-qa-test-qa-goal") {
+			t.Errorf("expected crucible name in output, got: %s", out)
+		}
+
+		time.Sleep(500 * time.Millisecond)
+		windows := listSessionWindows(t, qaSession)
+		if !containsExact(windows, "perceiver-qa-test-qa-goal") {
+			t.Errorf("expected perceiver window, got: %v", windows)
+		}
+
+		kindledPath := filepath.Join(instDir, "magna-opera", "qa-goal", "kindled", "perceiver")
+		if _, err := os.Stat(kindledPath); err != nil {
+			t.Errorf("expected kindled state file at %s: %v", kindledPath, err)
+		}
+	})
+
+	t.Run("kindle perceiver is idempotent", func(t *testing.T) {
+		out, err := runAth("kindle", "qa-test", "--role", "perceiver", "--mo", "qa-goal")
+		if err != nil {
+			t.Fatalf("idempotent kindle failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "already running") {
+			t.Errorf("expected 'already running' message, got: %s", out)
+		}
+	})
+
+	t.Run("quiesce single role", func(t *testing.T) {
+		out, err := runAth("quiesce", "qa-test", "qa-goal", "--role", "perceiver")
+		if err != nil {
+			t.Fatalf("quiesce --role perceiver failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "Perceiver") && !strings.Contains(out, "quiesced") {
+			t.Errorf("expected role quiesce message, got: %s", out)
+		}
+
+		time.Sleep(300 * time.Millisecond)
+		windows := listSessionWindows(t, qaSession)
+		if containsExact(windows, "perceiver-qa-test-qa-goal") {
+			t.Error("expected perceiver window to be killed after quiesce")
+		}
+
+		kindledPath := filepath.Join(instDir, "magna-opera", "qa-goal", "kindled", "perceiver")
+		if _, err := os.Stat(kindledPath); !os.IsNotExist(err) {
+			t.Errorf("expected kindled state file to be removed")
+		}
+	})
+
+	t.Run("kindle nonexistent role errors", func(t *testing.T) {
+		out, err := runAth("kindle", "qa-test", "--role", "nonexistent", "--mo", "qa-goal")
+		if err == nil {
+			t.Fatal("expected error for nonexistent role")
+		}
+		if !strings.Contains(out, "role file") {
+			t.Errorf("expected 'role file' error, got: %s", out)
 		}
 	})
 
