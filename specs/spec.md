@@ -47,13 +47,33 @@ Two loose naming registers: **monster manual** for agents (creatures with purpos
 
 ### The Human
 
-**Artifex** *(alchemical/Latin: "craftsman")* — The human who directs the athanor. Sets goals, makes judgment calls. The one the system serves. In the current system, the artifex also fills the role of **Primus, the Forge Lord** — the athanor-level supervisor who ensures each goal has its supervisor and keeps the furnace lit. (Eventually Primus becomes its own agent role.)
+**Artifex** *(alchemical/Latin: "craftsman")* — The human who directs the athanor. Sets goals, makes judgment calls. The one the system serves.
+
+**Primus** *(alchemical: "the first")* — An architectural role (not an agent role) responsible for supervising an athanor instance or the whole forge. Primus ensures kindled roles stay alive, sessions stay unblocked, and the furnace keeps burning. The first explicit implementations are the **liveness timer** (ensures all kindled presence-driven roles have active sessions) and the **permission stall detection timer** (unblocks stuck Claude Code sessions). Future primus responsibilities may include stall detection, health dashboards, and resource management. Currently the artifex fills primus responsibility manually where automation hasn't landed yet.
 
 ### The Agents
 
-**Marut** *(monster manual)* — Supervisor. One per top-level goal. Relentlessly ensures its goal advances — watching agent health AND goal progress. Dispatcher and cleanup. Also the narrator: sends brief dispatches to the artifex at meaningful turns in the story. Not a decision-maker — only the artifex has final authority.
+Agents fall into two lifecycle classes:
 
-**Azer** *(monster manual)* — Worker. Skilled, bounded, exists to execute. Charged with a single unit of work, operates in its own environment. When done, discharges its work and the supervisor determines what comes next.
+**Presence-driven agents** are singletons — at most one session per MO. They are launched by `ath kindle`, self-reforge when their context fills, and are kept alive by a universal liveness timer (a primus responsibility). Their crucible persists across reforges. Kindled state is stored in MO files and discoverable via `rg`. `ath quiesce` clears kindled state so the timer stops resurrecting the role.
+
+**Opus-scoped agents** are workers — launched by `ath muster` for a specific opus, they discharge when done. Many can run concurrently per MO.
+
+| | Presence-driven (kindle) | Opus-scoped (muster) |
+|---|---|---|
+| **Launch** | `ath kindle` | `ath muster` |
+| **Lifecycle** | Self-reforging, persistent | Work, discharge, done |
+| **Cardinality** | Singleton per MO | Many per MO |
+| **Kept alive by** | Liveness timer (muster=no-op if exists) | Their own opus scope |
+| **Examples** | Marut, Perceiver, Attendant | Azer |
+
+**Marut** *(monster manual)* — Supervisor. Presence-driven singleton, one per MO. Relentlessly ensures its goal advances — watching agent health AND goal progress. Dispatcher and cleanup. Also the narrator: sends brief dispatches to the artifex at meaningful turns in the story. Not a decision-maker — only the artifex has final authority. The marut is the prototype for the presence-driven class — perceiver and attendant follow the same lifecycle pattern.
+
+**Azer** *(monster manual)* — Worker. Opus-scoped. Skilled, bounded, exists to execute. Charged with a single unit of work, operates in its own environment. When done, discharges its work and the supervisor determines what comes next.
+
+**Perceiver** *(alchemical)* — Mirror for the artifex's state. Presence-driven singleton. Processes interoceptive signals (voice notes, check-ins) into a living portrait of the artifex's current state. Internal to the system — the portrait is a means to an end, supporting attunement-aware decisions by other agents.
+
+**Attendant** *(alchemical)* — The artifex's attunement companion. Presence-driven singleton. Always active — the artifex communicates with it via Telegram. Incorporates interoception, surfaces materia as invitations, supports the "noticing moment before action." The primary interface between the life athanor and the artifex's daily experience.
 
 **Beholder** *(monster manual)* — Watcher. Scans channels and conditions, creates work when it finds something that needs doing. (Designed, not yet built.)
 
@@ -222,13 +242,20 @@ The system is designed for pure maximization — the marut relentlessly advances
 ### Supervision Model
 
 ```
-Artifex (human) = Primus, the Forge Lord
+Primus (architectural role — liveness timer + stall detection)
   └── Athanor instance
-        ├── Marut (one per MO, crucible: marut-<athanor>-<mo>)
-        │     └── Azers (one per opus, in own environment)
-        └── Marut (another MO)
-              └── Azers
+        ├── Presence-driven roles (kindled, singleton per MO)
+        │     ├── Marut (supervisor, one per MO)
+        │     │     └── Azers (opus-scoped, one per opus)
+        │     ├── Perceiver (state mirror — where applicable)
+        │     └── Attendant (attunement companion — where applicable)
+        └── Another MO
+              ├── Marut
+              │     └── Azers
+              └── ...
 ```
+
+**Kindled state and the liveness timer.** `ath kindle` flags a role as kindled in the MO's state (stored in MO files, discoverable via `rg`). A single athanor-wide liveness timer (every 5 minutes) scans all MOs for kindled roles and ensures each has an active tmux session. Missing sessions are re-kindled automatically. `ath quiesce` clears kindled state. This is the first implementation of primus responsibility — one heartbeat for the whole athanor.
 
 **The marut is dispatcher and cleanup** — not a decision-maker. It keeps the operational loop turning: check opera, muster azers for charged opera, monitor progress, clean up after discharge. It inscribes assessment opera when the queue is empty. It escalates when mechanical duties fail. Only the artifex has final authority.
 
@@ -269,7 +296,7 @@ These are locked architectural decisions. Changing them requires explicit artife
 - **No agent may run `/orchestrate`** — its long-lived coordinator model conflicts with the opera/trail model
 - **No agent may read the system blueprint** — this spec and related design docs are the artifex's working space, not the materialized system
 - **No agent may modify the athanor's shared components** (agent roles, protocols, opus lifecycle in the source repo's `shared/` directory) — agents read these files but never write to them. The athanor does not understand itself well enough to self-modify. System changes are the artifex's domain.
-- **The artifex is Primus, the Forge Lord for now** — manually launching, monitoring, restarting. No automated primus until there are multiple Magna Opera to supervise
+- **Primus is an architectural role with incremental automation** — the liveness timer and permission stall detection are the first implementations. The artifex still fills primus responsibility where automation hasn't landed (e.g., stall detection, health assessment). Automation grows as the system proves what works.
 - **Plans are optional context, not first-order** — goals + geas are the success guarantee. Many planning styles can succeed with clear goals
 - **Provide minimal materia, test escalation** — the first test is whether the marut escalates cleanly when it hits gaps vs. guessing/hallucinating
 

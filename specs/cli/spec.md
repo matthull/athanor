@@ -44,10 +44,11 @@ The athanor CLI (`ath`) is the operational backbone of the athanor system. It re
 | **Instance** | A single athanor scoped to one Magnum Opus. Directory at `~/athanor/athanors/<name>/`. Contains config, opera, and symlinked shared components. |
 | **Shared components** | Role files, geas, protocols shared across all instances. Live in the source repo's `shared/` directory and are symlinked directly into each instance. Repo location: `$ATHANOR_REPO` (default `~/code/athanor`). |
 | **Crucible** | A tmux window where an agent session runs. Named `marut-<athanor>` or `azer-<opus>`. |
-| **Kindle** | Launch a marut for an athanor — create crucible, start session. |
-| **Muster** | Launch an azer for an opus — create crucible, start session, verify. |
+| **Kindle** | Launch a presence-driven role for an athanor — set kindled state, create crucible, start session. Default role: marut. |
+| **Muster** | Launch an azer (or other opus-scoped role) for an opus — create crucible, start session, verify. Supports `--role` flag (default: azer). |
 | **Reforge** | Kill a dead session and spawn fresh in the same crucible. |
-| **Quiesce** | Graceful shutdown — verify no charged opera remain, kill the marut. |
+| **Quiesce** | Graceful shutdown — clear kindled state, verify no charged opera remain, kill sessions. |
+| **Kindled state** | A flag in MO state files indicating a presence-driven role should be kept alive. Discoverable via `rg`. Set by `ath kindle`, cleared by `ath quiesce`. |
 
 ---
 
@@ -104,11 +105,11 @@ ath kindle myproject
 [marut decides an opus needs an azer]
 [marut calls wtp add branch-name if code work — project-specific, not ath's job]
 
-ath muster fix-nil-error.md --worktree-path /path/to/worktree
+ath muster fix-nil-error.md --worktree-path /path/to/worktree [--role azer]
   → reads $ATHANOR to find the instance
   → reads opus file for crucible naming
   → creates tmux window "azer-fix-nil-error"
-  → launches claude --model opus with azer boot prompt
+  → launches claude --model opus with role-specific boot prompt (default: azer)
   → runs ath whisper idle to verify launch
 ```
 
@@ -168,24 +169,30 @@ Create a new athanor instance.
 
 **Exit codes:** 0=success, 1=already exists or error, 2=usage error
 
-#### `ath kindle <name>`
+#### `ath kindle <name> [--role <role>] [--mo <mo-name>]`
 
-Launch a marut for an athanor. The marut is the furnace — once kindled, it runs autonomously.
+Launch a presence-driven role for an athanor. Sets kindled state so the liveness timer keeps it alive.
+
+**Default role:** marut. Other presence-driven roles (perceiver, attendant) use `--role`.
 
 **What it does:**
 1. Reads `~/athanor/athanors/<name>/athanor.yml`
-2. Validates magnum-opus.md exists and has content (not just template placeholders)
-3. Creates tmux window: `marut-<name>`
-4. Launches claude session in the window:
+2. Validates the role file exists (e.g., `marut.md`, `perceiver.md`, `attendant.md`)
+3. **Sets kindled state** for this role in the MO's state — marks it as "should be running"
+4. If a session already exists for this role: **no-op** (idempotent — the liveness timer uses this)
+5. Creates tmux window: `<role>-<name>` (e.g., `marut-bugsnag`, `perceiver-life`)
+6. Launches claude session in the window:
    - Working directory: `athanor.yml → project` (or `~` if no project)
-   - Model: `athanor.yml → marut_model` (default: sonnet)
+   - Model: per-role config (default: sonnet)
    - Environment: `ATHANOR=~/athanor/athanors/<name>/`
-   - Prompt: the marut boot prompt (reads AGENTS.md, magnum-opus.md, marut.md, muster.md, starts /loop 5m)
-5. Verifies launch with `ath whisper idle marut-<name>`
+   - Prompt: role-specific boot prompt
+7. Verifies launch with `ath whisper idle <role>-<name>`
+
+**Idempotency is critical.** The liveness timer calls `ath kindle` every 5 minutes for each kindled role. If the session is already running, kindle is a no-op. This makes the timer implementation trivial — just call kindle for everything that should be alive.
 
 **The boot prompt is encoded in the CLI**, not in agent specs. This means prompt improvements are CLI releases, not spec edits. `[D:prompt-as-infrastructure]`
 
-**Exit codes:** 0=marut launched and verified idle, 1=launch failed, 2=usage error
+**Exit codes:** 0=role launched and verified idle (or already running), 1=launch failed, 2=usage error
 
 #### `ath reforge <name>`
 
@@ -201,15 +208,21 @@ Kill a dead marut session and spawn fresh. The crucible endures; the session is 
 
 **Exit codes:** 0=reforged and verified, 1=reforge failed, 2=crucible not found
 
-#### `ath quiesce <name>`
+#### `ath quiesce <name> [--role <role>]`
 
-Graceful shutdown of an athanor.
+Graceful shutdown of an athanor or a specific kindled role.
 
-**What it does:**
-1. Checks for charged opera — warns if any exist
-2. Checks for active azer crucibles — warns if any exist
-3. Kills the marut crucible
-4. Prints summary: "Athanor <name> quiesced. Trail: N discharged opera."
+**Without `--role` — quiesce the whole athanor:**
+1. Clears kindled state for all roles (so the liveness timer stops resurrecting them)
+2. Checks for charged opera — warns if any exist
+3. Checks for active azer crucibles — warns if any exist
+4. Kills all presence-driven role crucibles (marut, perceiver, attendant, etc.)
+5. Prints summary: "Athanor <name> quiesced. Trail: N discharged opera."
+
+**With `--role` — quiesce a single role:**
+1. Clears kindled state for that role only
+2. Kills that role's crucible
+3. Other kindled roles continue running
 
 **Does NOT** delete the instance directory or opera. The trail persists.
 
@@ -248,19 +261,36 @@ Opera:
 
 **Exit codes:** 0=success, 1=error
 
-### Azer Management (called by marut)
+### Primus: Liveness Timer
 
-#### `ath muster <opus-file> [--worktree-path <path>] [--model <model>] [--name <name>]`
+A single athanor-wide systemd timer (every 5 minutes) that implements the first primus responsibility: ensuring all kindled presence-driven roles have active sessions.
 
-Launch an azer for a charged opus. The marut's primary dispatch command.
+**How it works:**
+1. Scans all MO directories for kindled state (via `rg` or equivalent)
+2. For each kindled role: checks tmux for an active session
+3. Missing session? → calls `ath kindle <athanor> --role <role>` (which is idempotent)
+4. Already running? → no-op
+
+**Implementation:** Shell script invoked by a systemd user timer. No Go code needed — just file reads and tmux checks. Replaces per-role timers (e.g., the current `attunement-intake.timer`) with one universal heartbeat.
+
+**Kindled state storage:** Stored in MO state files, discoverable via `rg`. Format TBD — could be YAML frontmatter in the MO file, a sidecar state file, or a dedicated section. The constraint: it must be grep-discoverable so the timer script stays simple.
+
+**Relationship to other primus responsibilities:** The permission stall detection timer is also primus responsibility but operates independently. Future primus implementations (stall detection, health dashboards) may be folded into this timer or run as separate services. `[D:incremental-primus — automate what's proven, keep the rest manual]`
+
+### Opus-Scoped Agent Management (called by marut)
+
+#### `ath muster <opus-file> [--worktree-path <path>] [--model <model>] [--name <name>] [--role <role>]`
+
+Launch an agent for a charged opus. The marut's primary dispatch command.
 
 **Context detection:** Reads `$ATHANOR` to determine which athanor instance this is for. If `$ATHANOR` is not set, requires `--athanor <name>`. `[D:agent-context-via-env]`
 
 **Arguments:**
 - `<opus-file>` — Opus filename (resolved relative to `$ATHANOR/opera/`) or absolute path
-- `--worktree-path <path>` — Working directory for the azer. Default: project dir from athanor.yml. Use this to point to a git worktree or any other temporary workspace outside the athanor's project dir. The name "worktree" is generic — it applies to any alternate workspace, not just `git worktree`.
+- `--worktree-path <path>` — Working directory for the agent. Default: project dir from athanor.yml. Use this to point to a git worktree or any other temporary workspace outside the athanor's project dir. The name "worktree" is generic — it applies to any alternate workspace, not just `git worktree`.
 - `--model <model>` — Model override. Default: `athanor.yml → azer_model` (default: opus)
 - `--name <name>` — Crucible name override. Default: `azer-<opus-slug>` derived from filename
+- `--role <role>` — Agent role file to use. Default: `azer`. Allows mustering non-azer opus-scoped roles (e.g., attendant for a specific opus). The role file (`<role>.md`) must exist in the athanor instance. `[D:backward-compatible — azer default preserved]`
 
 **What it does:**
 1. Resolves opus file path
@@ -270,7 +300,7 @@ Launch an azer for a charged opus. The marut's primary dispatch command.
    - Working directory: `--worktree-path` value or project dir
    - Model: `--model` value or athanor.yml default
    - Environment: `ATHANOR=$ATHANOR`
-   - Prompt: azer boot prompt (reads AGENTS.md, azer.md, opus file, execute)
+   - Prompt: role-specific boot prompt (reads AGENTS.md, `<role>.md`, opus file, execute)
 5. Verifies launch with `ath whisper idle <crucible-name>`
 6. Prints: crucible name and verification status
 
