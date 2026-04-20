@@ -291,6 +291,40 @@ This is a test opus created by the QA harness.
 		}
 	})
 
+	// ─── Phase 5c: ath services ────────────────────────────────────────
+
+	t.Run("services lists service dependencies", func(t *testing.T) {
+		out, err := runAth("services")
+		// Exit code 1 is expected in test env (services aren't running)
+		_ = err
+		if !strings.Contains(out, "ATH SERVICES") {
+			t.Errorf("expected ATH SERVICES header, got: %s", out)
+		}
+		if !strings.Contains(out, "athanor-liveness.timer") {
+			t.Errorf("expected athanor-liveness.timer in output, got: %s", out)
+		}
+		if !strings.Contains(out, "attunement-intake.timer") {
+			t.Errorf("expected attunement-intake.timer in output, got: %s", out)
+		}
+		if !strings.Contains(out, "voice-notes-process.timer") {
+			t.Errorf("expected voice-notes-process.timer in output, got: %s", out)
+		}
+	})
+
+	t.Run("services json output", func(t *testing.T) {
+		out, err := runAth("services", "--json")
+		_ = err // exit 1 expected
+		if !strings.Contains(out, "\"timestamp\"") {
+			t.Errorf("expected JSON with timestamp, got: %s", out)
+		}
+		if !strings.Contains(out, "\"all_healthy\"") {
+			t.Errorf("expected all_healthy field in JSON, got: %s", out)
+		}
+		if !strings.Contains(out, "\"athanor-liveness.timer\"") {
+			t.Errorf("expected unit name in JSON, got: %s", out)
+		}
+	})
+
 	// ─── Phase 6: ath kindle (creates tmux window) ───────────────────
 	// kindle will try to launch 'claude' which may not be interactive here.
 	// We test that the tmux window is created with the right name.

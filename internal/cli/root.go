@@ -51,6 +51,8 @@ func Execute() int {
 		return runPatrol(os.Args[2:])
 	case "dashboard":
 		return runDashboard(os.Args[2:])
+	case "services":
+		return runServices(os.Args[2:])
 	case "completion":
 		return runCompletion(os.Args[2:])
 	case "version":
@@ -85,6 +87,7 @@ Usage:
   ath opera [<name>] [--mo <mo-name>]      List opera with status
   ath patrol [--json] [--exclude <pane>]  Scan panes for prompts/stalls
   ath dashboard [--watch] [--json]        At-a-glance system overview
+  ath services [--json]                    Check athanor service dependencies
 
   ath whisper send <target> <message>     Send a message to a tmux target
   ath whisper idle <target>               Wait for target to become idle

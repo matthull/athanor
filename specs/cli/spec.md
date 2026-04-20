@@ -379,6 +379,53 @@ Create a new opus from the standard template. Writes to `$ATHANOR/opera/YYYY-MM-
 
 Print version, commit, build time (same as current whisper).
 
+#### `ath services [--json]`
+
+List all athanor systemd service dependencies with their current status. Serves dual purpose: health check (are all required services running?) and dependency declaration (the command's implementation IS the canonical list).
+
+**Output (text):**
+```
+ATH SERVICES
+
+UNIT                          STATUS    LAST TRIGGER          NEXT
+athanor-liveness.timer        active    10:31 (4m ago)        10:36
+attunement-intake.timer       active    10:30 (5m ago)        11:00
+voice-notes-process.timer     active    10:30 (5m ago)        10:35
+
+All services healthy.
+```
+
+**Output (JSON with `--json`):**
+```json
+{
+  "timestamp": "10:35:01",
+  "services": [
+    {
+      "unit": "athanor-liveness.timer",
+      "description": "Keeps kindled presence-driven roles alive (5-min cadence)",
+      "status": "active",
+      "last_trigger": "Sun 2026-04-20 10:31:19 CDT",
+      "next_trigger": "Sun 2026-04-20 10:36:19 CDT"
+    }
+  ],
+  "all_healthy": true
+}
+```
+
+**Canonical service list** (defined in Go code, one place):
+- `athanor-liveness.timer` — keeps kindled presence-driven roles alive (5-min cadence)
+- `attunement-intake.timer` — processes voice note signals into attunement corpus (30-min cadence)
+- `voice-notes-process.timer` — transcribes voice notes from GDrive (5-min cadence)
+
+Adding a new service dependency means adding it to the `athanorServices` slice in `internal/cli/services_cmd.go`.
+
+**Color coding** (when stdout is a terminal and `NO_COLOR` is not set):
+- Green: active
+- Red: inactive/failed
+- Yellow: unknown
+
+**Exit codes:** 0=all services active, 1=any service inactive/failed, 2=usage error
+
 #### `ath completion zsh`
 
 Generate zsh completion script. Install with:
@@ -549,6 +596,7 @@ Rename the GitHub repo: `github.com/matthull/whisper` → `github.com/matthull/a
 | `ath quiesce` | Should | Graceful shutdown |
 | `ath opera` | Should | List opera with status |
 | `ath inscribe` | Nice | Create opus from template |
+| `ath services` | Should | List and check systemd service dependencies |
 
 ### Phase 3 — Enhanced operations
 
@@ -578,6 +626,9 @@ Rename the GitHub repo: `github.com/matthull/whisper` → `github.com/matthull/a
 | `ath whisper idle` detects idle | Identical behavior to current whisper idle |
 | `ath status` lists all athanors | Shows all instances with marut/azer/opera counts |
 | `ath status <name>` shows detail | Correct crucible detection and opera breakdown |
+| `ath services` lists all services | Shows all canonical service deps with status |
+| `ath services --json` produces JSON | Valid JSON with timestamp, services array, all_healthy |
+| `ath services` exit code reflects health | 0 if all active, 1 if any inactive/failed |
 | Zsh completion for athanor names | `ath kindle <TAB>` completes from instance directory names |
 | Zsh completion for opus files | `ath muster <TAB>` completes from charged opera |
 | Zsh completion for crucibles | `ath cleanup <TAB>` completes from `azer-*` tmux windows |
