@@ -32,6 +32,7 @@ Two things activate presence-driven roles: **new signals** and **time passing**.
 When no new signals were processed (intake gate found nothing), the perceiver still whispers a bare clock nudge: "No new signals. Clock check."
 
 **Whisper mechanism:** `ath whisper send attendant-<athanor> "<nudge content>"`
+*Note: `attendant-<athanor>` is shorthand. The actual tmux window name includes the MO suffix (e.g., `attendant-athanor-architect-life-domains`). This works because `ath whisper send` passes the target to tmux's `-t` flag, which does prefix matching. If multiple windows share the prefix, tmux will error — currently safe because there's only one attendant per athanor.*
 
 **Cadence:** Every 30 minutes (matches attunement-intake.timer). This is the attendant's heartbeat.
 

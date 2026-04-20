@@ -1,0 +1,35 @@
+#!/bin/bash
+# Pre-check for attunement signals before launching the perceiver in batch intake mode.
+# Usage: attunement-intake-check
+#
+# Exits immediately if no unprocessed signals exist.
+# Otherwise launches claude-run with the attunement intake protocol, which
+# invokes the perceiver agent role to process signals and update the corpus.
+#
+# Install: cp scripts/attunement-intake-check ~/.local/bin/
+# Timer:   cp scripts/systemd/attunement-intake.{timer,service} ~/.config/systemd/user/
+#          systemctl --user enable --now attunement-intake.timer
+
+set -euo pipefail
+
+ATHANOR_DIR="${ATHANOR:-$HOME/athanor/athanors/athanor-architect}"
+SIGNALS_DIR="$ATHANOR_DIR/signals/attunement"
+PROTOCOL="$HOME/code/athanor/specs/life-domains/attunement-intake-protocol.md"
+
+# Count .md files in the signals dir (not in processed/ subdirectory)
+count=$(find "$SIGNALS_DIR" -maxdepth 1 -name '*.md' -type f 2>/dev/null | wc -l)
+
+if [ "$count" -eq 0 ]; then
+    # No signals, but the nudge contract requires a bare clock nudge so the
+    # attendant can check vigils against the clock even during quiet periods.
+    # This avoids spinning up a Claude session just to send a static string.
+    ATHANOR_NAME=$(basename "$ATHANOR_DIR")
+    ath whisper send "attendant-${ATHANOR_NAME}" "No new signals. Clock check." 2>/dev/null || true
+    exit 0
+fi
+
+echo "[attunement-intake] Found ${count} unprocessed signal(s), invoking perceiver"
+exec /home/matt/.local/bin/claude-run "$PROTOCOL" \
+    --model claude-sonnet-4-6 \
+    --tools "Read,Write,Edit,Glob,Grep,Bash(mv *),Bash(ls *),Bash(date *),Bash(find *),Bash(mkdir *),Bash(wc *),Bash(ath *)" \
+    --dir "$HOME/code/athanor"
