@@ -105,6 +105,8 @@ func runKindle(args []string) int {
 		h, _ := os.UserHomeDir()
 		workDir = h
 	}
+	// All presence-driven roles (marut, perceiver, attendant) use the marut model.
+	// They are lightweight singletons — sonnet is appropriate. Craft work (azer) uses opus.
 	model := cfg.EffectiveMarutModel()
 
 	moPath := athanor.MagnumOpusPath(instDir, moName)

@@ -1,0 +1,46 @@
+#!/bin/bash
+# Athanor liveness check — ensure all kindled presence-driven roles have active sessions.
+# Called by athanor-liveness.timer every 5 minutes.
+#
+# Scans all athanor instances for kindled state files (magna-opera/<mo>/kindled/<role>),
+# checks tmux for active windows, and calls `ath kindle` for any missing sessions.
+#
+# Legacy instances (no magna-opera/ directory) are naturally excluded — they have no
+# kindled/ directories and are unaffected by this script.
+#
+# Install: cp scripts/athanor-liveness-check ~/.local/bin/
+# Timer:   cp scripts/systemd/athanor-liveness.{timer,service} ~/.config/systemd/user/
+#          systemctl --user enable --now athanor-liveness.timer
+set -euo pipefail
+
+ATHANOR_HOME="${ATHANOR_HOME:-$HOME/athanor}"
+ATH_BIN="$HOME/.local/bin/ath"
+
+# Bail if no athanors dir
+[[ -d "$ATHANOR_HOME/athanors" ]] || exit 0
+
+# Find all kindled role files: magna-opera/<mo>/kindled/<role>
+find "$ATHANOR_HOME/athanors" -path '*/kindled/*' -type f 2>/dev/null | while read -r kindled_file; do
+    role=$(basename "$kindled_file")
+    # Parse path: .../athanors/<name>/magna-opera/<mo>/kindled/<role>
+    # Remove ATHANOR_HOME/athanors/ prefix, then split
+    rel="${kindled_file#$ATHANOR_HOME/athanors/}"
+    athanor_name="${rel%%/*}"
+    # Extract MO name from: <athanor>/magna-opera/<mo>/kindled/<role>
+    mo_part="${rel#*/magna-opera/}"
+    mo_name="${mo_part%%/*}"
+
+    # Build expected crucible name: <role>-<athanor>-<mo>
+    crucible="${role}-${athanor_name}-${mo_name}"
+    session="athanor-${athanor_name}"
+
+    # Check if tmux window exists (fixed-string match to avoid regex issues)
+    if tmux list-windows -t "$session" -F '#{window_name}' 2>/dev/null | grep -qxF "$crucible"; then
+        # Already running — no-op
+        :
+    else
+        echo "[athanor-liveness] Rekindling $role for $athanor_name/$mo_name"
+        "$ATH_BIN" kindle "$athanor_name" --role "$role" --mo "$mo_name" || \
+            echo "[athanor-liveness] WARNING: Failed to kindle $role for $athanor_name/$mo_name"
+    fi
+done
