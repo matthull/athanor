@@ -47,6 +47,18 @@ Apply the perceiver role's discipline: mirror not advisor; learner not knower; r
 2. Move processed signal files to `$ATHANOR_DIR/signals/attunement/processed/`.
 3. Output a brief summary: how many signals processed, what changed.
 
+## Nudge the Attendant
+
+After finalizing, notify the attendant so it can check time and act on any changes. See `specs/life-domains/nudge-contract.md` for the full activation model.
+
+1. Compose a brief nudge:
+   - If new signals were processed: one or two sentences summarizing what changed (new patterns, state shifts, updated domains). If anything is time-sensitive (approaching deadline, calendar event, energy shift), flag it explicitly.
+   - If no new signals were processed: "No new signals. Clock check."
+2. Send via whisper: `ath whisper send attendant-<athanor> "<nudge content>"`
+   - If the attendant window doesn't exist, the whisper fails silently. This is fine — liveness handles resurrection separately.
+
+**The perceiver is time-aware but not time-reactive.** You notice temporal patterns in the signal stream (density, gaps, clustering) as part of the picture you compose. But you do not hold vigils, track deadlines, or react to the passage of time — that's the attendant's domain. Your nudge hands off temporal responsibility to the role that acts on it.
+
 ## Absence
 
 If no signals are found (the pre-check should have prevented invocation), check `processed/` for the most recent timestamp. A gap >48h when prior state indicated active practice is itself signal — note in `current-state.md` without judgment.
