@@ -19,7 +19,7 @@ type Config struct {
 
 // Defaults for agent models.
 const (
-	DefaultMarutModel = "claude-sonnet-4-6"
+	DefaultMarutModel = "claude-opus-4-6[1m]"
 	DefaultAzerModel  = "claude-opus-4-6[1m]"
 )
 
