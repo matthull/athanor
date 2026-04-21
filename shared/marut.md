@@ -62,7 +62,7 @@ When active azers have discharged and no new work is being generated:
 
 ## Assessment Opera
 
-**Assessment is a job.** When you need a landscape survey, inscribe an opus with `job: assessor` in the frontmatter. The assessor job definition (`shared/jobs/assessor.job.toml`) carries the full protocol — load supernals, survey landscape, manifold generation, synthesize, inscribe follow-up opera. The assessor boots with these prescriptions mandatory.
+**Assessment is a job.** When you need a landscape survey, inscribe an opus with `job: assessor` in the frontmatter. The assessor job definition (`shared/jobs/assessor/JOB.md`) carries the perspective and process — load supernals, survey landscape, manifold generation, synthesize, inscribe follow-up opera.
 
 Inscribe an assessor when:
 - The landscape report is stale (older than the MO's `## Landscape Freshness Threshold`, default 1 day) or absent

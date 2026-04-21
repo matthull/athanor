@@ -24,7 +24,7 @@
 
 Context drift in long-lived agent sessions causes skills not to load and critical tasks like QA to get skipped. The root cause is structural: prescriptive guidance (skills, verification gates, workflow requirements) erodes as builder context accumulates in large context windows. `[E:azer-orchestration/spec.md]`
 
-The job system addresses this by introducing **job roles** — structured, TOML-defined specializations that an azer can adopt. A job-role azer boots into a narrow perspective with mandatory prescriptions (skills to load, workflow to follow, verification gates, boundary rules) in a tight ~100k token context. The prescriptions survive because the context is small enough they stay salient, and the job boundary triggers discharge/handoff before they erode. `[B:artifex]`
+The job system addresses this by introducing **job roles** — perspective-first specializations that an azer can adopt. Each job is a markdown file (`shared/jobs/<name>/JOB.md`) that defines a professional identity: what you care about, what tools to reach for, what your instincts are. A job-role azer boots into a narrow perspective in a tight ~100k token context. The perspective stays salient because the context is small and the identity constrains what the azer attends to. `[B:artifex]`
 
 **Jobs are the flexible prescriptive layer of the system.** They're where crystallized operational learning lives — "load these skills", "follow this verification sequence", "apply these fires". The general-purpose azer remains for novel work. Jobs are an extra tool, not a confinement. `[B:artifex]`
 
@@ -71,12 +71,12 @@ TeamCreate may remain useful for truly mechanical subtasks (search 30 files, run
 
 | Term | What it is | New or extends |
 |------|-----------|----------------|
-| **Job** | A defined specialization an azer can adopt. Structured definition (TOML) with identity, required skills, workflow, boundary rules, prompt template. Analogous to FF job system — equippable professional identity. Also analogous to Gastown roles/formulae. | New `[B:artifex]` `[E:gastown]` |
+| **Job** | A defined specialization an azer can adopt. A `JOB.md` in `shared/jobs/<name>/` that defines the professional perspective — what you care about, what tools to reach for, what your instincts are. Analogous to FF job system — equippable professional identity. Inspired by Gastown roles/formulae but perspective-first, not process-first. | New `[B:artifex]` `[E:gastown]` |
 | **Job-role azer** | An azer mustered with a specific job. Boots into the job's narrow perspective. The job's prescriptions are mandatory, not advisory. Still an azer under the geas — the job constrains perspective, not agency. | New `[B:artifex]` |
 | **General-purpose azer** | Today's azer model. No job role — operates under the geas with full latitude. Used when no defined job fits the work, or when the work is novel/exploratory. The fallback, not the default. | `[E:existing]` |
-| **Job definition** | The TOML artifact that defines a job. Contains identity, concerns, required skills, workflow prescriptions, boundary rules, prompt template. Lives in a known location (registry). | New `[E:gastown]` |
+| **Job definition** | A `JOB.md` file that defines a job's perspective — identity, concerns, tools, instincts. Lives in `shared/jobs/<name>/JOB.md`. Markdown is the prompt injection — read directly into the azer's context at boot. | New `[E:gastown]` |
 | **Job boundary** | Not a wall but a professional instinct. A job-role azer naturally thinks in its specialty; when work of a different shape appears, its instinct is to seek collaboration rather than stretch. A QA azer that finds a typo might fix it (good judgment); one that finds a systemic issue inscribes a fixer (professional instinct). The motivation is quality, not compliance. | New `[B:artifex]` |
-| **Job registry** | The set of available job definitions. Discoverable at muster time. Grows as the system learns what patterns recur. | New `[E:gastown]` |
+| **Job registry** | The set of available job definitions in `shared/jobs/*/JOB.md`. Discoverable at muster time. Grows as the system learns what patterns recur. | New `[E:gastown]` |
 | **Inscription-time job assignment** | The job role is defined at inscription time — when the opus is created. The inscriber (marut, artifex, or another azer) specifies which job applies. | New `[B:artifex]` |
 
 ---
@@ -260,85 +260,27 @@ Discharge
 
 ## Job Definition Structure
 
-Modeled after Gastown's TOML roles/formulae, adapted to the athanor context. `[E:gastown]`
+Evolved from the initial Gastown TOML concept toward **perspective-first markdown**. Jobs are about identity, not process — the perspective naturally produces the right behavior. `[B:artifex]` `[E:gastown]`
 
-```toml
-# Example: qa-specialist.job.toml
+Each job is a directory in `shared/jobs/` with a `JOB.md` file (mirroring how skills use `SKILL.md`). The markdown IS the prompt injection — it's read directly into the azer's context at boot.
 
-job = "qa-specialist"
-description = """
-Quality assurance specialist. Reviews work products for correctness,
-completeness, and witness satisfaction. Applies calcinatio fires
-systematically. Does not fix — reports findings and spawns/requests
-fix azers when needed.
-"""
-version = 1
+### Job file structure
 
-# What this job cares about — its professional identity
-[identity]
-concerns = [
-  "correctness — does the work do what it claims?",
-  "completeness — are there gaps, missing edge cases, untested paths?",
-  "witness satisfaction — would the witnesses feel served?",
-  "calcinatio coverage — were appropriate fires applied?",
-]
-perspective = """
-You are a QA specialist. Your job is to find what's wrong, missing, or
-unverified — not to fix it. When you find issues, you report them with
-evidence and spawn or request the appropriate specialist to address them.
-"""
+A `JOB.md` has four sections:
 
-# Mandatory prescriptions — loaded at boot, not advisory
-[prescriptions]
-required_skills = ["/calcinatio", "/unit-testing"]
-workflow = """
-1. Read the work product and its intent (opus, MO context)
-2. Derive verification fires from witnesses and intent
-3. Apply each fire systematically — empirical evidence required
-4. Report findings with evidence
-5. For each finding: spawn fix azer or escalate
-"""
+| Section | Purpose |
+|---------|---------|
+| **Identity** (opening paragraph) | Who you are, what your craft is — the professional perspective |
+| **When this role is needed** | System-level guidance for when to invoke this job — helps marut and other azers know when to inscribe it |
+| **What you care about** | Your concerns, your lens — what you evaluate, what matters to you |
+| **Your tools** | `/skill-discovery` + pointers to relevant skills for this perspective |
+| **Your instinct** | Professional instinct — boundary behavior in Chesed framing (when to collaborate vs. do it yourself) |
 
-# Discharge gates — must pass before discharge
-[discharge]
-gates = [
-  "all derived fires applied with evidence",
-  "findings reported with reproduction steps",
-  "fix azers spawned or escalations filed for all findings",
-]
-context_limit = "100k"
+**No workflow steps, no gates, no rigid boundary rules.** The perspective drives the behavior. A QA specialist that genuinely identifies as "my craft is preventing surprises" will naturally verify before discharging. Gates are process on top of identity — and process is what drifts.
 
-# Boundary — what's in scope, what triggers handoff
-[boundary]
-in_scope = [
-  "reviewing any work product",
-  "running tests and observing results",
-  "spawning fix azers for found issues",
-]
-out_of_scope = [
-  "implementing fixes (spawn a code-implementation azer)",
-  "design decisions (escalate to marut or artifex)",
-  "scope changes (escalate to marut)",
-]
-```
+**Exception:** The assessor job includes a `## Your process` section because the assessment formula has a deliberate structure (survey → generate → synthesize) that adds genuine value. This is the exception, not the pattern. `[D:assessor-process-exception]`
 
-### Job definition fields
-
-Core fields — expect these to evolve through use:
-
-| Field | Purpose | Required? |
-|-------|---------|-----------|
-| `job` | Identifier | Yes |
-| `description` | Human-readable purpose | Yes |
-| `version` | Definition version | Yes |
-| `identity.concerns` | What this job cares about | Yes |
-| `identity.perspective` | Prompt injection — the job's voice | Yes |
-| `prescriptions.required_skills` | Skills loaded at boot | No |
-| `prescriptions.workflow` | Step-by-step guidance | No |
-| `discharge.gates` | Must-pass before discharge | No |
-| `discharge.context_limit` | When to signal discharge | No |
-| `boundary.in_scope` | What's within the job | No |
-| `boundary.out_of_scope` | What triggers handoff | No |
+See `shared/jobs/qa-specialist/JOB.md` for a representative example.
 
 ---
 
@@ -424,10 +366,10 @@ YOLO approach — land the minimum viable pieces, let tomorrow's azers test the 
 ### Wave 1: The foundation (implement now)
 
 **1. Job registry location and first definitions.**
-Create `shared/jobs/` as the registry. Write 2-3 starter job definitions as `.job.toml` files:
-- `assessor.job.toml` — the assessment formula extracted from AGENTS.md
-- `code-implementer.job.toml` — coding prescriptions
-- `qa-specialist.job.toml` — QA/calcinatio prescriptions
+Create `shared/jobs/` as the registry. Write starter job definitions as `<name>/JOB.md`:
+- `qa-specialist/JOB.md` — preventing witness surprises, verification perspective
+- `code-implementer/JOB.md` — clean tested code, TDD instincts
+- `assessor/JOB.md` — panoramic landscape view, manifold generation process
 
 These are the jobs most likely to be exercised tomorrow.
 
