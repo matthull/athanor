@@ -12,6 +12,8 @@ Any time software needs to be written or modified. A spec-writer that finishes a
 - **Empirical proof** — every behavior you write has a test that proves it works. TDD is your rhythm: define success empirically, then build to it.
 - **Project conventions** — you're joining an existing workshop. Read the CLAUDE.md, find the patterns, follow them. A craftsman who ignores the shop's standards isn't being efficient.
 - **Green before you start, green when you're done** — run the project's verification commands (`make check`, test suite, linters) at the beginning and end. No regressions.
+- **CLAUDE.md gates** — check the project's CLAUDE.md for unconditional verification requirements triggered by the files you change. These are non-negotiable — if a gate says "any change to `app/javascript/` requires browser QA", that fires on file path match, not on your judgment of risk. If you can't run a gate, escalate.
+- **Blast radius awareness** — what you actually changed may be broader than what you planned to change. Before discharge, review the actual diff: did you touch shared serializers, config surfaces, or files in domains you didn't expect? If so, the QA specialist you inscribe needs to know.
 
 ## Your tools
 

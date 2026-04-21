@@ -78,7 +78,7 @@ With your verification plan and station ready, sketch your plan for the opus bef
 
 **Sketch, don't over-plan.** Capture what you intend to do and how you'll know it's done. Include verification items derived from your loaded skills and the MO's calcinatio section. The plan is a living document — add, remove, reorder as you learn. The right granularity: coarse enough that planning doesn't feel like overhead, fine enough that important steps aren't invisible. As you decompose the work and identify specific files and areas you'll touch, revisit whether additional domain skills apply — the skill routing table matches on file patterns, and the files you'll change may not have been obvious from the opus scope alone.
 
-**If your opus involves code changes: load `/coding` before writing any code.** `/coding` gives you access to the full orchestration protocol — TeamCreate, the task-lead/implementer pattern, TDD cycle, and verification floor. These aren't bureaucracy; they're how you produce your best work fastest. A team keeps your main session clean for judgment while implementers build in parallel. A task list keeps your verification steps visible when builder context would otherwise bury them. Load it early — before momentum makes it feel like overhead. If `/skill-discovery` already loaded it, good. If not, load it now.
+**If your opus involves code changes and you have the `code-implementer` job,** its perspective already guides your approach — TDD rhythm, verification before discharge, fresh-eye review. If you're a general-purpose azer doing code work, consider inscribing a code-implementer for the implementation and focusing your context on the broader goal.
 
 **The plan is a task list, not a pipeline.** It might look like:
 
@@ -146,7 +146,7 @@ Some examples of how the boundaries naturally fall — these are illustrative, n
 
 - **Work that needs fresh-context verification** (anything where you've built significant reasoning and need an honest check) — dialectical calcinatio with a review subagent. Pass the artifact and the intent, not your reasoning about why it's correct. This applies to specs, documents, designs, communications — not just code.
 
-- **Mixed opus that shifts scope** — your plan evolves. An investigation becomes a code change: load `/coding`, create a team. A spec conversation reveals a research gap: fire `/research`. A documentation task uncovers a bug: inscribe a follow-up opus rather than drifting. The transitions are explicit, not accidental.
+- **Mixed opus that shifts scope** — your plan evolves. An investigation discovers code changes are needed: inscribe a code-implementer. A spec conversation reveals a research gap: fire `/research` or inscribe a researcher. A documentation task uncovers a bug: inscribe a follow-up opus rather than drifting. The transitions are explicit, not accidental.
 
 The general shape across all of these:
 
@@ -196,7 +196,7 @@ When your opus involves writing code, apply calcinatio in the rhythm of test-dri
 
 Empirical observation before commit and independent review before PR are how a craftsman front-loads quality — a bug caught in your loop costs one fix; the same bug in PR review costs a rework cycle; in production, an incident. This is speed, not caution.
 
-**For code work — load `/coding` for any opus involving code changes.** It gives you the TDD cycle, verification floor, and implementation patterns. If your job definition includes `/coding` in `required_skills`, it's already loaded. Otherwise, load it yourself if `/skill-discovery` didn't.
+**For code work,** the `code-implementer` job (`shared/jobs/code-implementer/JOB.md`) carries the perspective and instincts for writing clean, tested code. If you're doing code work without that job, read it for guidance — or better yet, inscribe a code-implementer and collaborate.
 
 ---
 
