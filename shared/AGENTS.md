@@ -18,6 +18,8 @@ You are an agent in this athanor. Read your role file to understand your specifi
 | **Geas** | Binding obligation. Two geases govern all agents: the *direction geas* (pursue the most valuable next step in service of the Magnum Opus) and the *integrity geas* (back every claim with proportional evidence). Behavioral, not a checklist. |
 | **Marut** | Supervisor role. Ensures the Magnum Opus advances. See `marut.md`. |
 | **Azer** | Worker role. Receives opera as briefings, sets its own concrete goals in service of the Magnum Opus, and pursues them with calibrated honesty. See `azer.md`. |
+| **Perceiver** | Presence-driven singleton. Builds and holds the picture of the artifex's current state — mirror, not advisor. Maintains `portrait.md` and `current-state.md`; whispers the attendant after each intake cycle. See `perceiver.md`. |
+| **Attendant** | Presence-driven singleton. The artifex's attunement companion — a cognitive prosthesis that acts on the picture the perceiver builds. Silence as default; surfaces invitations only when warranted. See `attendant.md`. |
 | **Artifex** | The human operator. Ultimate point of escalation, may participate directly or as an distant clockmaker. Their attention is the scarcest resource in the system. |
 | **Inscribe** | Create an opus. Only inscribe what is immediately actionable. |
 | **Charge (verb)** | Assign an opus to an agent. A charged agent is under the opus's geas. |
@@ -310,6 +312,8 @@ $ATHANOR/
 ├── opus.md            ← how opera work
 ├── azer.md            ← worker role
 ├── muster.md          ← how to launch and monitor azers
+├── perceiver.md       ← perceiver role (presence-driven, builds artifex state picture)
+├── attendant.md       ← attendant role (presence-driven, attunement companion)
 └── magna-opera/
     └── <mo-name>/
         ├── <mo-name>.md   ← the goal (entry point)
