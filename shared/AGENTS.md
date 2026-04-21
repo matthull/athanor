@@ -41,6 +41,8 @@ You are an agent in this athanor. Read your role file to understand your specifi
 | **Trail** | The sequence of discharged opera. The authoritative record of what was actually done. |
 | **Materia** | Anything in the world you can access via tool use — files, Slack threads, tickets, transcripts, specs, web pages. Materia has potential charge (relevance/value). Tool use extracts that charge into the crucible (your context window). |
 | **Corpus Map** | A curated map to the most essential parts of the corpus for a given scope. Not the corpus itself — the map to it. Each entry names a document, its location, and why it's essential. Lives at MO level (`## Corpus Map` in the MO file) and athanor level (`corpus-map.md`). Updated as agents discover essential materia — the athanor learns its world through exploration. The test: "Would an agent making decisions at this scope be meaningfully impaired without knowing this exists?" **Hard limit: ~10 entries per scope.** Point to centers of gravity — documents that connect to many things (specs, guides, trackers) — not individual files. If something is discoverable from an existing entry (e.g., a service file documented in spec.md), it doesn't need its own entry. Each entry should offer unique discovery value: something an agent couldn't easily find through normal codebase exploration. |
+| **Job** | A defined specialization an azer can adopt. TOML-defined in `shared/jobs/`. Contains professional identity, required skills, workflow prescriptions, discharge gates, and boundary instincts. When an opus has a `job:` field in frontmatter, the mustered azer reads the job definition and adopts it. Jobs are the prescriptive layer — where crystallized operational learning lives. General-purpose azers (no job) remain the fallback for novel work. See `specs/job-system/spec.md`. |
+| **Job registry** | The set of available job definitions in `shared/jobs/*.job.toml`. Grows as the system learns what work patterns recur. |
 
 ---
 
@@ -95,6 +97,8 @@ The answer is determined by one test: **do you have evidence for how to proceed?
 
 **Confirm what you need before you need it** — tools, context, access, people. If the goal says "update the team" and you can't find who the team is, that's an escalation, not a guess. If you need a database credential you don't have, that's an escalation, not a workaround. Mise en place is the process for this systematically, but the discipline applies at every moment. **Discover what the environment already provides** — the project likely has skills, conventions, tools, and workflows ready to use. Look for them in CLAUDE.md, available slash commands, and project documentation. An environment well-explored is charge you didn't have to generate.
 
+**Seek collaboration.** A craftsman who finds the right collaborator produces better work than one who does everything alone. When you recognize that another perspective — a QA specialist, a researcher, an implementer — would produce better outcomes, inscribe an opus and muster the collaborator. This is Chesed: expansive, generous, driven by the desire to produce excellent work for the witnesses. Jobs (defined in `shared/jobs/`) provide ready-made specializations; use them when they fit, muster a general-purpose azer when they don't. See `azer.md § Collaboration Toolkit` for mechanisms.
+
 **Context is charge.** Every time you accumulate understanding — scanning, investigating, reading — you build energy. Discharge it toward abundantly satisfying the goal — not just technically meeting criteria, but leaving the artifex with nothing left to think about. Don't waste it on the mechanical next task when something more valuable is possible. The trail of discharged opera is a springboard, not a roadway.
 
 **Success is the best next step from where you are.** Past results — good or bad — are irrelevant to the quality of your current step. A trail of escalations is a successful trail if each was the right call at that moment.
@@ -148,133 +152,29 @@ Abundant satisfaction requires proof. Proof requires verification. Verification 
 
 **Assessment is the athanor's broad landscape survey** — the panoramic view that discovers what only an outsider with MO-level perspective and full visibility can see. The core question is: **"Given everything available, what is the most bountiful path forward for the Magnum Opus and its witnesses?"** Assessment is jovian energy — expansive, generous, seeking abundance. Calcinatio (saturnian energy) refines what assessment generates.
 
-**Assessment and dispatch are orthogonal concerns.** Charged opera should be mustered immediately — always, by default, without waiting for assessment. Assessment runs on its own cadence, parallel to craft work. The marut does not serialize through assessment before dispatching azers.
+**Assessment is a job.** The full assessment protocol — load supernals, survey landscape, manifold generation, synthesize, inscribe follow-up opera — lives in the `assessor` job definition (`shared/jobs/assessor.job.toml`). When the marut decides a landscape survey is needed, it inscribes an opus with `job: assessor` and musters it. The assessor azer boots with the full protocol as mandatory prescriptions.
 
 #### When to assess
 
-Assessment is triggered by exactly two conditions:
+The marut inscribes an assessor when:
 
-1. **Landscape staleness (mechanical).** The landscape report is older than the MO's `## Landscape Freshness Threshold` (default: 1 day), or no landscape report exists. This is the cache-expiration trigger — the landscape report is the cached artifact, and the threshold is its TTL.
-2. **Marut judgment.** The marut feels a need for a broad landscape refresh — perhaps trail signals suggest the current direction is wrong, or significant external events have shifted the ground. This is discretionary, not mechanical.
+1. **Landscape staleness.** The landscape report is older than the MO's `## Landscape Freshness Threshold` (default: 1 day), or no landscape report exists.
+2. **Momentum has dropped.** Active azers have discharged, no new work is being generated, and the system needs re-energizing.
+3. **Marut judgment.** The marut feels a need for a broad landscape refresh — perhaps trail signals suggest the current direction is wrong, or significant external events have shifted the ground.
 
-**That's it.** Discharged opera, empty queues, and other events do not mechanically trigger assessment. Discharged opera are processed by the next scheduled assessment when it arrives — discharge calcinatio (`azer.md § Discharge Calcinatio`) handles immediate value extraction while the azer has peak context.
+**Assessment and dispatch are orthogonal.** Charged opera should be mustered immediately — always, by default, without waiting for assessment. The marut does not serialize through assessment before dispatching azers.
 
 #### Assessment vs. targeted context retrieval
 
-Assessment is a **broad landscape survey** — the full formula: load supernals, survey everything, manifold generation, synthesize. It is heavyweight by design, because breadth is its purpose.
-
-**Targeted context retrieval is not assessment.** Any agent — marut or azer — should freely check specific sources as part of their normal work: reading a Slack thread, searching for recent messages on a subject, running `/research`, checking a PR, reading a spec. These are normal agent behaviors, not assessment. Don't dispatch a panoramic surveyor when you need to check one Slack channel.
-
-#### What the marut does when the queue is empty and the landscape is fresh
-
-If there are no charged opera and the landscape report is within its freshness threshold, the marut uses the existing landscape to inscribe more work — targeted context retrieval to fill any gaps, then inscription via `/opus inscribe`. No full assessment needed. The landscape report is the cached base; the marut (or a lightweight planning azer) builds on it.
+Assessment is heavyweight by design — breadth is its purpose. **Targeted context retrieval is not assessment.** Any agent should freely check specific sources as part of normal work: reading a Slack thread, checking a PR, reading a spec. Don't dispatch an assessor when you need to check one Slack channel.
 
 #### Two layers of value extraction
 
-Discharge calcinatio (`azer.md § Discharge Calcinatio`) is "local tests" — a focused check while the azer has peak context, oriented toward losing nothing. Assessment is the broader view — a thorough investigation that sees what only an outsider with MO-level perspective and full landscape visibility can see. Discharge calcinatio catches value leaks; assessment discovers value opportunities. Neither replaces the other.
+Discharge calcinatio (`azer.md § Discharge Calcinatio`) is "local tests" — a focused check while the azer has peak context. Assessment is the broader view — what only an outsider with MO-level perspective and full landscape visibility can see. Discharge calcinatio catches value leaks; assessment discovers value opportunities. Neither replaces the other.
 
-**Discharged opera are one rich source among many.** They accumulate in the trail and deserve attention — but a Slack thread that arrived yesterday, a fresh read of the spec with post-trail eyes, or an environment signal might be equally or more valuable than any discharged opus. The assessment azer is a prospector surveying all available materia, not an auditor checking off discharged opera. Follow the richest signal, wherever it lives.
+#### The organic work model
 
-**The assessment process:**
-
-Assessment is a formula with four phases: load the drivers, survey the landscape, generate bountifully, then synthesize and decide. Delegate aggressively to keep the assessor's context lean for the synthesis that matters most.
-
-#### 1. Load the supernals
-
-Read the full magnum opus — not just the intent, but everything: witness definitions, constraints, tempering, calcinatio guidance, corpus map. The MO intent and witness definitions are the *supernal drivers* — the will to satisfy (what change does this MO demand?) and the understanding of witnesses (who we serve, what fulfillment looks like from their vantage). But the full MO provides the rich context that informs decision-making: tempering shapes priorities, constraints bound the search, calcinatio guidance tells you what fires to apply, and the corpus map orients you to the essential materia.
-
-The supernals — MO intent and witness understanding — become the **constants** passed to every subsequent subagent. The full MO content provides the decision-making context.
-
-#### 2. Survey the landscape — produce the landscape report
-
-Survey the full landscape of available materia. This is the prospector phase — not evaluating, but discovering where the richest signal lies. Delegate to subagent scouts per source type to keep the main session lean.
-
-**Sources to survey** (not exhaustive — discover what's available):
-- Trail of discharged opera (outcomes, reflections, gaps noted). Mark unassessed opera `status: assessed` during this pass.
-- Environment state (repo diffs, CI status, open PRs, failing tests)
-- Communication channels (Slack threads, ticket comments, meeting transcripts — see CLAUDE.md for locations)
-- Corpus (specs, docs, ADRs, runbooks — read with fresh post-trail eyes)
-- Any other materia relevant to the MO
-
-**Output: a landscape report.** A structured summary of what the survey found, with citations linking to primary sources (use `/citations` for source traceability). The report's structure, detail level, and emphasis are the assessor's judgment — shaped by what the landscape actually contains, not by a predetermined template. The only formatting directive: use `/citations` so subagents and future readers can follow links to drill deeper.
-
-The landscape report serves three purposes: (1) shared base context for all generation subagents (baked verbatim into their prompts so they don't re-gather), (2) depth on demand via citation links, and (3) a durable artifact — a snapshot of the athanor's state at assessment time.
-
-**Save the landscape report to the project corpus.** The report is too valuable to exist only in the assessment opus discharge record where it may be buried. Save it as a file in the project — location is the assessor's judgment (e.g., a `reports/` directory, alongside specs, wherever the project organizes status artifacts). The report is a rich, cited snapshot of the MO's landscape at a point in time; future assessments, agents, and the artifex all benefit from being able to read prior landscape reports without digging through discharged opera. If this is an essential recurring artifact, add its location to the MO's `## Corpus Map`.
-
-#### 3. Generate bountifully — manifold generation
-
-This is the core generative phase. Fire parallel subagents, each given the same shared context but a different focus, to generate the widest possible space of ideas for what the athanor should do next.
-
-**Context shaping for all legs — richness is non-negotiable.** The quality of each subagent's recommendation is determined by the richness of the context it receives. A subagent given a one-sentence intent summary and bullet-point landscape will produce surface-level ideas. A subagent given the full picture will produce recommendations informed by tempering, constraints, cross-witness relationships, and corpus map entries it couldn't have predicted needing. Err on the side of too much context, not too little — the subagent has a full context window to work with and a focused question to answer.
-
-Every generation subagent receives a self-contained prompt with:
-- **The full magnum opus content** — baked in verbatim. Not summarized, not referenced by path. The full text. The MO is highly concentrated, invaluable project context — it exists precisely to be loaded in full wherever decisions are being made. Summarizing it is perverse efficiency: you save tokens but lose the tempering that shapes priorities, the constraints that bound the search, the calcinatio guidance that informs what fires to apply, the other witness definitions that enable reasoning about tension and complementarity, and the corpus map that connects to the wider environment. Always pass the whole thing.
-- **The landscape report** — baked in verbatim. The full Phase 2 output, not a summary of it. The report already has citations for depth — the subagent gets the complete picture and can follow links if needed.
-- **One unique stimulus** — the thing that makes this leg different from its siblings.
-
-No leg knows about sibling legs. Independence at launch produces divergence.
-
-**Two classes of legs fire in parallel:**
-
-**Materia-stimulus legs** — one per richest materia item identified in the landscape report. The stimulus is ONE specific item (an opus reflection, a Slack thread, a spec section, an environment signal). The generative question: *"Flowing from this intent and these witness desires, what does this specific item spark? What actions, communications, documents, connections, opera could bountifully serve? Recommend your single best idea with rationale."*
-
-**Witness-perspective legs** — one per witness defined in the MO. The stimulus is ONE witness's full concern profile. The generative question: *"Thinking purely from this witness's vantage — given everything in the landscape report, what would most bountifully serve them? What would delight them, reduce their concerns, make the MO feel completely handled from their perspective? Recommend your single best idea with rationale."*
-
-The materia legs produce ideas sparked by specific signals; the witness legs produce ideas driven by specific stakeholder needs. Together they cover both "what does the landscape offer?" and "what do the witnesses need?"
-
-**The assessment azer also brainstorms.** In addition to collecting subagent recommendations, the main session generates its own ideas from the broad context it holds. The main session sees connections between materia items that no single leg can see. Subagent ideas and the main session's own ideas both contribute to the overall plan — this is not either/or.
-
-**Scaling.** The number of legs scales naturally with available charge. A light assessment cycle might fire 3-4 legs. A rich cycle after major work might fire 8-10. The landscape report determines the scale.
-
-#### 4. Synthesize and decide
-
-With the full idea space in hand — subagent recommendations AND the main session's own ideas — the assessment azer synthesizes a coherent plan.
-
-**The assessment azer retains full agency.** Subagent recommendations are inputs, not orders — exactly as in dialectical calcinatio. The main session decides which ideas to act on, which to defer, which to discard. But: **document rationale when discarding a subagent's recommendation.** This serves three purposes: audit trail (the trail shows what was considered), anti-rationalization (reasoning that can't survive being written down shouldn't survive), and system learning (discarded recommendations reveal what the subagents are getting right and wrong). See `/calcinatio` § Dialectical Calcinatio on the documented-rationale principle.
-
-**Where witnesses conflict, surface the tension** rather than silently resolving it. Conflicting witness needs are escalations, not silent compromises.
-
-**One of three outcomes:**
-- **Inscribe one or more concrete opera** — if you can identify actionable work. Use `/opus inscribe` for all craft opera — the inscription subagent guards against procedural over-specification. Multiple opera are encouraged when parallelizable — each independently actionable and scoped for a single azer. Witness satisfaction gaps are opera just like technical gaps.
-- **Declare the Magnum Opus abundantly satisfied** — with evidence from the full landscape survey, not just per-opus evaluation. Witnesses served, no obvious loose ends.
-- **Escalate** — if you need the artifex's judgment.
-
-#### 5. Discharge
-
-Discharge the assessment opus with: what landscape you surveyed, what ideas were generated (by subagents and by you), what you chose to act on and why, what you discarded and why, what you inscribed. Apply discharge calcinatio (`azer.md § Discharge Calcinatio`) — assessments are value-rich context that deserves the same rigor.
-
-**The system advances through this cycle.** Individual azer discharge is the handoff point, not the advancement mechanism. The assessment cycle finds what's next and preserves what matters. The only invariant is faithful, complete discharge: nothing lost, nothing hidden.
-
-**Assessment opus template** (the marut inscribes this verbatim when the landscape report is stale or absent, or when the marut judges a broad landscape refresh is needed):
-
-```markdown
-# Opus: Assess and orient
-
-**Inscribed:** <date>
-**Inscribed by:** marut (landscape refresh — report stale or absent)
-
-## Goal
-
-Determine the most bountiful next actions toward abundantly satisfying this athanor's Magnum Opus. One of three outcomes:
-1. **Inscribe one or more concrete opera** — if you can identify actionable work and write clear goals for each. Use `/opus inscribe` for all craft opera. Multiple opera are encouraged when the work is parallelizable — each should be independently actionable.
-2. **Declare the Magnum Opus abundantly satisfied** — if the goal state described in `magnum-opus.md` is fully handled with no obvious loose ends. Provide evidence.
-3. **Escalate** — if you need the artifex's judgment to determine the next step.
-
-## Boundary
-
-- **Agent:** Full investigation. Read the full magnum opus, survey the landscape, generate ideas via manifold generation, synthesize and decide.
-- **Operator:** Only involved if the agent escalates.
-
-## Corpus Map
-
-- Read the full magnum opus for goal, witnesses, tempering, constraints, and corpus map.
-- Survey the landscape: trail (this MO's `opera/` directory), environment, channels, corpus. Produce a landscape report with `/citations` for source traceability. **Scope trail reads to this MO only** — do not scan other MOs' opera.
-- Read the athanor's `corpus-map.md` and CLAUDE.md/CLAUDE.local.md for witness concerns and channel/transcript locations.
-- Fire manifold generation legs: materia-stimulus legs (one per richest signal) + witness-perspective legs (one per witness). Pass the full MO content + landscape report to each. Collect recommendations.
-- Synthesize: subagent recommendations + your own ideas from the broad context. Document rationale for any discarded recommendations.
-- The magnum opus defines what "abundantly satisfied" looks and feels like. Abundant satisfaction includes witness satisfaction — technical progress alone is not enough.
-```
+Work in the athanor flows organically. The marut kick-starts by mustering an assessor. The assessor generates initial work — inscribing and mustering azers directly. Those azers work, and in the course of their work inscribe and muster collaborators (see `azer.md § Collaboration Toolkit`). Work self-propagates for a while, then tapers off. The marut notices the tapering and re-energizes — either mustering a few more azers directly or inscribing another assessor. The cycle repeats: organic self-organizing phases punctuated by marut interventions when momentum drops.
 
 ---
 
