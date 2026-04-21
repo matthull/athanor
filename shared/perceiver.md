@@ -150,28 +150,28 @@ The core geas in `AGENTS.md` applies to you. These are additional obligations sp
 
 The perceiver is an agent role, not a single process. It can be invoked in several modes — what stays constant is the posture, geas, and corpus; what varies is how the session is started and what it's focused on.
 
-### Scheduled intake (batch, headless)
+### Singleton session (primary mode)
 
-The **attunement intake** workflow invokes the perceiver on a timer to process incoming signals and keep the corpus current. This is the ambient mode — it runs whether you're present or not.
+The perceiver runs as a **presence-driven singleton** — one persistent session kindled via `ath kindle <athanor> <mo> --role perceiver`. The liveness timer (`athanor-liveness.timer`, 5-min cadence) ensures the session is running; if the tmux window disappears, liveness rekindles it.
 
-- **Trigger:** `attunement-intake.timer` (systemd user timer, 30-min cadence)
-- **Gate:** `attunement-intake-check` — counts unprocessed signals in `$ATHANOR/signals/attunement/`, exits immediately if none (no Claude session = no cost)
-- **Session:** `claude-run` launches a headless session with the attunement intake protocol, which loads this role file and executes a signal-processing pass
-- **Protocol:** `specs/life-domains/attunement-intake-protocol.md`
-- **Logs:** `~/egregore/logs/headless/<timestamp>-attunement-intake-protocol.json`
-- **Manual trigger:** `attunement-intake-check` (or `systemctl --user start attunement-intake.service`)
+New signals are delivered via whisper. When `attunement-intake-check` detects unprocessed signals in the inbox, it:
+1. Ensures the perceiver is kindled (idempotent — no-op if already running)
+2. Whispers the signal filenames to the perceiver's tmux window
 
-Each intake pass is a fresh session — accumulated understanding lives in `portrait.md` and `current-state.md`, not in session context.
+The perceiver then reads the signals, absorbs them, updates portrait.md and current-state.md, and moves processed signals to `processed/`. Accumulated understanding lives in session context AND in the corpus — the singleton maintains continuity that batch sessions cannot.
+
+- **Signal delivery:** `attunement-intake.timer` (30-min cadence) → `attunement-intake-check` → whisper to perceiver
+- **Liveness:** `athanor-liveness.timer` (5-min cadence) → rekindles if missing
+- **Crucible name:** `perceiver-<athanor>-<mo>` (e.g., `perceiver-athanor-architect-life-domains`)
 
 ### Interactive consultation
 
-The artifex (or another agent) can invoke the perceiver interactively — for a conversation about state, a deliberate portrait deepening, a check-in when the snapshot feels stale or thin, or any other mode of engagement with the picture.
+The artifex (or another agent) can engage the running perceiver directly — switch to its tmux window and start talking. The session is always the perceiver; conversation is a natural mode, not a separate invocation.
 
-- Start a Claude Code session (tmux window, `claude`, or similar)
-- Load this role: "Read `~/athanor/athanors/athanor-architect/AGENTS.md`, then `~/code/athanor/shared/perceiver.md`. [What you want to do.]"
-- The session adopts the perceiver posture and can read the corpus, converse, rewrite portrait.md / current-state.md as appropriate
+If no perceiver is running, the artifex can kindle one:
+- `ath kindle <athanor> <mo> --role perceiver`
 
-Interactive sessions have the same posture constraints as batch sessions — mirror not advisor, learner not knower, remembered not surveilled. The context differs (a conversation vs. a queue of signals); the role does not.
+Interactive engagement has the same posture constraints as signal processing — mirror not advisor, learner not knower, remembered not surveilled.
 
 ---
 
