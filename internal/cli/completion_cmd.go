@@ -109,6 +109,8 @@ _ath() {
     local -a commands
     commands=(
         'init:Create a new athanor instance'
+        'inscribe:Create an opus file'
+        'collaborate:Inscribe and muster a peer azer (from crucible)'
         'craft:Interactive session with the artifex'
         'craft-mo:Create a new Magnum Opus interactively'
         'kindle:Launch a presence-driven role for an athanor'
@@ -283,6 +285,84 @@ _ath() {
             if (( CURRENT == 3 )); then
                 _ath_tmux_azer_windows
             fi
+            ;;
+        inscribe)
+            # Complete flag values
+            case "${words[$(( CURRENT - 1 ))]}" in
+                --intent|--name) return ;;
+                --job)
+                    # Complete job names from shared/jobs/
+                    local _repo_dir="${ATHANOR_REPO:-$HOME/code/athanor}"
+                    local -a _jobs
+                    _jobs=( ${(f)"$(ls -d $_repo_dir/shared/jobs/*/ 2>/dev/null | xargs -I{} basename {})"} )
+                    (( ${#_jobs} )) && compadd -- "${_jobs[@]}"
+                    return
+                    ;;
+            esac
+
+            # Count positional args
+            local -i _pos=0 _i _skip=0
+            for (( _i = 3; _i < CURRENT; _i++ )); do
+                if (( _skip )); then _skip=0; continue; fi
+                case "${words[$_i]}" in
+                    --intent|--job|--name) _skip=1 ;;
+                    --muster) ;;
+                    -*) ;;
+                    *) (( _pos++ )) ;;
+                esac
+            done
+
+            case $_pos in
+                0) _ath_athanor_names ;;
+                1) _ath_mo_names "${words[3]}" ;;
+            esac
+
+            # Offer remaining flags
+            local -a _iflags=(--intent --job --name --muster)
+            for (( _i = 3; _i < CURRENT; _i++ )); do
+                _iflags=("${(@)_iflags:#${words[$_i]}}")
+            done
+            (( ${#_iflags} )) && compadd -- "${_iflags[@]}"
+            ;;
+        collaborate)
+            # Complete flag values
+            case "${words[$(( CURRENT - 1 ))]}" in
+                --intent) return ;;
+                --job)
+                    local _repo_dir="${ATHANOR_REPO:-$HOME/code/athanor}"
+                    local -a _jobs
+                    _jobs=( ${(f)"$(ls -d $_repo_dir/shared/jobs/*/ 2>/dev/null | xargs -I{} basename {})"} )
+                    (( ${#_jobs} )) && compadd -- "${_jobs[@]}"
+                    return
+                    ;;
+            esac
+
+            # Count positional args
+            local -i _pos=0 _i _skip=0
+            for (( _i = 3; _i < CURRENT; _i++ )); do
+                if (( _skip )); then _skip=0; continue; fi
+                case "${words[$_i]}" in
+                    --intent|--job) _skip=1 ;;
+                    -*) ;;
+                    *) (( _pos++ )) ;;
+                esac
+            done
+
+            # Positional: MO name (infer athanor from $ATHANOR)
+            if (( _pos == 0 )); then
+                if [[ -n "$ATHANOR" && -d "$ATHANOR" ]]; then
+                    _ath_mo_names "${ATHANOR:t}"
+                else
+                    _message 'MO name (requires $ATHANOR)'
+                fi
+            fi
+
+            # Offer remaining flags
+            local -a _cflags=(--intent --job)
+            for (( _i = 3; _i < CURRENT; _i++ )); do
+                _cflags=("${(@)_cflags:#${words[$_i]}}")
+            done
+            (( ${#_cflags} )) && compadd -- "${_cflags[@]}"
             ;;
         whisper)
             local -a whisper_commands
