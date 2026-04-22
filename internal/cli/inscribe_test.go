@@ -136,14 +136,25 @@ func TestParseInscribeArgs(t *testing.T) {
 		}
 	})
 
-	t.Run("missing positionals errors", func(t *testing.T) {
+	t.Run("one positional errors with MO message", func(t *testing.T) {
 		args := []string{"my-athanor", "--intent", "Fix it"}
 		_, err := parseInscribeArgs(args)
 		if err == nil {
 			t.Fatal("expected error for missing MO name")
 		}
-		if !strings.Contains(err.Error(), "MO name required") {
-			t.Errorf("error = %q, want mention of MO name", err.Error())
+		if err.Error() != "MO name required" {
+			t.Errorf("error = %q, want %q", err.Error(), "MO name required")
+		}
+	})
+
+	t.Run("no positionals errors with both names", func(t *testing.T) {
+		args := []string{"--intent", "Fix it"}
+		_, err := parseInscribeArgs(args)
+		if err == nil {
+			t.Fatal("expected error for missing positionals")
+		}
+		if !strings.Contains(err.Error(), "athanor name") {
+			t.Errorf("error = %q, want mention of athanor name", err.Error())
 		}
 	})
 

@@ -15,6 +15,9 @@ import (
 
 const maxSlugLen = 50
 
+// collapseHyphens matches two or more consecutive hyphens.
+var collapseHyphens = regexp.MustCompile(`-{2,}`)
+
 // slugify converts a human-readable string into a filename-safe slug.
 // Examples:
 //
@@ -23,7 +26,7 @@ const maxSlugLen = 50
 //
 // The result is lowercased, non-alphanumeric characters are replaced with
 // hyphens, consecutive hyphens are collapsed, and the result is truncated
-// to maxLen characters on a word boundary.
+// to maxLen runes on a word boundary.
 func slugify(s string, maxLen int) string {
 	s = strings.ToLower(s)
 
@@ -39,15 +42,15 @@ func slugify(s string, maxLen int) string {
 	s = b.String()
 
 	// Collapse multiple hyphens
-	re := regexp.MustCompile(`-{2,}`)
-	s = re.ReplaceAllString(s, "-")
+	s = collapseHyphens.ReplaceAllString(s, "-")
 
 	// Trim leading/trailing hyphens
 	s = strings.Trim(s, "-")
 
-	// Truncate on a hyphen boundary if too long
-	if maxLen > 0 && len(s) > maxLen {
-		s = s[:maxLen]
+	// Truncate on a hyphen boundary if too long (rune-safe)
+	runes := []rune(s)
+	if maxLen > 0 && len(runes) > maxLen {
+		s = string(runes[:maxLen])
 		// Don't cut mid-word — trim back to last hyphen
 		if idx := strings.LastIndex(s, "-"); idx > 0 {
 			s = s[:idx]
@@ -83,8 +86,11 @@ func parseInscribeArgs(args []string) (*inscribeArgs, error) {
 		return nil, err
 	}
 
-	if len(positional) < 2 {
+	if len(positional) < 1 {
 		return nil, fmt.Errorf("athanor name and MO name required")
+	}
+	if len(positional) < 2 {
+		return nil, fmt.Errorf("MO name required")
 	}
 	ia.athanorName = positional[0]
 	ia.moName = positional[1]
@@ -121,8 +127,10 @@ func runInscribe(args []string) int {
 
 	// Build opus filename
 	datestamp := time.Now().Format("2006-01-02")
-	slug := ia.name
-	if slug == "" {
+	slug := ""
+	if ia.name != "" {
+		slug = slugify(ia.name, maxSlugLen)
+	} else {
 		slug = slugify(ia.intent, maxSlugLen)
 	}
 	if slug == "" {
