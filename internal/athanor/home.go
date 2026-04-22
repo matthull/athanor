@@ -104,6 +104,68 @@ func EnsureHome(home string) error {
 	return nil
 }
 
+// JobsDir is the subdirectory containing job definitions in the source repo.
+const JobsDir = "jobs"
+
+// ValidateJob checks that a named job exists in the shared job registry.
+// Returns nil if shared/jobs/<name>/JOB.md exists, or an error describing
+// what's wrong and listing available jobs.
+func ValidateJob(jobName string) error {
+	shared, err := SharedPath()
+	if err != nil {
+		return fmt.Errorf("resolving shared path: %w", err)
+	}
+	jobPath := filepath.Join(shared, JobsDir, jobName, "JOB.md")
+	if _, err := os.Stat(jobPath); err != nil {
+		if os.IsNotExist(err) {
+			available, _ := ListJobs()
+			return fmt.Errorf("unknown job %q (available: %s)", jobName, formatJobList(available))
+		}
+		return fmt.Errorf("checking job %q: %w", jobName, err)
+	}
+	return nil
+}
+
+// ListJobs returns the names of all available jobs in the shared registry.
+func ListJobs() ([]string, error) {
+	shared, err := SharedPath()
+	if err != nil {
+		return nil, err
+	}
+	jobsDir := filepath.Join(shared, JobsDir)
+	entries, err := os.ReadDir(jobsDir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("listing jobs: %w", err)
+	}
+	var names []string
+	for _, e := range entries {
+		if e.IsDir() {
+			jmd := filepath.Join(jobsDir, e.Name(), "JOB.md")
+			if _, err := os.Stat(jmd); err == nil {
+				names = append(names, e.Name())
+			}
+		}
+	}
+	return names, nil
+}
+
+func formatJobList(jobs []string) string {
+	if len(jobs) == 0 {
+		return "none"
+	}
+	result := ""
+	for i, j := range jobs {
+		if i > 0 {
+			result += ", "
+		}
+		result += j
+	}
+	return result
+}
+
 // expandHome expands a leading ~ to the user's home directory.
 func expandHome(path string) (string, error) {
 	if len(path) == 0 {

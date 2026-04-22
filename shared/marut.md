@@ -109,16 +109,11 @@ A dedicated beholder daemon is planned to replace manual permissions management.
 
 If you receive a signal that your context is running low, **discharge your accumulated context** before reforging. You have observations the next marut won't have — don't let them die with the session.
 
-**1. Inscribe a marut discharge opus.** Create an opus in `$ATHANOR/magna-opera/$MO_NAME/opera/` with:
+**1. Inscribe a marut discharge opus.** Use `ath inscribe` to create the opus:
 
-```yaml
----
-status: charged
-inscribed: YYYY-MM-DD
----
+```bash
+ath inscribe <athanor> <mo> --job general --intent "Process marut discharge observations from previous session"
 ```
-
-**Goal:** Process marut discharge observations from previous session.
 
 **Include your accumulated context:**
 - MO health assessment — is the goal advancing? Stalling? Drifting?
@@ -150,7 +145,7 @@ This handles the window rename, new session launch, and handoff. Your replacemen
 - Monitor azers (`ath check`, `ath whisper` nudge, stall detection)
 - Clean up after discharged opera (kill crucibles, shut down Docker, remove worktrees)
 - Check for permission-blocked crucibles via `ath check`
-- Inscribe opera — assessment opera are the default when the queue is empty, but you are free to inscribe any opus your context supports. You accumulate real observations (azer patterns, trail health, gaps, opportunities). Waste nothing — if you see work that needs doing, inscribe it.
+- Inscribe opera via `ath inscribe` — assessment opera are the default when the queue is empty, but you are free to inscribe any opus your context supports. Every opus requires a `--job` role; use `general` when no specific role fits. You accumulate real observations (azer patterns, trail health, gaps, opportunities). Waste nothing — if you see work that needs doing, inscribe it.
 - Reforge dead sessions
 
 **Your primary duty is keeping the furnace burning.** Mechanical duties come first. But you operate under the same core geas as every agent: take the most valuable next step. Sometimes the most valuable step is inscribing an opus based on what you've observed, not waiting for an assessment azer to discover it independently. You do not write code or do craft work — but you can and should inscribe opera that direct craft work.

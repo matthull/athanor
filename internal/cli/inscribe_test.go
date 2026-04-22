@@ -105,8 +105,8 @@ func TestParseInscribeArgs(t *testing.T) {
 		}
 	})
 
-	t.Run("minimal args", func(t *testing.T) {
-		args := []string{"my-athanor", "my-mo", "--intent", "Do something"}
+	t.Run("minimal args with job", func(t *testing.T) {
+		args := []string{"my-athanor", "my-mo", "--intent", "Do something", "--job", "general"}
 		ia, err := parseInscribeArgs(args)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -114,16 +114,38 @@ func TestParseInscribeArgs(t *testing.T) {
 		if ia.athanorName != "my-athanor" {
 			t.Errorf("athanorName = %q, want %q", ia.athanorName, "my-athanor")
 		}
-		if ia.job != "" {
-			t.Errorf("job = %q, want empty", ia.job)
+		if ia.job != "general" {
+			t.Errorf("job = %q, want %q", ia.job, "general")
 		}
 		if ia.muster {
 			t.Error("muster = true, want false")
 		}
 	})
 
+	t.Run("missing job errors", func(t *testing.T) {
+		args := []string{"my-athanor", "my-mo", "--intent", "Do something"}
+		_, err := parseInscribeArgs(args)
+		if err == nil {
+			t.Fatal("expected error for missing --job")
+		}
+		if !strings.Contains(err.Error(), "--job is required") {
+			t.Errorf("error = %q, want mention of --job", err.Error())
+		}
+	})
+
+	t.Run("invalid job errors", func(t *testing.T) {
+		args := []string{"my-athanor", "my-mo", "--intent", "Do something", "--job", "nonexistent-job"}
+		_, err := parseInscribeArgs(args)
+		if err == nil {
+			t.Fatal("expected error for invalid job")
+		}
+		if !strings.Contains(err.Error(), "unknown job") {
+			t.Errorf("error = %q, want mention of unknown job", err.Error())
+		}
+	})
+
 	t.Run("flags before positionals", func(t *testing.T) {
-		args := []string{"--intent", "Fix it", "my-athanor", "my-mo"}
+		args := []string{"--intent", "Fix it", "--job", "general", "my-athanor", "my-mo"}
 		ia, err := parseInscribeArgs(args)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -236,8 +258,8 @@ func TestParseCollaborateArgs(t *testing.T) {
 		}
 	})
 
-	t.Run("minimal args", func(t *testing.T) {
-		args := []string{"my-mo", "--intent", "Do something"}
+	t.Run("minimal args with job", func(t *testing.T) {
+		args := []string{"my-mo", "--intent", "Do something", "--job", "general"}
 		ca, err := parseCollaborateArgs(args)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -245,8 +267,19 @@ func TestParseCollaborateArgs(t *testing.T) {
 		if ca.moName != "my-mo" {
 			t.Errorf("moName = %q, want %q", ca.moName, "my-mo")
 		}
-		if ca.job != "" {
-			t.Errorf("job = %q, want empty", ca.job)
+		if ca.job != "general" {
+			t.Errorf("job = %q, want %q", ca.job, "general")
+		}
+	})
+
+	t.Run("missing job errors", func(t *testing.T) {
+		args := []string{"my-mo", "--intent", "Do something"}
+		_, err := parseCollaborateArgs(args)
+		if err == nil {
+			t.Fatal("expected error for missing --job")
+		}
+		if !strings.Contains(err.Error(), "--job is required") {
+			t.Errorf("error = %q, want mention of --job", err.Error())
 		}
 	})
 

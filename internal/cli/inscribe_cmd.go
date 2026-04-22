@@ -77,7 +77,7 @@ func parseInscribeArgs(args []string) (*inscribeArgs, error) {
 
 	fs := flag.NewFlagSet("inscribe", flag.ContinueOnError)
 	fs.StringVar(&ia.intent, "intent", "", "natural language intent for the opus (required)")
-	fs.StringVar(&ia.job, "job", "", "job role for the azer")
+	fs.StringVar(&ia.job, "job", "", "job role for the azer (required)")
 	fs.StringVar(&ia.name, "name", "", "opus filename override (default: slugified intent)")
 	fs.BoolVar(&ia.muster, "muster", false, "immediately muster an azer for this opus")
 	fs.SetOutput(os.Stderr)
@@ -99,6 +99,14 @@ func parseInscribeArgs(args []string) (*inscribeArgs, error) {
 		return nil, fmt.Errorf("--intent is required")
 	}
 
+	if ia.job == "" {
+		return nil, fmt.Errorf("--job is required (use \"general\" if no specific role fits)")
+	}
+
+	if err := athanor.ValidateJob(ia.job); err != nil {
+		return nil, err
+	}
+
 	return &ia, nil
 }
 
@@ -106,7 +114,7 @@ func runInscribe(args []string) int {
 	ia, err := parseInscribeArgs(args)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		fmt.Fprintln(os.Stderr, "usage: ath inscribe <athanor> <mo> --intent <text> [--job <job>] [--name <name>] [--muster]")
+		fmt.Fprintln(os.Stderr, "usage: ath inscribe <athanor> <mo> --job <job> --intent <text> [--name <name>] [--muster]")
 		return 2
 	}
 

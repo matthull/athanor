@@ -25,7 +25,7 @@ func parseCollaborateArgs(args []string) (*collaborateArgs, error) {
 
 	fs := flag.NewFlagSet("collaborate", flag.ContinueOnError)
 	fs.StringVar(&ca.intent, "intent", "", "natural language intent for the opus (required)")
-	fs.StringVar(&ca.job, "job", "", "job role for the peer azer")
+	fs.StringVar(&ca.job, "job", "", "job role for the peer azer (required)")
 	fs.SetOutput(os.Stderr)
 
 	if err := fs.Parse(flagArgs); err != nil {
@@ -39,6 +39,14 @@ func parseCollaborateArgs(args []string) (*collaborateArgs, error) {
 
 	if ca.intent == "" {
 		return nil, fmt.Errorf("--intent is required")
+	}
+
+	if ca.job == "" {
+		return nil, fmt.Errorf("--job is required (use \"general\" if no specific role fits)")
+	}
+
+	if err := athanor.ValidateJob(ca.job); err != nil {
+		return nil, err
 	}
 
 	return &ca, nil
@@ -58,7 +66,7 @@ func runCollaborate(args []string) int {
 	ca, err := parseCollaborateArgs(args)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		fmt.Fprintln(os.Stderr, "usage: ath collaborate <mo> --intent <text> [--job <job>]")
+		fmt.Fprintln(os.Stderr, "usage: ath collaborate <mo> --job <job> --intent <text>")
 		return 2
 	}
 

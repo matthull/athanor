@@ -367,17 +367,17 @@ discharged  2026-03-23  mute-sso-credential-not-found
 assessed    2026-03-22  fix-missing-size-group-column
 ```
 
-#### `ath inscribe <athanor> <mo> --intent <text> [--job <job>] [--name <name>] [--muster]`
+#### `ath inscribe <athanor> <mo> --job <job> --intent <text> [--name <name>] [--muster]`
 
-Create an opus file with correct path, date prefix, and YAML frontmatter. Generates filename from date + slugified intent (or `--name` override). Writes `status: charged`, `inscribed`, `magnum_opus`, and optional `job` fields. Intent becomes the opus body under a heading.
+Create an opus file with correct path, date prefix, and YAML frontmatter. Generates filename from date + slugified intent (or `--name` override). Writes `status: charged`, `inscribed`, `magnum_opus`, and `job` fields. Intent becomes the opus body under a heading. The `--job` flag is required and validated against the job registry (`shared/jobs/<job>/JOB.md`); use `general` when no specific role fits.
 
 With `--muster`, immediately launches an azer for the opus after creation.
 
 **Exit codes:** 0=created (prints opus path), 1=runtime error, 2=usage error
 
-#### `ath collaborate <mo> --intent <text> [--job <job>]`
+#### `ath collaborate <mo> --job <job> --intent <text>`
 
-Peer-collaboration shorthand designed to be called from a running crucible. Infers athanor from `$ATHANOR` env var, creates the opus (same as `ath inscribe` internally), adds collaboration context ("Inscribed by: \<calling crucible\>. Whisper back to \<calling crucible\> when complete."), and musters the peer immediately.
+Peer-collaboration shorthand designed to be called from a running crucible. Infers athanor from `$ATHANOR` env var, creates the opus (same as `ath inscribe` internally), adds collaboration context ("Inscribed by: \<calling crucible\>. Whisper back to \<calling crucible\> when complete."), and musters the peer immediately. The `--job` flag is required; use `general` when no specific role fits.
 
 **Exit codes:** 0=created and mustered (prints crucible name), 1=runtime error, 2=usage error
 
@@ -606,7 +606,7 @@ Rename the GitHub repo: `github.com/matthull/whisper` → `github.com/matthull/a
 | `ath cleanup` | Should | Post-discharge crucible cleanup |
 | `ath quiesce` | Should | Graceful shutdown |
 | `ath opera` | Should | List opera with status |
-| `ath inscribe` | Should | Create opus with intent, optional job, optional auto-muster |
+| `ath inscribe` | Should | Create opus with required job, intent, optional auto-muster |
 | `ath collaborate` | Should | Inscribe + muster peer from crucible (friction parity with Agent tool) |
 | `ath services` | Should | List and check systemd service dependencies |
 

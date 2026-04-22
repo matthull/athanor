@@ -30,12 +30,12 @@ All opera use YAML frontmatter to track status. Opera live in their Magnum Opus'
 ---
 status: charged
 inscribed: 2026-03-23
-job: qa-specialist          # optional — if set, azer adopts this job from shared/jobs/
+job: qa-specialist          # required — azer adopts this job from shared/jobs/
 magnum_opus: some-mo        # optional — which MO this opus serves
 ---
 ```
 
-The `job:` field is optional. When present, the mustered azer reads the corresponding job definition from `shared/jobs/<job-name>/JOB.md` and adopts it — adopting its perspective, loading relevant skills, and following its professional instincts. When absent, a general-purpose azer is mustered with full latitude.
+The `job:` field is required — `ath inscribe` enforces this. The mustered azer reads the corresponding job definition from `shared/jobs/<job-name>/JOB.md` and adopts it — adopting its perspective, loading relevant skills, and following its professional instincts. Use `general` when no specific role fits.
 
 ```yaml
 ---
