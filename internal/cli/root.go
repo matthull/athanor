@@ -29,6 +29,10 @@ func Execute() int {
 		return runKindle(os.Args[2:])
 	case "muster":
 		return runMuster(os.Args[2:])
+	case "inscribe":
+		return runInscribe(os.Args[2:])
+	case "collaborate":
+		return runCollaborate(os.Args[2:])
 	case "craft":
 		return runCraft(os.Args[2:])
 	case "craft-mo":
@@ -75,6 +79,10 @@ Usage:
   ath init <name> [--project <path>]        Create a new athanor instance
   ath kindle <name> [<mo-name>] [--role <r>] Launch a presence-driven role
   ath reforge <name> [<mo-name>]           Kill and relaunch a marut
+  ath inscribe <athanor> <mo> --intent <text> [--job <job>] [--muster]
+                                           Create an opus file
+  ath collaborate <mo> --intent <text> [--job <job>]
+                                           Inscribe + muster a peer azer (from crucible)
   ath muster <opus-file> [--worktree-path <path>]    Launch an azer for an opus
   ath muster <mo> <name> --intent <text>   Launch autonomous azer from intent
   ath craft <athanor> <mo> <name>           Interactive session with the artifex

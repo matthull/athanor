@@ -497,6 +497,180 @@ This is a test opus created by the QA harness.
 		}
 	})
 
+	// ─── Phase 8c: ath inscribe ─────────────────────────────────────
+
+	t.Run("inscribe creates opus file", func(t *testing.T) {
+		out, err := runAth("inscribe", "qa-test", "qa-goal",
+			"--intent", "Fix the widget loader")
+		if err != nil {
+			t.Fatalf("ath inscribe failed: %v\n%s", err, out)
+		}
+		// Output should be the opus path
+		opusOut := strings.TrimSpace(out)
+		if !strings.Contains(opusOut, "fix-the-widget-loader") {
+			t.Errorf("expected slugified name in output, got: %s", opusOut)
+		}
+		if !strings.HasSuffix(opusOut, ".md") {
+			t.Errorf("expected .md extension in output, got: %s", opusOut)
+		}
+		// Verify the file exists and has correct content
+		data, err := os.ReadFile(opusOut)
+		if err != nil {
+			t.Fatalf("opus file not readable: %v", err)
+		}
+		content := string(data)
+		if !strings.Contains(content, "status: charged") {
+			t.Error("missing 'status: charged' in frontmatter")
+		}
+		if !strings.Contains(content, "magnum_opus: qa-goal") {
+			t.Error("missing magnum_opus in frontmatter")
+		}
+		if !strings.Contains(content, "Fix the widget loader") {
+			t.Error("missing intent text in opus body")
+		}
+	})
+
+	t.Run("inscribe with job includes job in frontmatter", func(t *testing.T) {
+		out, err := runAth("inscribe", "qa-test", "qa-goal",
+			"--intent", "Verify auth flow", "--job", "qa-specialist")
+		if err != nil {
+			t.Fatalf("ath inscribe --job failed: %v\n%s", err, out)
+		}
+		opusOut := strings.TrimSpace(out)
+		data, err := os.ReadFile(opusOut)
+		if err != nil {
+			t.Fatalf("opus file not readable: %v", err)
+		}
+		if !strings.Contains(string(data), "job: qa-specialist") {
+			t.Error("missing job field in frontmatter")
+		}
+	})
+
+	t.Run("inscribe with muster creates crucible", func(t *testing.T) {
+		out, err := runAth("inscribe", "qa-test", "qa-goal",
+			"--intent", "Run smoke tests", "--muster")
+		if err != nil {
+			t.Fatalf("ath inscribe --muster failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-run-smoke-tests")
+
+		if !strings.Contains(out, "azer-run-smoke-tests") {
+			t.Errorf("expected crucible name in output, got: %s", out)
+		}
+
+		time.Sleep(500 * time.Millisecond)
+		windows := listSessionWindows(t, qaSession)
+		if !containsExact(windows, "azer-run-smoke-tests") {
+			t.Errorf("expected tmux window 'azer-run-smoke-tests' in session %s, got: %v", qaSession, windows)
+		}
+	})
+
+	t.Run("inscribe missing intent errors", func(t *testing.T) {
+		_, err := runAth("inscribe", "qa-test", "qa-goal")
+		if err == nil {
+			t.Fatal("expected error when --intent not provided")
+		}
+	})
+
+	t.Run("inscribe missing MO errors", func(t *testing.T) {
+		_, err := runAth("inscribe", "qa-test", "nonexistent-mo",
+			"--intent", "Do something")
+		if err == nil {
+			t.Fatal("expected error for nonexistent MO")
+		}
+	})
+
+	// ─── Phase 8d: ath collaborate ──────────────────────────────────
+
+	t.Run("collaborate creates opus and musters", func(t *testing.T) {
+		// collaborate needs $ATHANOR set (normally set in crucibles)
+		cmd := exec.Command(athBin, "collaborate", "qa-goal",
+			"--intent", "Review auth module")
+		cmd.Env = append(os.Environ(),
+			"ATHANOR_HOME="+tmpHome,
+			"ATHANOR_REPO="+tmpRepo,
+			"ATHANOR="+instDir)
+		outBytes, err := cmd.CombinedOutput()
+		out := string(outBytes)
+		if err != nil {
+			t.Fatalf("ath collaborate failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-review-auth-module")
+
+		if !strings.Contains(out, "azer-review-auth-module") {
+			t.Errorf("expected crucible name in output, got: %s", out)
+		}
+
+		time.Sleep(500 * time.Millisecond)
+		windows := listSessionWindows(t, qaSession)
+		if !containsExact(windows, "azer-review-auth-module") {
+			t.Errorf("expected tmux window 'azer-review-auth-module' in session %s, got: %v", qaSession, windows)
+		}
+
+		// Verify the opus file was created in the opera dir
+		entries, err := os.ReadDir(filepath.Join(instDir, "magna-opera", "qa-goal", "opera"))
+		if err != nil {
+			t.Fatalf("reading opera dir: %v", err)
+		}
+		found := false
+		for _, e := range entries {
+			if strings.Contains(e.Name(), "review-auth-module") {
+				found = true
+				// Read and verify collaboration context
+				data, _ := os.ReadFile(filepath.Join(instDir, "magna-opera", "qa-goal", "opera", e.Name()))
+				content := string(data)
+				if !strings.Contains(content, "magnum_opus: qa-goal") {
+					t.Error("missing magnum_opus in collaborate opus")
+				}
+				break
+			}
+		}
+		if !found {
+			t.Error("collaborate opus file not found in opera dir")
+		}
+	})
+
+	t.Run("collaborate without ATHANOR errors", func(t *testing.T) {
+		cmd := exec.Command(athBin, "collaborate", "qa-goal",
+			"--intent", "Do something")
+		cmd.Env = []string{"PATH=" + os.Getenv("PATH"), "HOME=" + os.Getenv("HOME")}
+		out, err := cmd.CombinedOutput()
+		if err == nil {
+			t.Fatal("expected error when $ATHANOR not set")
+		}
+		if !strings.Contains(string(out), "ATHANOR") {
+			t.Errorf("expected error about $ATHANOR, got: %s", out)
+		}
+	})
+
+	t.Run("collaborate missing intent errors", func(t *testing.T) {
+		cmd := exec.Command(athBin, "collaborate", "qa-goal")
+		cmd.Env = append(os.Environ(),
+			"ATHANOR_HOME="+tmpHome,
+			"ATHANOR_REPO="+tmpRepo,
+			"ATHANOR="+instDir)
+		_, err := cmd.CombinedOutput()
+		if err == nil {
+			t.Fatal("expected error when --intent not provided")
+		}
+	})
+
+	// ─── Phase 8e: cleanup inscribe/collaborate windows ─────────────
+
+	t.Run("cleanup inscribe muster crucible", func(t *testing.T) {
+		out, err := runAth("cleanup", "azer-run-smoke-tests", "--athanor", "qa-test")
+		if err != nil {
+			t.Fatalf("cleanup inscribe crucible failed: %v\n%s", err, out)
+		}
+	})
+
+	t.Run("cleanup collaborate crucible", func(t *testing.T) {
+		out, err := runAth("cleanup", "azer-review-auth-module", "--athanor", "qa-test")
+		if err != nil {
+			t.Fatalf("cleanup collaborate crucible failed: %v\n%s", err, out)
+		}
+	})
+
 	// ─── Phase 9: ath whisper between windows ────────────────────────
 	// Create a plain bash window to whisper to (easier to verify than
 	// a claude session which has its own TUI)
