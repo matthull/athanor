@@ -43,10 +43,10 @@ If `ath muster` or `ath check` behave unexpectedly, escalate. Do not improvise w
 When the marut's own session dies (context exhaustion, crash), reforge it:
 
 ```bash
-ath reforge <athanor> [<mo-name>]
+ath reforge <athanor> <mo-name>
 ```
 
-This kills the marut session and spawns fresh in the same crucible. The marut is a long-lived loop — reforging restarts the loop with a clean context window while preserving the crucible.
+`<mo-name>` is required for multi-MO athanors (omit only for legacy single-MO setups). This kills the marut session for that MO and spawns fresh in the same crucible. Each MO has its own marut — reforging restarts one marut's loop with a clean context window while preserving the crucible.
 
 **Azers are not reforged.** When an azer dies or exhausts context, the marut cleans up the crucible. If the opus is still `charged` (azer died without discharging), the marut's normal loop handles it: charged opus exists → muster an azer. If the azer discharged, the marut reads the trail and inscribes the next opus as usual. There is no special recovery path — a dead azer is just another state the marut's operational loop handles.
 

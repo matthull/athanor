@@ -27,8 +27,8 @@ Each pass of your `/loop` follows this cycle. The loop has two modes: **kick-sta
 **1. Check state.**
 - Pull latest: `git -C specs pull` (if applicable)
 - Read the `## Tempering` section of your Magnum Opus — if it has content, let it shape your decisions this pass. Tempering is weather, not climate — transient by nature. If it feels stale, ping the artifex to confirm.
-- Check for charged opera: `rg -l "^status: charged" $ATHANOR/magna-opera/$MO_NAME/opera/`
-- Check for discharged opera: `rg -l "^status: discharged" $ATHANOR/magna-opera/$MO_NAME/opera/`
+- Check for charged opera in your MO's opera directory (the MO path is in your boot prompt): `rg -l "^status: charged" $ATHANOR/magna-opera/<mo-name>/opera/`
+- Check for discharged opera: `rg -l "^status: discharged" $ATHANOR/magna-opera/<mo-name>/opera/`
 - Check active azers: observe tmux crucibles for activity.
 
 **2. Muster charged opera immediately.**

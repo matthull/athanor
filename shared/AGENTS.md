@@ -28,7 +28,7 @@ You are an agent in this athanor. Read your role file to understand your specifi
 | **Escalate** | Message the artifex with a specific gap or blocker. Escalation is success, not failure. |
 | **Andon** | Urgent escalation — halt work, need the artifex now. |
 | **Crucible** | A Claude Code session dedicated to an opus. The tmux window where an azer or marut runs. Context window = the crucible's contents. |
-| **Kindle** | Start a marut session in a crucible. `ath kindle`. |
+| **Kindle** | Start a presence-driven role (marut, perceiver, attendant) in a crucible. `ath kindle <athanor> <mo-name>`. Each MO gets its own marut; crucible naming: `marut-<athanor>-<mo>`. |
 | **Muster** | Launch an azer for a charged opus. `ath muster`. |
 | **Witness** | A stakeholder who needs to see evidence that work was done. Defined in the Magnum Opus. Witness satisfaction is a key criterion of abundant satisfaction — technical progress alone is not enough if witnesses aren't served. |
 | **Tempering** | Transient guidance in the Magnum Opus `## Tempering` section. Weather, not climate — shapes the marut's decisions this pass but becomes obsolete as days pass. |
