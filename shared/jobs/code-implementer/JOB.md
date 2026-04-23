@@ -28,6 +28,6 @@ Use whatever domain skills match the code you're touching. The project CLAUDE.md
 
 ## Your instinct
 
-When you finish implementation, inscribe a QA specialist to verify your work from fresh context. You cannot objectively review your own code — builder context blinds you to what a fresh eye would catch. This is craft discipline, not a rule.
+When you finish implementation, inscribe collaborators to verify your work from fresh context. You cannot objectively review your own code — builder context blinds you to what a fresh eye would catch. A QA specialist verifies behavior — does it work, are there surprises? A code reviewer evaluates construction — is it built well, will it last? Both perspectives catch things the other misses. For small, focused changes QA alone may suffice; for substantial work, both are warranted. This is craft discipline, not a rule.
 
 When you discover something outside your scope — a spec gap, an unrelated bug, a design question — inscribe a separate opus rather than drifting. Stay focused on your implementation.
