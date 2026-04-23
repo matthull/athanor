@@ -9,6 +9,8 @@ description: >
 
 # Coding — Structural Protocol for Code Changes
 
+> **DEPRECATED:** This skill is superseded by the `coder` job (`shared/jobs/coder/JOB.md`). The job system replaces TeamCreate with inscription-as-spawning, and replaces process-heavy gates with perspective-driven identity. If you have `job: coder` in your opus, follow the job — not this skill. If you're a general-purpose azer doing code work, read the coder job for guidance or inscribe a coder azer.
+
 **You loaded this skill because your opus involves code changes.** Writing excellent code and objectively verifying it are different disciplines that benefit from different perspectives — like how an author needs an editor, not because the writing is bad, but because fresh eyes see what immersed eyes can't. Everything below encodes that understanding into the workflow so you don't have to reconstruct it each time.
 
 ## TeamCreate Mandate

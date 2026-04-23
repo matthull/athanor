@@ -208,7 +208,7 @@ Work flows organically, with the marut as backstop when momentum drops. `[B:arti
 
 1. **Marut kick-starts.** Morning — the marut musters an assessor azer. `[B:artifex]`
 2. **Assessor generates initial work.** The assessor surveys the landscape, produces a report, and directly musters a couple of azers for the most immediate actions. The assessor discharges.
-3. **Work self-propagates.** Those azers work, and in the course of their work inscribe and muster collaborators — a code-implementer inscribes a QA specialist, a researcher inscribes a spec-writer to capture findings. Work flows organically for a while.
+3. **Work self-propagates.** Those azers work, and in the course of their work inscribe and muster collaborators — a coder inscribes a QA specialist, a researcher inscribes a spec-writer to capture findings. Work flows organically for a while.
 4. **Work tapers off.** Azers discharge, no new work is being generated. The system is quiet.
 5. **Marut notices and re-energizes.** The marut sees the tapering — either musters a few azers directly for obvious next steps, or musters another assessor to survey the new landscape and generate the next wave.
 6. **Cycle repeats.** Organic self-organizing phases punctuated by marut interventions when momentum drops.
@@ -338,7 +338,7 @@ Candidate jobs based on recurring work patterns. `[U:needs-validation]`
 
 | Job | Scope | Key prescriptions |
 |-----|-------|-------------------|
-| `code-implementer` | Write code per spec/opus | `/coding`, `/unit-testing`, TDD cycle, `make check` gate |
+| `coder` | Write, modify, and review code | Shift-left quality, `/code-review`, `/unit-testing`, builder bias awareness |
 | `qa-specialist` | Review and verify work products | `/calcinatio`, empirical verification, finding reports |
 | `spec-writer` | Shape specifications | `/spec`, brownfield discovery, viewpoint review |
 | `assessor` | Landscape survey and opus inscription | Assessment formula from AGENTS.md, manifold generation |
@@ -368,7 +368,7 @@ YOLO approach — land the minimum viable pieces, let tomorrow's azers test the 
 **1. Job registry location and first definitions.**
 Create `shared/jobs/` as the registry. Write starter job definitions as `<name>/JOB.md`:
 - `qa-specialist/JOB.md` — preventing witness surprises, verification perspective
-- `code-implementer/JOB.md` — clean tested code, TDD instincts
+- `coder/JOB.md` — clean tested maintainable code, shift-left quality, builder bias awareness
 - `assessor/JOB.md` — panoramic landscape view, manifold generation process
 
 These are the jobs most likely to be exercised tomorrow.
@@ -417,7 +417,7 @@ Run the system with these changes. The marut boots, musters an assessor, and the
 
 Behavioral scenarios to observe once the system runs: `[D:observe-in-practice]`
 
-1. **Job prescriptions survive.** A code-implementer azer loads `/coding` and `/unit-testing` at boot and still follows their guidance at discharge time (~100k tokens later). Evidence: discharge record shows verification gates hit.
+1. **Job prescriptions survive.** A coder azer loads `/code-review` and `/unit-testing` at boot and still follows their guidance at discharge time (~100k tokens later). Evidence: discharge record shows verification gates hit.
 2. **Collaboration happens.** An azer inscribes a peer with a job role instead of doing everything itself. Evidence: trail shows multiple small specialized opera rather than one large general one.
 3. **Discharge relay works.** An azer inscribes follow-up opera before writing its discharge, and the next azer is already running when the discharge is written. Evidence: timestamps in trail show overlap.
 4. **Marut shepherds effectively.** The marut notices when momentum drops and re-energizes. Evidence: trail doesn't show long gaps between waves of work.

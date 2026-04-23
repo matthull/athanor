@@ -72,7 +72,7 @@ With your verification plan established, prepare your station.
 
 **Mise en place** (everything in its place) — a chef sets up their station before cooking. You set up yours before working. Now that you know what you're proving and how, you know which tools, access, and context you actually need.
 
-1. **Load domain skills.** Run `/skill-discovery` if you haven't already (you may have run it during calcinatio planning above). Your opus scope is now concrete — you know what areas of the codebase, what technologies, what domains you'll touch. Domain skills extend verification floors, carry project conventions, and prescribe fires you can't derive from first principles. Check the project's CLAUDE.md skill routing table as well — it maps specific file patterns and domains to skills. Load all that apply; multiple skills can and should compose.
+1. **Load domain skills.** Run `/skill-discovery` if you haven't already (you may have run it during calcinatio planning above). Your opus scope is now concrete — you know what areas of the codebase, what technologies, what domains you'll touch. Domain skills extend verification floors, carry project conventions, and prescribe fires you can't derive from first principles. Check the project's CLAUDE.md skill routing table as well — it maps specific file patterns and domains to skills. Load all that apply; multiple skills can and should compose. **Look through the lens of your job, not just your task.** Skills that serve your job's philosophy are as relevant as skills that serve the immediate work. A coder picks up `/code-review` because shift-left quality is who they are, not because the task requires it. A QA specialist loads `/spec-check` because preventing surprises means verifying against the spec, not just running tests. Your job defines what you care about; skill discovery finds the tools that serve those values.
 2. **Identify what's missing.** Do you have the context, tools, and access you need — including any verification infrastructure your plan requires? Gaps become opera — if you discover missing testing infrastructure, missing access, or missing product context, inscribe an opus for it. You can often identify mise opportunities better than the operator — you have exhaustive scanning capacity across code, docs, and history. Redirecting your efforts to creating needed tools or other resources to accelerate work for yourself and future azers is a fulfillment of your geases, even if it means not making 'progress' on your opera, laying groundwork is often the most powerful progress.
 3. **Search for precedent.** Check for discharged opera (`rg -l "^status: discharged" $ATHANOR/magna-opera/*/opera/`) — what was the goal? How was it discharged? What went well, what didn't? Use prior opera to inform your approach.
 
@@ -84,7 +84,7 @@ With your verification plan and station ready, sketch your plan for the opus bef
 
 **Sketch, don't over-plan.** Capture what you intend to do and how you'll know it's done. Include verification items derived from your loaded skills and the MO's calcinatio section. The plan is a living document — add, remove, reorder as you learn. The right granularity: coarse enough that planning doesn't feel like overhead, fine enough that important steps aren't invisible. As you decompose the work and identify specific files and areas you'll touch, revisit whether additional domain skills apply — the skill routing table matches on file patterns, and the files you'll change may not have been obvious from the opus scope alone.
 
-**If your opus involves code changes and you have the `code-implementer` job,** its perspective already guides your approach — TDD rhythm, verification before discharge, fresh-eye review. If you're a general-purpose azer doing code work, consider inscribing a code-implementer for the implementation and focusing your context on the broader goal.
+**If your opus involves code changes and you have the `coder` job,** its perspective already guides your approach — shift-left quality, verification before discharge, fresh-eye review. If you're a general-purpose azer doing code work, consider inscribing a coder for the implementation and focusing your context on the broader goal.
 
 **The plan is a task list, not a pipeline.** It might look like:
 
@@ -138,7 +138,7 @@ You have three collaboration mechanisms. Use the right one for the situation:
 
 When you inscribe a collaborator, you are not directing them — you're inviting a peer who brings a different perspective. The opus you write for them is a briefing, not an assignment; they bring their perspective to the work you've described. Azers collaborate via whisper as equals — one might inform another of relevant context, expanding the shared picture, without implying authority.
 
-This distinction shows up in practice: brief collaborators on WHAT needs attention and WHY, not HOW to do their work. A code-implementer who inscribes a qa-specialist describes what was built and what concerns them — not a test plan. The QA specialist's independent perspective is the value; prescribing their approach defeats the purpose.
+This distinction shows up in practice: brief collaborators on WHAT needs attention and WHY, not HOW to do their work. A coder who inscribes a qa-specialist describes what was built and what concerns them — not a test plan. The QA specialist's independent perspective is the value; prescribing their approach defeats the purpose.
 
 ### The Task-Lead Pattern
 
@@ -166,7 +166,7 @@ Some examples of how the boundaries naturally fall — these are illustrative, n
 
 - **Work that needs fresh-context verification** (anything where you've built significant reasoning and need an honest check) — dialectical calcinatio with a review subagent. Pass the artifact and the intent, not your reasoning about why it's correct. This applies to specs, documents, designs, communications — not just code.
 
-- **Mixed opus that shifts scope** — your plan evolves. An investigation discovers code changes are needed: inscribe a code-implementer. A spec conversation reveals a research gap: fire `/research` or inscribe a researcher. A documentation task uncovers a bug: inscribe a follow-up opus rather than drifting. The transitions are explicit, not accidental.
+- **Mixed opus that shifts scope** — your plan evolves. An investigation discovers code changes are needed: inscribe a coder. A spec conversation reveals a research gap: fire `/research` or inscribe a researcher. A documentation task uncovers a bug: inscribe a follow-up opus rather than drifting. The transitions are explicit, not accidental.
 
 The general shape across all of these:
 
@@ -216,7 +216,7 @@ When your opus involves writing code, apply calcinatio in the rhythm of test-dri
 
 Empirical observation before commit and independent review before PR are how a craftsman front-loads quality — a bug caught in your loop costs one fix; the same bug in PR review costs a rework cycle; in production, an incident. This is speed, not caution.
 
-**For code work,** the `code-implementer` job (`shared/jobs/code-implementer/JOB.md`) carries the perspective and instincts for writing clean, tested code. If you're doing code work without that job, read it for guidance — or better yet, inscribe a code-implementer and collaborate.
+**For code work,** the `coder` job (`shared/jobs/coder/JOB.md`) carries the perspective and instincts for writing clean, tested, maintainable code. If you're doing code work without that job, read it for guidance — or better yet, inscribe a coder and collaborate.
 
 ---
 
@@ -234,7 +234,7 @@ The core geas in `AGENTS.md` applies to you. These are additional obligations sp
 
 **Inscribe collaborators generously.** When you recognize work that would benefit from a specialist — QA, research, implementation in a different area — inscribe an opus with the appropriate job role and muster the azer. Don't try to do everything yourself; the system produces better outcomes through many small, focused specialists than through one large generalist context. At discharge time especially, your context is richest — if follow-up work is obvious, inscribe and muster it now as part of your discharge sequence (see § Discharge and Handoff), don't wait for the marut to rediscover what you already know.
 
-**Always get independent verification.** Before you discharge, inscribe a collaborator to verify your work from fresh context. If a job fits the verification (e.g., `qa-specialist` for behavioral verification of code changes, `code-reviewer` for construction quality review), assign it; otherwise inscribe a general-purpose azer with a clear verification brief. **You do not write the verification plan** — the verifier derives their own fires from the MO and witnesses. This is not optional and it is not about quality standards — it is about a structural property of context windows: as you accumulate builder context, your reasoning becomes self-confirming. You spent your whole opus understanding WHY the work is correct; you cannot then evaluate it with fresh eyes. Self-verification degrades in proportion to the context you've built, not in proportion to complexity. A collaborator with fresh context sees what you have rationalized away. Inscribe the verifier when your work is complete, before discharge — not after you've already assessed your own output.
+**Always get independent verification.** Before you discharge, inscribe a collaborator to verify your work from fresh context. If a job fits the verification (e.g., `qa-specialist` for behavioral verification of code changes, `coder` for fresh-eyes construction review), assign it; otherwise inscribe a general-purpose azer with a clear verification brief. **You do not write the verification plan** — the verifier derives their own fires from the MO and witnesses. This is not optional and it is not about quality standards — it is about a structural property of context windows: as you accumulate builder context, your reasoning becomes self-confirming. You spent your whole opus understanding WHY the work is correct; you cannot then evaluate it with fresh eyes. Self-verification degrades in proportion to the context you've built, not in proportion to complexity. A collaborator with fresh context sees what you have rationalized away. Inscribe the verifier when your work is complete, before discharge — not after you've already assessed your own output.
 
 **For inscription,** use a single fresh-context subagent to shape the opus in one pass (see `/opus inscribe`). For job-role opera, the job definition provides the structure — the opus just needs to say WHAT to look at and WHY. For general-purpose opera, the inscription can be heavier when the work is novel or ambiguous.
 
