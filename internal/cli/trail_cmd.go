@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 
 	"github.com/matthull/athanor/internal/athanor"
 )
@@ -50,10 +51,11 @@ func runTrail(args []string) int {
 
 func printTrailJSON(report *athanor.TrailReport) int {
 	type jsonReport struct {
-		TotalOpera      int            `json:"total_opera"`
-		DischargedOpera int            `json:"discharged_opera"`
-		ChargedOpera    int            `json:"charged_opera"`
-		JobCounts       map[string]int `json:"job_counts"`
+		TotalOpera      int                       `json:"total_opera"`
+		DischargedOpera int                       `json:"discharged_opera"`
+		ChargedOpera    int                       `json:"charged_opera"`
+		JobCounts       map[string]int            `json:"job_counts"`
+		MOJobCounts     map[string]map[string]int `json:"mo_job_counts"`
 		Collaboration   struct {
 			WhisperMentions     int     `json:"whisper_mentions"`
 			InscribeMentions    int     `json:"inscribe_mentions"`
@@ -70,6 +72,7 @@ func printTrailJSON(report *athanor.TrailReport) int {
 		DischargedOpera: report.DischargedOpera,
 		ChargedOpera:    report.ChargedOpera,
 		JobCounts:       report.JobCounts,
+		MOJobCounts:     report.MOJobCounts,
 	}
 	jr.Collaboration.WhisperMentions = report.TotalWhisperMentions
 	jr.Collaboration.InscribeMentions = report.TotalInscribeMentions
@@ -127,6 +130,32 @@ func printTrailHuman(report *athanor.TrailReport, athName, moFilter string) int 
 		fmt.Printf("  %-20s %3d (%4.1f%%)\n", jc.name, jc.count, pct)
 	}
 
+	// Per-MO job diversity (the primary collaboration signal)
+	if len(report.MOJobCounts) > 1 || moFilter == "" {
+		fmt.Println("\nPer-MO Job Diversity:")
+		var moNames []string
+		for name := range report.MOJobCounts {
+			moNames = append(moNames, name)
+		}
+		sort.Strings(moNames)
+		for _, moName := range moNames {
+			moJobs := report.MOJobCounts[moName]
+			var parts []string
+			for job, count := range moJobs {
+				parts = append(parts, fmt.Sprintf("%s:%d", job, count))
+			}
+			sort.Strings(parts)
+			diversity := len(moJobs)
+			label := "single-role"
+			if diversity >= 3 {
+				label = "networked"
+			} else if diversity >= 2 {
+				label = "dyadic"
+			}
+			fmt.Printf("  %-40s [%s] %s\n", moName, label, strings.Join(parts, ", "))
+		}
+	}
+
 	// Collaboration signals
 	fmt.Println("\nCollaboration Signals (across all opera):")
 	fmt.Printf("  Inscribe mentions:    %d\n", report.TotalInscribeMentions)
@@ -144,6 +173,11 @@ func printTrailHuman(report *athanor.TrailReport, athName, moFilter string) int 
 		fmt.Printf(" (%.1f%%)", pct)
 	}
 	fmt.Println()
+
+	// Warnings
+	for _, w := range report.Warnings {
+		fmt.Fprintf(os.Stderr, "%s\n", w)
+	}
 
 	return 0
 }

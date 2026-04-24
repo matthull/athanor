@@ -268,16 +268,41 @@ Did some work.
 		}
 	}
 
+	// Create a second athanor for filter exclusion testing
+	instDir2 := filepath.Join(tmpHome, AthanorsDir, "other-ath")
+	operaDir2 := filepath.Join(instDir2, MagnaOperaDir, "other-mo", "opera")
+	moDir2 := filepath.Join(instDir2, MagnaOperaDir, "other-mo")
+	if err := os.MkdirAll(operaDir2, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(moDir2, "other-mo.md"), []byte("# Other MO"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	otherOpus := `---
+status: discharged
+inscribed: 2026-04-23
+discharged: 2026-04-23
+magnum_opus: other-mo
+job: assessor
+---
+# Assessment
+## Outcome
+Did assessment work.
+`
+	if err := os.WriteFile(filepath.Join(operaDir2, "2026-04-23-assessment.md"), []byte(otherOpus), 0644); err != nil {
+		t.Fatal(err)
+	}
+
 	t.Run("analyze all", func(t *testing.T) {
 		report, err := AnalyzeTrail(tmpHome, "", "")
 		if err != nil {
 			t.Fatalf("AnalyzeTrail: %v", err)
 		}
-		if report.TotalOpera != 3 {
-			t.Errorf("TotalOpera = %d, want 3", report.TotalOpera)
+		if report.TotalOpera != 4 {
+			t.Errorf("TotalOpera = %d, want 4", report.TotalOpera)
 		}
-		if report.DischargedOpera != 2 {
-			t.Errorf("DischargedOpera = %d, want 2", report.DischargedOpera)
+		if report.DischargedOpera != 3 {
+			t.Errorf("DischargedOpera = %d, want 3", report.DischargedOpera)
 		}
 		if report.ChargedOpera != 1 {
 			t.Errorf("ChargedOpera = %d, want 1", report.ChargedOpera)
@@ -300,19 +325,33 @@ Did some work.
 		if report.OperaWithDyadEvidence != 1 {
 			t.Errorf("OperaWithDyadEvidence = %d, want 1", report.OperaWithDyadEvidence)
 		}
+		// Per-MO job diversity
+		moKey := "test-ath/test-mo"
+		if report.MOJobCounts[moKey] == nil {
+			t.Fatalf("MOJobCounts[%s] is nil", moKey)
+		}
+		if report.MOJobCounts[moKey]["coder"] != 1 {
+			t.Errorf("MOJobCounts[%s][coder] = %d, want 1", moKey, report.MOJobCounts[moKey]["coder"])
+		}
+		if report.MOJobCounts[moKey]["qa-specialist"] != 1 {
+			t.Errorf("MOJobCounts[%s][qa-specialist] = %d, want 1", moKey, report.MOJobCounts[moKey]["qa-specialist"])
+		}
 	})
 
-	t.Run("filter by athanor", func(t *testing.T) {
+	t.Run("filter by athanor excludes other", func(t *testing.T) {
 		report, err := AnalyzeTrail(tmpHome, "test-ath", "")
 		if err != nil {
 			t.Fatalf("AnalyzeTrail: %v", err)
 		}
 		if report.TotalOpera != 3 {
-			t.Errorf("TotalOpera = %d, want 3", report.TotalOpera)
+			t.Errorf("TotalOpera = %d, want 3 (should exclude other-ath)", report.TotalOpera)
+		}
+		if report.JobCounts["assessor"] != 0 {
+			t.Errorf("JobCounts[assessor] = %d, want 0 (other-ath should be excluded)", report.JobCounts["assessor"])
 		}
 	})
 
-	t.Run("filter by athanor and mo", func(t *testing.T) {
+	t.Run("filter by athanor and mo excludes other", func(t *testing.T) {
 		report, err := AnalyzeTrail(tmpHome, "test-ath", "test-mo")
 		if err != nil {
 			t.Fatalf("AnalyzeTrail: %v", err)
@@ -322,8 +361,31 @@ Did some work.
 		}
 	})
 
+	t.Run("filter other athanor only", func(t *testing.T) {
+		report, err := AnalyzeTrail(tmpHome, "other-ath", "")
+		if err != nil {
+			t.Fatalf("AnalyzeTrail: %v", err)
+		}
+		if report.TotalOpera != 1 {
+			t.Errorf("TotalOpera = %d, want 1", report.TotalOpera)
+		}
+		if report.JobCounts["assessor"] != 1 {
+			t.Errorf("JobCounts[assessor] = %d, want 1", report.JobCounts["assessor"])
+		}
+	})
+
 	t.Run("nonexistent athanor returns empty", func(t *testing.T) {
 		report, err := AnalyzeTrail(tmpHome, "nonexistent", "")
+		if err != nil {
+			t.Fatalf("AnalyzeTrail: %v", err)
+		}
+		if report.TotalOpera != 0 {
+			t.Errorf("TotalOpera = %d, want 0", report.TotalOpera)
+		}
+	})
+
+	t.Run("nonexistent mo returns empty", func(t *testing.T) {
+		report, err := AnalyzeTrail(tmpHome, "test-ath", "nonexistent-mo")
 		if err != nil {
 			t.Fatalf("AnalyzeTrail: %v", err)
 		}

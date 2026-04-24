@@ -1,6 +1,7 @@
 package athanor
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -43,7 +44,8 @@ type TrailReport struct {
 	ChargedOpera    int
 
 	// Job diversity
-	JobCounts map[string]int
+	JobCounts   map[string]int
+	MOJobCounts map[string]map[string]int // MO name → job → count
 
 	// Collaboration signals (aggregated)
 	TotalWhisperMentions     int
@@ -55,6 +57,9 @@ type TrailReport struct {
 
 	// Per-opus detail
 	Opera []OpusAnalysis
+
+	// Warnings collected during analysis
+	Warnings []string
 }
 
 // ParseOpusFrontmatter extracts YAML frontmatter fields from an opus file's content.
@@ -74,16 +79,15 @@ func ParseOpusFrontmatter(content string) OpusFrontmatter {
 	frontmatter := content[3 : 3+end]
 	for _, line := range strings.Split(frontmatter, "\n") {
 		line = strings.TrimSpace(line)
-		if k, v := parseFMLine(line, "status:"); v != "" {
-			_ = k
+		if v := parseFMLine(line, "status:"); v != "" {
 			fm.Status = v
-		} else if _, v := parseFMLine(line, "inscribed:"); v != "" {
+		} else if v := parseFMLine(line, "inscribed:"); v != "" {
 			fm.Inscribed = v
-		} else if _, v := parseFMLine(line, "discharged:"); v != "" {
+		} else if v := parseFMLine(line, "discharged:"); v != "" {
 			fm.Discharged = v
-		} else if _, v := parseFMLine(line, "magnum_opus:"); v != "" {
+		} else if v := parseFMLine(line, "magnum_opus:"); v != "" {
 			fm.MagnumOpus = v
-		} else if _, v := parseFMLine(line, "job:"); v != "" {
+		} else if v := parseFMLine(line, "job:"); v != "" {
 			fm.Job = v
 		}
 	}
@@ -92,11 +96,12 @@ func ParseOpusFrontmatter(content string) OpusFrontmatter {
 }
 
 // parseFMLine checks if a line starts with the given prefix and returns the value.
-func parseFMLine(line, prefix string) (string, string) {
+// Returns empty string if the line doesn't match the prefix.
+func parseFMLine(line, prefix string) string {
 	if strings.HasPrefix(line, prefix) {
-		return prefix, strings.TrimSpace(strings.TrimPrefix(line, prefix))
+		return strings.TrimSpace(strings.TrimPrefix(line, prefix))
 	}
-	return "", ""
+	return ""
 }
 
 // Patterns for detecting collaboration signals in opus body text.
@@ -168,7 +173,8 @@ func AnalyzeOpus(path, athanorName, moName string) (OpusAnalysis, error) {
 // If moName is empty, scans all MOs within each athanor.
 func AnalyzeTrail(home, athanorName, moName string) (*TrailReport, error) {
 	report := &TrailReport{
-		JobCounts: make(map[string]int),
+		JobCounts:   make(map[string]int),
+		MOJobCounts: make(map[string]map[string]int),
 	}
 
 	var instances []string
@@ -192,14 +198,24 @@ func AnalyzeTrail(home, athanorName, moName string) (*TrailReport, error) {
 			var err error
 			mos, err = ListMagnaOpera(instDir)
 			if err != nil {
+				if !os.IsNotExist(err) {
+					report.Warnings = append(report.Warnings,
+						fmt.Sprintf("warning: listing MOs for %s: %v", inst, err))
+				}
 				continue
 			}
 		}
 
 		for _, mo := range mos {
+			moKey := inst + "/" + mo
+
 			operaDir := OperaPath(instDir, mo)
 			entries, err := os.ReadDir(operaDir)
 			if err != nil {
+				if !os.IsNotExist(err) {
+					report.Warnings = append(report.Warnings,
+						fmt.Sprintf("warning: reading opera for %s: %v", moKey, err))
+				}
 				continue
 			}
 
@@ -211,6 +227,8 @@ func AnalyzeTrail(home, athanorName, moName string) (*TrailReport, error) {
 
 				analysis, err := AnalyzeOpus(opusPath, inst, mo)
 				if err != nil {
+					report.Warnings = append(report.Warnings,
+						fmt.Sprintf("warning: reading opus %s: %v", e.Name(), err))
 					continue
 				}
 
@@ -224,12 +242,16 @@ func AnalyzeTrail(home, athanorName, moName string) (*TrailReport, error) {
 					report.ChargedOpera++
 				}
 
-				// Job diversity
+				// Job diversity (global and per-MO)
 				job := analysis.Frontmatter.Job
 				if job == "" {
 					job = "(none)"
 				}
 				report.JobCounts[job]++
+				if report.MOJobCounts[moKey] == nil {
+					report.MOJobCounts[moKey] = make(map[string]int)
+				}
+				report.MOJobCounts[moKey][job]++
 
 				// Aggregate signals
 				report.TotalWhisperMentions += analysis.Signals.WhisperMentions
