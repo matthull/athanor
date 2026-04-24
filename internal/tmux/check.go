@@ -49,10 +49,15 @@ var (
 //  5. Prompt prefix visible → StateIdle
 //  6. Fallback → StateActive
 func (r *Runner) CheckCrucible(target string) (CrucibleState, string, error) {
-	// 1. Check window exists by querying it directly
-	_, err := r.DisplayMessage(target, "#{window_name}")
-	if err != nil {
-		return StateDead, "crucible not found", nil
+	// 1. Resolve bare window names to fully-qualified session:window targets.
+	// tmux capture-pane and display-message only resolve bare names within the
+	// current session, causing false "dead" reports for cross-session crucibles.
+	if !strings.Contains(target, ":") {
+		resolved, err := r.FindWindow(target)
+		if err != nil {
+			return StateDead, "crucible not found", nil
+		}
+		target = resolved
 	}
 
 	// 2. Capture last 20 lines

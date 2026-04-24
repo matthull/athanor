@@ -195,6 +195,36 @@ func (r *Runner) ListWindows() ([]string, error) {
 	return strings.Split(out, "\n"), nil
 }
 
+// FindWindow searches all sessions for a window with the given exact name
+// and returns the fully-qualified "session:window" target. Returns an error
+// if the window is not found or exists in multiple sessions.
+func (r *Runner) FindWindow(name string) (string, error) {
+	out, err := r.run("list-windows", "-a", "-F", "#{session_name}\t#{window_name}")
+	if err != nil {
+		return "", err
+	}
+	if out == "" {
+		return "", fmt.Errorf("window %q not found", name)
+	}
+
+	var matches []string
+	for _, line := range strings.Split(out, "\n") {
+		parts := strings.SplitN(line, "\t", 2)
+		if len(parts) == 2 && parts[1] == name {
+			matches = append(matches, parts[0]+":"+parts[1])
+		}
+	}
+
+	switch len(matches) {
+	case 0:
+		return "", fmt.Errorf("window %q not found", name)
+	case 1:
+		return matches[0], nil
+	default:
+		return "", fmt.Errorf("window %q is ambiguous (found in %d sessions)", name, len(matches))
+	}
+}
+
 // ListSessionWindows returns window names for a specific session.
 func (r *Runner) ListSessionWindows(session string) ([]string, error) {
 	out, err := r.run("list-windows", "-t", session, "-F", "#{window_name}")
