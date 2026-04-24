@@ -62,6 +62,17 @@ func TestATHFullLifecycle(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(sharedDir, "perceiver.md"), []byte("# Perceiver (test)\nTest perceiver role."), 0644); err != nil {
 		t.Fatal(err)
 	}
+	// Set up job definitions in the repo so --job validation passes
+	for _, job := range []string{"general", "qa-specialist", "coder", "assessor"} {
+		jobDir := filepath.Join(sharedDir, athanor.JobsDir, job)
+		if err := os.MkdirAll(jobDir, 0755); err != nil {
+			t.Fatal(err)
+		}
+		content := fmt.Sprintf("# %s (test)\nTest job definition.", job)
+		if err := os.WriteFile(filepath.Join(jobDir, "JOB.md"), []byte(content), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
 	if err := os.MkdirAll(filepath.Join(tmpHome, athanor.AthanorsDir), 0755); err != nil {
 		t.Fatal(err)
 	}
@@ -501,7 +512,7 @@ This is a test opus created by the QA harness.
 
 	t.Run("inscribe creates opus file", func(t *testing.T) {
 		out, err := runAth("inscribe", "qa-test", "qa-goal",
-			"--intent", "Fix the widget loader")
+			"--intent", "Fix the widget loader", "--job", "general")
 		if err != nil {
 			t.Fatalf("ath inscribe failed: %v\n%s", err, out)
 		}
@@ -548,7 +559,7 @@ This is a test opus created by the QA harness.
 
 	t.Run("inscribe with muster creates crucible", func(t *testing.T) {
 		out, err := runAth("inscribe", "qa-test", "qa-goal",
-			"--intent", "Run smoke tests", "--muster")
+			"--intent", "Run smoke tests", "--job", "general", "--muster")
 		if err != nil {
 			t.Fatalf("ath inscribe --muster failed: %v\n%s", err, out)
 		}
@@ -585,7 +596,7 @@ This is a test opus created by the QA harness.
 	t.Run("collaborate creates opus and musters", func(t *testing.T) {
 		// collaborate needs $ATHANOR set (normally set in crucibles)
 		cmd := exec.Command(athBin, "collaborate", "qa-goal",
-			"--intent", "Review auth module")
+			"--intent", "Review auth module", "--job", "general")
 		cmd.Env = append(os.Environ(),
 			"ATHANOR_HOME="+tmpHome,
 			"ATHANOR_REPO="+tmpRepo,
@@ -632,7 +643,7 @@ This is a test opus created by the QA harness.
 
 	t.Run("collaborate without ATHANOR errors", func(t *testing.T) {
 		cmd := exec.Command(athBin, "collaborate", "qa-goal",
-			"--intent", "Do something")
+			"--intent", "Do something", "--job", "general")
 		cmd.Env = []string{"PATH=" + os.Getenv("PATH"), "HOME=" + os.Getenv("HOME")}
 		out, err := cmd.CombinedOutput()
 		if err == nil {
