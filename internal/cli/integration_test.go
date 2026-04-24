@@ -336,6 +336,83 @@ This is a test opus created by the QA harness.
 		}
 	})
 
+	// ─── Phase 5d: ath trail ────────────────────────────────────────
+
+	// Add a discharged opus with collaboration signals for trail analysis
+	trailOpusPath := filepath.Join(instDir, "magna-opera", "qa-goal", "opera", "2026-03-24-collab-test.md")
+	trailOpusContent := `---
+status: discharged
+inscribed: 2026-03-24
+discharged: 2026-03-24
+magnum_opus: qa-goal
+job: coder
+---
+# Collaboration test opus
+
+## Outcome
+Inscribed a qa-specialist for independent review. Used whisper to coordinate with peer.
+`
+	if err := os.WriteFile(trailOpusPath, []byte(trailOpusContent), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run("trail shows collaboration topology", func(t *testing.T) {
+		out, err := runAth("trail", "qa-test")
+		if err != nil {
+			t.Fatalf("ath trail failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "ATH TRAIL") {
+			t.Errorf("expected ATH TRAIL header, got: %s", out)
+		}
+		if !strings.Contains(out, "Job Diversity") {
+			t.Errorf("expected Job Diversity section, got: %s", out)
+		}
+		if !strings.Contains(out, "coder") {
+			t.Errorf("expected coder job in output, got: %s", out)
+		}
+		if !strings.Contains(out, "Dyad Coverage") {
+			t.Errorf("expected Dyad Coverage section, got: %s", out)
+		}
+	})
+
+	t.Run("trail with mo filter", func(t *testing.T) {
+		out, err := runAth("trail", "qa-test", "--mo", "qa-goal")
+		if err != nil {
+			t.Fatalf("ath trail --mo failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "qa-test/qa-goal") {
+			t.Errorf("expected scoped header, got: %s", out)
+		}
+	})
+
+	t.Run("trail json output", func(t *testing.T) {
+		out, err := runAth("trail", "qa-test", "--json")
+		if err != nil {
+			t.Fatalf("ath trail --json failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "\"total_opera\"") {
+			t.Errorf("expected total_opera in JSON, got: %s", out)
+		}
+		if !strings.Contains(out, "\"dyad_coverage_pct\"") {
+			t.Errorf("expected dyad_coverage_pct in JSON, got: %s", out)
+		}
+		if !strings.Contains(out, "\"coder\"") {
+			t.Errorf("expected coder job in JSON, got: %s", out)
+		}
+	})
+
+	t.Run("trail empty athanor", func(t *testing.T) {
+		// qa-warn-test doesn't exist yet at this point in the test,
+		// but a nonexistent athanor should return empty gracefully
+		out, err := runAth("trail", "nonexistent-ath")
+		if err != nil {
+			t.Fatalf("ath trail nonexistent should succeed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "No opera found") {
+			t.Errorf("expected 'No opera found' for empty athanor, got: %s", out)
+		}
+	})
+
 	// ─── Phase 6: ath kindle (creates tmux window) ───────────────────
 	// kindle will try to launch 'claude' which may not be interactive here.
 	// We test that the tmux window is created with the right name.
