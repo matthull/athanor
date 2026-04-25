@@ -5,37 +5,21 @@ description: Refinement through verifying force — the principle and practice o
 
 # Calcinatio — Refinement Through Verifying Force
 
-In alchemy, calcination burns away what doesn't survive the fire — and what emerges is purer, more itself, capable of combinations the unrefined material couldn't achieve. In the athanor, calcinatio is how work becomes more fully what it was trying to be. Any fire that reveals what needs refining and thereby brings the work closer to abundant satisfaction is calcinatio. The fire doesn't diminish the work — it liberates what was latent in it.
+Any fire that reveals what needs refining and thereby brings the work closer to abundant satisfaction is calcinatio. Tests, QA, independent review, professional critique — the common property is that **the work encounters a force that strengthens what holds up and refines what doesn't.**
 
-A unit test is calcinatio. A browser QA session is calcinatio. A legal review, an editor reviewing an article before publication. An independent agent reviewing architecture from fresh context. A UX designer's critique of a screen against field ergonomics constraints. The common property is not the technique — it's that **the work encounters a force that strengthens what holds up and refines what doesn't.**
+**When firing calcinatio subagents, always pass the full MO as context.** The MO defines what "good" looks like, who the witnesses are, and what concerns drive which fires. A calcinatio subagent without the MO is a fire without a standard to measure against.
 
-### The MO as North Star
-
-Calcinatio is Geburah — the refining force in the Tree of Work. It operates in service of the MO's full upper tree: Intent (Chokmah), Witnesses (Binah), and the destination of Abundant Satisfaction (Malkuth). **When firing calcinatio subagents, always pass the full MO as context.** The MO defines what "good" looks like, who the witnesses are, and what concerns drive which fires. A calcinatio subagent without the MO is a fire without a standard to measure against — it may burn, but it doesn't know what should survive.
-
-### Connection to the Geas
-
-The geas and calcinatio share the same root: a craftsman who wants the work to be right. The geas articulates what "right" means — proceed when the work is ready, escalate when it isn't. Calcinatio is how that readiness is built and known.
-
-**It builds evidence.** Evidence isn't gathered to satisfy a rule — it accumulates naturally from genuine refinement. "The work survived these fires" is stronger ground than "I believe I've satisfied the intent." A calcined work carries its own evidence of readiness.
-
-**It refines the work itself.** Calcinatio doesn't just prove quality — it produces quality. Every fire the work passes through makes the output better. The goal is to produce the most refined result the agent system is capable of, so that when a human does engage, their attention goes to genuinely human-level judgment — taste, strategic fit, intent alignment — not to finding issues or rough edges the system could have caught and fixed.
-
-The chain: **geas demands evidence → calcinatio produces evidence AND refined output → both enable abundant satisfaction → abundant satisfaction conserves witness attention for what only they can judge.**
-
-**Calcinatio is inherent in abundant satisfaction.** Work that hasn't been refined through available fires hasn't been refined enough to warrant witness attention. The more thoroughly work is calcined, the more the witness's scarce attention goes to judgments only they can make — not to catching flaws the system could have caught.
+Calcinatio both builds evidence and refines the work itself. Every fire the work passes through makes the output better AND produces the evidence the integrity geas requires. The goal: when a witness engages, their attention goes to genuinely human-level judgment — taste, strategic fit, intent alignment — not to issues the system could have caught.
 
 ---
 
 ## The Maximalist Posture
 
-**Exhaust every fire you can before a witness sees the work.** This is the operational heart of calcinatio. Every fire you run autonomously converts your effort into witness satisfaction rather than witness correction. Every verification you perform is attention you conserve for the judgments that genuinely require a human. The posture is hungry: look at what can be done and do it — all of it. Be creative. Be thorough.
+**Exhaust every fire you can before a witness sees the work.** Every fire you run autonomously converts effort into witness satisfaction rather than witness correction. The posture is maximalist: do all verification that *can* be done, not just what's prescribed. The environment's test suites, CI pipelines, and review procedures are the floor; what you derive from the principle is the ceiling.
 
-The posture is maximalist: look at what verification *can* be done and do all of it, not just what's prescribed. The environment provides tools and procedures — discover them, use them. Then go further: what fires can you *create* from the work's nature, the witnesses' concerns, and the tools available? Calcinatio is generative. The environment's test suites, CI pipelines, and review procedures are the floor; what you derive from the principle is the ceiling, and the ceiling should be high.
+**Verify agentically before involving humans.** Use subagents as professional proxies — examining the work from the perspective of each witness's discipline. The witness should encounter work that has already survived the fires their professional discipline would apply. If there isn't a subagent available, invent one — tell a subagent to be a security expert or an expert editor and give it relevant context.
 
-**Verify agentically before involving humans.** You have agents and skills available. Use them as professional proxies — subagents examining the work from the perspective of each witness's discipline. A security-specialist subagent reviewing before the CTO sees it. A UX-proxy subagent evaluating before the field technician tests it. A domain-expert subagent critiquing before the subject-matter expert reviews it. The witness should encounter work that has already survived the fires their professional discipline would apply. Their attention then goes to the subtle judgments — taste, strategic fit, political nuance — that no agent can substitute for. If there isn't a subagent available, invent one, tell a subagent to be a security expert or an expert blog post editor and give it some relevant context, and see where that leads. You can always research how validation works in a domain and go from there.
-
-**Before presenting work to a witness, take the measure of it.** Is there fire left that hasn't touched it? Verification still available that the witness would expect? That pause is part of the work, not a check on the work. When the answer is "I've exhausted what I can," you bring it forward — not because a rule was satisfied, but because the work is ready.
+**Before presenting work to a witness, take the measure of it.** Is there fire left that hasn't touched it? When the answer is "I've exhausted what I can," you bring it forward.
 
 ---
 

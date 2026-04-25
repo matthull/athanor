@@ -4,8 +4,6 @@ An opus is the unit of work in this athanor. It channels intent into action — 
 
 **An opus is not "work an agent can do alone."** It's any work that needs to happen, structured so the artifex doesn't have to hold it in their head. Some opera are fully autonomous (azer fixes a bug, ships a PR, drafts a technical design document, performs in depth research on a topic). Some need heavy operator involvement (infrastructure provisioning, system design decisions). Both are valid. The value of the opus is the same either way: the need is tracked, the approach is articulated, the boundary between agent and operator work is explicit, and the outcome goes in the trail.
 
-If an opus requires operator action, it should still be inscribed — with the operator dependency explicit. The charged agent guides the operator through what's needed, gathers context, documents the outcome. The operator acts; the agent structures.
-
 ---
 
 ## States
@@ -18,7 +16,7 @@ An opus has three states:
 
 There are no other states. No backlog, no draft, no "planned for later." Planning is fine and often of the highest value. But opera represent immediate work — plans can be made in project documents or other locations.
 
-**Why assessed matters:** A discharged opus captures rich context — findings, reflection, gaps, learnings. That context has value only if it reaches somewhere it can be used: updated specs, a Linear ticket, a Slack message, the assessor's own discharge notes. An opus that is discharged but never assessed is context that may be lost when the next agent doesn't happen to read it. The assessed state means: someone read this and made a best effort to release its value.
+**Why assessed matters:** A discharged opus captures rich context — findings, reflection, gaps, learnings. That context only has value if it reaches somewhere it can be used: updated specs, a Linear ticket, a Slack message, the assessor's own discharge notes. Assessed means: someone read this and made a best effort to release its value.
 
 ---
 
@@ -104,7 +102,7 @@ An opus file has two zones separated by a clear delimiter:
 
 **An opus is a briefing, not an assignment.** The intent says *what direction to pursue for witnesses*. The boundary says *who does what*. The context says *where to look and what's been tried*. The azer owns the decision of what concrete goals to set and when to discharge. Everything else — step-by-step instructions, implementation details, how-to guides, research findings, technical plans — belongs in the environment (specs, docs, scripts, tickets), not the opus.
 
-This is not a loss. The opus distills the pure intent; the environment holds the rest. When you have rich context about *how* to accomplish something, that context is valuable — put it in a spec, a doc, a script. The opus points to it via Context references. The separation keeps the opus clean and the environment rich. An agent inscribing an opus should never feel conflicted about "leaving things out" — everything that isn't intent, boundary, or context pointers goes to the environment where it's more useful and more findable.
+This is not a loss. The opus distills the pure intent; the environment holds the rest. When you have rich context about *how* to accomplish something, put it in a spec, a doc, a script. The opus points to it via Context references. The separation keeps the opus clean and the environment rich.
 
 An opus that says "The artifex's thinking reaches an audience through published articles" is correct — it states the witness's desired state. An opus that lists "Step 1: go to ghost.org, Step 2: click Integrations, Step 3: copy the API key..." has crossed into procedure. The charged agent discovers the procedure through mise en place — that's where its judgment and skill apply.
 
@@ -144,11 +142,9 @@ The outcome tells the trail *what was done*. The evidence tells the artifex *how
 
 Assessment is the act of extracting a discharged opus's context and releasing it somewhere it can be used. It is performed by an assessor — typically an azer charged with an assessment opus, doing this as part of walking the trail.
 
-**What assessment means:** The discharged opus captured findings, reflections, gaps, and learnings at the moment of completion. Assessment means: read those, determine what's actionable, and release the value — to specs, Linear, Slack, the assessor's own discharge notes, or wherever it belongs. The assessor follows the waste-nothing dictate.
+**What assessment means:** Read the discharged findings, reflections, gaps, and learnings; determine what's actionable; release the value — to specs, Linear, Slack, the assessor's own discharge notes, or wherever it belongs. The assessor follows the waste-nothing dictate. The assessor's own discharge is a valid destination — context released there enters the trail and continues forward.
 
-**"Somewhere else" includes the assessor's own discharge.** If the assessor is itself an azer with an opus, its discharge notes are a valid destination for context extracted from a discharged opus. Context released into a discharge is not lost — it enters the trail and continues forward.
-
-**Assessment is best-effort.** The assessor is not expected to be perfect. "I read this, nothing actionable, marking assessed" is a valid assessment. "I read this, updated the spec at X, created a ticket for the gap, assessed" is also valid. The discipline is to *make the attempt*, not to achieve completeness. An assessor that bounces off a discharged opus and says "I'm done here" has still broken the chain that would let context die in the file.
+**Assessment is best-effort.** "I read this, nothing actionable, marking assessed" is valid. "I read this, updated the spec at X, created a ticket for the gap, assessed" is also valid. The discipline is to make the attempt, not achieve completeness.
 
 **Command to list discharged-but-not-assessed opera** (run from within the athanor directory):
 
@@ -174,8 +170,6 @@ At the opus level, abundant satisfaction is the azer's own standard — not an e
 - Communication — notify the artifex, post to relevant channels, whatever makes the work visible to people who benefit from it
 
 The test: if the next agent picks up where you left off, do they have everything they need? If the artifex reads your discharged opus, do they feel the situation is fully understood — either fully handled or with a clear, honest account of where things stand and what's next?
-
-The agent's true obligation is to serve the Magnum Opus — not to blindly follow an opus inscription when conflicting evidence arises. If the direction is wrong, or circumstances have changed, the right action is to escalate or inscribe a corrected opus — not to pursue a direction that no longer serves the Magnum Opus. Escalation is an honorable discharge. So is discharging at a natural stopping point with honest reporting.
 
 ---
 

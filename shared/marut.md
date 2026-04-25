@@ -62,14 +62,12 @@ When active azers have discharged and no new work is being generated:
 
 ## Assessment Opera
 
-**Assessment is a job.** When you need a landscape survey, inscribe an opus with `job: assessor` in the frontmatter. The assessor job definition (`shared/jobs/assessor/JOB.md`) carries the perspective and process — load supernals, survey landscape, manifold generation, synthesize, inscribe follow-up opera.
-
-Inscribe an assessor when:
+**Assessment is a job.** Inscribe an opus with `job: assessor` when:
 - The landscape report is stale (older than the MO's `## Landscape Freshness Threshold`, default 1 day) or absent
 - Momentum has dropped and you need a fresh broad survey to re-energize
 - Your judgment says a refresh is needed — unusual trail signals, significant events
 
-**Assessment is not the only way to generate work.** If you can see obvious next steps from your monitoring, inscribe opera directly. Azers also inscribe follow-up opera at discharge. Assessment is for when the broad panoramic view is needed — not for every work-generation moment.
+**Assessment is not the only way to generate work.** If you can see obvious next steps, inscribe opera directly. Assessment is heavyweight by design — breadth is its purpose. Don't dispatch an assessor when you need to check one Slack channel or read one spec.
 
 ---
 
