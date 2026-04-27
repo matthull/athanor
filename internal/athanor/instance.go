@@ -75,22 +75,6 @@ func InitInstance(home, name, project string) error {
 		return fmt.Errorf("creating instance directory: %w", err)
 	}
 
-	// Symlink shared agent definitions from source repo
-	sharedDir, err := SharedPath()
-	if err != nil {
-		return fmt.Errorf("resolving shared path: %w", err)
-	}
-	for _, f := range SharedFiles {
-		src := filepath.Join(sharedDir, f)
-		if _, err := os.Stat(src); err != nil {
-			return fmt.Errorf("shared component %q not found at %s (is the athanor repo checked out?)", f, src)
-		}
-		dst := filepath.Join(instDir, f)
-		if err := os.Symlink(src, dst); err != nil {
-			return fmt.Errorf("symlinking %s: %w", f, err)
-		}
-	}
-
 	// Write athanor.yml
 	cfg := &Config{
 		Name:    name,
@@ -105,7 +89,86 @@ func InitInstance(home, name, project string) error {
 		return fmt.Errorf("creating magna-opera directory: %w", err)
 	}
 
+	// Symlink shared components via SyncInstance
+	if err := SyncInstance(home, name); err != nil {
+		return fmt.Errorf("syncing shared components: %w", err)
+	}
+
 	return nil
+}
+
+// SyncInstance reconciles symlinks for an existing instance, making it idempotent.
+// For each SharedFile and SharedDir: creates missing symlinks, fixes symlinks that
+// point to wrong targets, and leaves correct symlinks untouched.
+func SyncInstance(home, name string) error {
+	instDir := InstanceDir(home, name)
+
+	if _, err := os.Stat(instDir); os.IsNotExist(err) {
+		return fmt.Errorf("athanor %q does not exist at %s", name, instDir)
+	}
+
+	sharedDir, err := SharedPath()
+	if err != nil {
+		return fmt.Errorf("resolving shared path: %w", err)
+	}
+
+	// Sync individual files
+	for _, f := range SharedFiles {
+		src := filepath.Join(sharedDir, f)
+		if _, err := os.Stat(src); err != nil {
+			return fmt.Errorf("shared component %q not found at %s (is the athanor repo checked out?)", f, src)
+		}
+		dst := filepath.Join(instDir, f)
+		if err := ensureSymlink(src, dst); err != nil {
+			return fmt.Errorf("syncing %s: %w", f, err)
+		}
+	}
+
+	// Sync directories
+	for _, d := range SharedDirs {
+		src := filepath.Join(sharedDir, d)
+		if _, err := os.Stat(src); err != nil {
+			return fmt.Errorf("shared directory %q not found at %s (is the athanor repo checked out?)", d, src)
+		}
+		dst := filepath.Join(instDir, d)
+		if err := ensureSymlink(src, dst); err != nil {
+			return fmt.Errorf("syncing directory %s: %w", d, err)
+		}
+	}
+
+	return nil
+}
+
+// ensureSymlink creates or fixes a symlink at dst pointing to src.
+// If dst already exists and is a correct symlink, it's a no-op.
+// If dst is a symlink pointing elsewhere, it's replaced.
+// If dst exists but is not a symlink (e.g. a regular file), it's left alone and an error is returned.
+func ensureSymlink(src, dst string) error {
+	target, err := os.Readlink(dst)
+	if err == nil {
+		// dst is a symlink — check if it points to the right place
+		if target == src {
+			return nil // already correct
+		}
+		// Wrong target — remove and recreate
+		if err := os.Remove(dst); err != nil {
+			return fmt.Errorf("removing stale symlink: %w", err)
+		}
+		return os.Symlink(src, dst)
+	}
+
+	if os.IsNotExist(err) {
+		// dst doesn't exist — create symlink
+		return os.Symlink(src, dst)
+	}
+
+	// dst exists but is not a symlink (Readlink failed for non-ENOENT reason)
+	// Check if it's a regular file/dir that we shouldn't overwrite
+	if _, statErr := os.Lstat(dst); statErr == nil {
+		return fmt.Errorf("%s exists but is not a symlink — not overwriting", dst)
+	}
+
+	return fmt.Errorf("checking %s: %w", dst, err)
 }
 
 // ValidateMagnumOpus checks the legacy magnum-opus.md. Deprecated: use ValidateMO.

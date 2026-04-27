@@ -24,10 +24,17 @@ const (
 // SharedFiles are the component files symlinked from shared/ into each instance.
 var SharedFiles = []string{
 	"AGENTS.md",
+	"attendant.md",
 	"azer.md",
 	"marut.md",
 	"muster.md",
 	"opus.md",
+	"perceiver.md",
+}
+
+// SharedDirs are directories symlinked from shared/ into each instance.
+var SharedDirs = []string{
+	"jobs",
 }
 
 // Home resolves the athanor home directory path.

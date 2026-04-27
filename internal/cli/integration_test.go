@@ -56,12 +56,6 @@ func TestATHFullLifecycle(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	// perceiver.md is not in SharedFiles (so init won't symlink it); write it
-	// to sharedDir for discoverability parity and directly into the instance
-	// dir below so --role perceiver passes the role-file check.
-	if err := os.WriteFile(filepath.Join(sharedDir, "perceiver.md"), []byte("# Perceiver (test)\nTest perceiver role."), 0644); err != nil {
-		t.Fatal(err)
-	}
 	// Set up job definitions in the repo so --job validation passes
 	for _, job := range []string{"general", "qa-specialist", "coder", "assessor"} {
 		jobDir := filepath.Join(sharedDir, athanor.JobsDir, job)
@@ -129,7 +123,7 @@ func TestATHFullLifecycle(t *testing.T) {
 			}
 		}
 
-		// Verify symlinks
+		// Verify file symlinks
 		for _, f := range athanor.SharedFiles {
 			target, err := os.Readlink(filepath.Join(instDir, f))
 			if err != nil {
@@ -138,6 +132,18 @@ func TestATHFullLifecycle(t *testing.T) {
 			expectedTarget := filepath.Join(sharedDir, f)
 			if target != expectedTarget {
 				t.Errorf("symlink %s points to %q, want %q", f, target, expectedTarget)
+			}
+		}
+
+		// Verify directory symlinks (jobs/)
+		for _, d := range athanor.SharedDirs {
+			target, err := os.Readlink(filepath.Join(instDir, d))
+			if err != nil {
+				t.Errorf("expected symlink for dir %s: %v", d, err)
+			}
+			expectedTarget := filepath.Join(sharedDir, d)
+			if target != expectedTarget {
+				t.Errorf("symlink %s points to %q, want %q", d, target, expectedTarget)
 			}
 		}
 
@@ -161,6 +167,28 @@ func TestATHFullLifecycle(t *testing.T) {
 		}
 		if !strings.Contains(out, "already exists") {
 			t.Errorf("expected 'already exists' error, got: %s", out)
+		}
+	})
+
+	// ─── Phase 1b: ath sync ─────────────────────────────────────────
+
+	t.Run("sync is idempotent on existing instance", func(t *testing.T) {
+		out, err := runAth("sync", "qa-test")
+		if err != nil {
+			t.Fatalf("ath sync failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "Synced qa-test") {
+			t.Errorf("expected 'Synced qa-test' in output, got: %s", out)
+		}
+	})
+
+	t.Run("sync all instances", func(t *testing.T) {
+		out, err := runAth("sync")
+		if err != nil {
+			t.Fatalf("ath sync (all) failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "Synced qa-test") {
+			t.Errorf("expected 'Synced qa-test' in output, got: %s", out)
 		}
 	})
 
@@ -225,13 +253,6 @@ This is an automated test. No prior context needed.
 			t.Errorf("expected marut: -, got: %s", out)
 		}
 	})
-
-	// Symlink jobs directory into the instance so job boot clause resolves
-	jobsSrc := filepath.Join(sharedDir, athanor.JobsDir)
-	jobsDst := filepath.Join(instDir, "jobs")
-	if err := os.Symlink(jobsSrc, jobsDst); err != nil {
-		t.Fatalf("symlinking jobs into instance: %v", err)
-	}
 
 	// ─── Phase 4: Create test opus ───────────────────────────────────
 
@@ -956,13 +977,7 @@ Inscribed a qa-specialist for independent review. Used whisper to coordinate wit
 
 	// ─── Phase 14b-e: --role flag on kindle and quiesce ──────────────
 	// Phase 13 quiesced marut-qa-test-qa-goal, so this slot is clean.
-	// perceiver.md isn't symlinked by init — write it directly into instDir
-	// so the kindle role-file check passes.
-
-	if err := os.WriteFile(filepath.Join(instDir, "perceiver.md"),
-		[]byte("# Perceiver (test)\nTest perceiver role."), 0644); err != nil {
-		t.Fatal(err)
-	}
+	// perceiver.md is now in SharedFiles, so init symlinked it already.
 
 	t.Run("kindle perceiver creates role crucible", func(t *testing.T) {
 		out, err := runAth("kindle", "qa-test", "--role", "perceiver", "--mo", "qa-goal")

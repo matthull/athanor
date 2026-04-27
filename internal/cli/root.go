@@ -37,6 +37,8 @@ func Execute() int {
 		return runCraft(os.Args[2:])
 	case "craft-mo":
 		return runCraftMO(os.Args[2:])
+	case "sync":
+		return runSync(os.Args[2:])
 	case "status":
 		return runStatus(os.Args[2:])
 	case "reforge":
@@ -79,6 +81,7 @@ func printUsage() {
 
 Usage:
   ath init <name> [--project <path>]        Create a new athanor instance
+  ath sync [<name>]                        Reconcile symlinks (all instances if no name)
   ath kindle <name> [<mo-name>] [--role <r>] Launch a presence-driven role
   ath reforge <name> [<mo-name>]           Kill and relaunch a marut
   ath inscribe <athanor> <mo> --intent <text> [--job <job>] [--muster]

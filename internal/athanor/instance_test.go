@@ -79,6 +79,11 @@ func TestInitInstance(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
+	for _, d := range SharedDirs {
+		if err := os.MkdirAll(filepath.Join(sharedDir, d), 0755); err != nil {
+			t.Fatal(err)
+		}
+	}
 
 	// Init the instance
 	if err := InitInstance(home, "test-project", "/home/matt/code/test"); err != nil {
@@ -92,7 +97,7 @@ func TestInitInstance(t *testing.T) {
 		t.Fatalf("instance directory not created")
 	}
 
-	// Verify symlinks point to absolute repo paths
+	// Verify file symlinks point to absolute repo paths
 	for _, f := range SharedFiles {
 		path := filepath.Join(instDir, f)
 		target, err := os.Readlink(path)
@@ -103,6 +108,20 @@ func TestInitInstance(t *testing.T) {
 		expectedTarget := filepath.Join(sharedDir, f)
 		if target != expectedTarget {
 			t.Errorf("symlink %s -> %q, want %q", f, target, expectedTarget)
+		}
+	}
+
+	// Verify directory symlinks
+	for _, d := range SharedDirs {
+		path := filepath.Join(instDir, d)
+		target, err := os.Readlink(path)
+		if err != nil {
+			t.Errorf("expected symlink for dir %s: %v", d, err)
+			continue
+		}
+		expectedTarget := filepath.Join(sharedDir, d)
+		if target != expectedTarget {
+			t.Errorf("symlink %s -> %q, want %q", d, target, expectedTarget)
 		}
 	}
 
@@ -375,6 +394,147 @@ func TestReadOpusJob(t *testing.T) {
 		got := ReadOpusJob(path)
 		if got != "" {
 			t.Errorf("ReadOpusJob = %q, want empty", got)
+		}
+	})
+}
+
+// setupSyncTestRepo creates a temp home and repo with shared files/dirs,
+// returning (home, sharedDir). Sets ATHANOR_REPO for the test.
+func setupSyncTestRepo(t *testing.T) (string, string) {
+	t.Helper()
+	tmp := t.TempDir()
+	home := filepath.Join(tmp, "athanor")
+	repoDir := filepath.Join(tmp, "repo")
+	t.Setenv("ATHANOR_REPO", repoDir)
+
+	if err := EnsureHome(home); err != nil {
+		t.Fatal(err)
+	}
+	sharedDir := filepath.Join(repoDir, SharedDir)
+	if err := os.MkdirAll(sharedDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	for _, f := range SharedFiles {
+		if err := os.WriteFile(filepath.Join(sharedDir, f), []byte("# "+f), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, d := range SharedDirs {
+		if err := os.MkdirAll(filepath.Join(sharedDir, d), 0755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	return home, sharedDir
+}
+
+func TestSyncInstance(t *testing.T) {
+	t.Run("creates missing symlinks", func(t *testing.T) {
+		home, sharedDir := setupSyncTestRepo(t)
+
+		// Create a bare instance directory (no symlinks)
+		name := "bare-instance"
+		instDir := InstanceDir(home, name)
+		if err := os.MkdirAll(instDir, 0755); err != nil {
+			t.Fatal(err)
+		}
+
+		if err := SyncInstance(home, name); err != nil {
+			t.Fatalf("SyncInstance: %v", err)
+		}
+
+		// Verify all file symlinks created
+		for _, f := range SharedFiles {
+			target, err := os.Readlink(filepath.Join(instDir, f))
+			if err != nil {
+				t.Errorf("expected symlink for %s: %v", f, err)
+				continue
+			}
+			if target != filepath.Join(sharedDir, f) {
+				t.Errorf("symlink %s -> %q, want %q", f, target, filepath.Join(sharedDir, f))
+			}
+		}
+
+		// Verify all dir symlinks created
+		for _, d := range SharedDirs {
+			target, err := os.Readlink(filepath.Join(instDir, d))
+			if err != nil {
+				t.Errorf("expected symlink for dir %s: %v", d, err)
+				continue
+			}
+			if target != filepath.Join(sharedDir, d) {
+				t.Errorf("symlink %s -> %q, want %q", d, target, filepath.Join(sharedDir, d))
+			}
+		}
+	})
+
+	t.Run("idempotent on correct symlinks", func(t *testing.T) {
+		home, _ := setupSyncTestRepo(t)
+
+		// Init creates correct symlinks
+		if err := InitInstance(home, "idem-test", ""); err != nil {
+			t.Fatalf("InitInstance: %v", err)
+		}
+
+		// Sync again — should succeed with no changes
+		if err := SyncInstance(home, "idem-test"); err != nil {
+			t.Fatalf("SyncInstance (idempotent): %v", err)
+		}
+	})
+
+	t.Run("fixes stale symlinks", func(t *testing.T) {
+		home, sharedDir := setupSyncTestRepo(t)
+
+		name := "stale-test"
+		instDir := InstanceDir(home, name)
+		if err := os.MkdirAll(instDir, 0755); err != nil {
+			t.Fatal(err)
+		}
+
+		// Create a symlink pointing to wrong target
+		wrongTarget := "/tmp/nonexistent-target"
+		if err := os.Symlink(wrongTarget, filepath.Join(instDir, SharedFiles[0])); err != nil {
+			t.Fatal(err)
+		}
+
+		if err := SyncInstance(home, name); err != nil {
+			t.Fatalf("SyncInstance: %v", err)
+		}
+
+		// Verify the stale symlink was fixed
+		target, err := os.Readlink(filepath.Join(instDir, SharedFiles[0]))
+		if err != nil {
+			t.Fatalf("expected symlink for %s: %v", SharedFiles[0], err)
+		}
+		expected := filepath.Join(sharedDir, SharedFiles[0])
+		if target != expected {
+			t.Errorf("symlink %s -> %q, want %q", SharedFiles[0], target, expected)
+		}
+	})
+
+	t.Run("errors on nonexistent instance", func(t *testing.T) {
+		home, _ := setupSyncTestRepo(t)
+		if err := SyncInstance(home, "nonexistent"); err == nil {
+			t.Error("expected error for nonexistent instance")
+		}
+	})
+
+	t.Run("refuses to overwrite regular file", func(t *testing.T) {
+		home, _ := setupSyncTestRepo(t)
+
+		name := "regular-file-test"
+		instDir := InstanceDir(home, name)
+		if err := os.MkdirAll(instDir, 0755); err != nil {
+			t.Fatal(err)
+		}
+
+		// Create a regular file where a symlink should go
+		if err := os.WriteFile(filepath.Join(instDir, SharedFiles[0]), []byte("real file"), 0644); err != nil {
+			t.Fatal(err)
+		}
+
+		err := SyncInstance(home, name)
+		if err == nil {
+			t.Error("expected error when regular file exists at symlink target")
 		}
 	})
 }
