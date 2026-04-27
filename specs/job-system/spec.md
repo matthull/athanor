@@ -342,7 +342,7 @@ Jobs live at the **Yesod level** — foundation, the bridge between the environm
 
 ### Implemented `[I:implemented]`
 
-Five jobs are defined in `jobs/` and symlinked into each athanor instance as `jobs/`:
+Seven jobs are defined in `jobs/` and symlinked into each athanor instance as `jobs/`:
 
 | Job | Scope | Key prescriptions |
 |-----|-------|-------------------|
@@ -351,6 +351,8 @@ Five jobs are defined in `jobs/` and symlinked into each athanor instance as `jo
 | `assessor` | Landscape survey and opus inscription | Structured process (survey → generate → synthesize → inscribe), manifold generation |
 | `general` | Novel, exploratory, cross-cutting work | Breadth-first perspective, loneliness signal for collaboration, scout not fallback |
 | `investigator` | Trace problems to root cause | Evidence over narrative, `/rca`, communication closes the loop |
+| `solution-architect` | Periodic holistic eye on MO architecture | Spec-reality alignment, architectural fitness, `/spec-check`, `/explore`, proposal-ready findings |
+| `project-manager` | Witness satisfaction audit and progress assessment | Witness coverage, hill-chart status, tunnel vision detection, `/project-management` |
 
 ### Candidate — from voice notes `[V:voice-note]`
 
@@ -358,8 +360,6 @@ The artifex identified recurring work patterns that suggest new job definitions 
 
 | Job | Scope | Origin signal |
 |-----|-------|---------------|
-| `solution-architect` | Holistic eye on the MO — keeps specs/docs up to date with what's being done, flags architectural issues, makes proposals to artifex. Periodic check-in role, not continuous. | Recording 185 (2026-04-24) |
-| `project-manager` | Stakeholder/witness satisfaction audit — are we progressing toward witness needs? Breaks tunnel vision from opera momentum. Hill-chart style status, audits for missed items, realigns with upstream product docs. | Recording 185-(1) (2026-04-24) |
 | `environment-warden` | Local environment health — when an azer is stuck debugging env issues (missing deps, broken tools, config drift), this specialist takes over instead of the coder going in circles. | Recording 182 (2026-04-24) |
 
 ### Candidate — from original spec `[U:needs-validation]`
