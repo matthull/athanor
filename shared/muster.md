@@ -32,7 +32,7 @@ This creates the crucible (tmux window) and launches Claude with the correct boo
 ath check azer-<opus-name>
 ```
 
-Should return `active` or `idle`. If it returns `dead`, the launch failed — escalate.
+Should show a `last_active` timestamp and pane content indicating the session is running. If it prints "crucible not found" (exit code 2), the launch failed — escalate.
 
 If `ath muster` or `ath check` behave unexpectedly, escalate. Do not improvise workarounds.
 
@@ -54,29 +54,28 @@ ath reforge <athanor> <mo-name>
 
 ## Monitoring
 
-Once an azer is charged, check its state each loop pass:
+Once an azer is charged, check its crucible each loop pass:
 
 ```bash
 ath check azer-<opus-name>
 ```
 
-Returns one of:
-- `active` — tool call in progress, working normally
-- `idle` — waiting for input (may be thinking or may be stalled)
-- `permission` — blocked on a permission prompt, needs approval
-- `exhausted` — context limit reached, session is done
-- `dead` — crucible not found, session died
+This outputs a `last_active` timestamp (from the Claude Code status bar, if present) followed by 25 lines of raw pane content. You interpret the output — the command does not classify state for you.
 
-**When `idle` persists across multiple passes** (> 10 minutes) → likely stalled. Nudge:
+**Reading the output:**
+- **`last_active` timestamp** — when the azer last produced output. A recent timestamp means it's working. A stale timestamp (> 10 minutes) suggests it may be stuck.
+- **Raw pane content** — read it like you'd read over a craftsman's shoulder. Look for what tool is running, whether a permission prompt is blocking, whether the context limit appeared, or whether the session died.
+
+**When the timestamp is stale with no visible progress** → likely stalled. Nudge:
 ```bash
 ath whisper send azer-<opus-name> "Status check — are you making progress on your opus? If stuck, escalate."
 ```
 
-**When `permission`** → approve the prompt or escalate to the artifex.
+**When you see a permission prompt** in the pane content → approve the prompt or escalate to the artifex.
 
-**When `exhausted` or `dead`** → clean up the crucible (`ath cleanup`). The opus is either discharged (trail has it) or still charged (azer died mid-work). Either way, the normal operational loop handles it — charged opera get mustered, discharged opera get assessed.
+**When the session is exhausted or gone** → clean up the crucible (`ath cleanup`). The opus is either discharged (trail has it) or still charged (azer died mid-work). Either way, the normal operational loop handles it — charged opera get mustered, discharged opera get assessed.
 
-**If nudge doesn't unstick** → escalate to the artifex with what you observed.
+**If a nudge doesn't unstick** → escalate to the artifex with what you observed in the pane content.
 
 ---
 
