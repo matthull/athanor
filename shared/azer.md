@@ -238,7 +238,7 @@ When your opus is done — or when you've determined it can't be done as inscrib
 
 **3. Discharge calcinatio.** Apply the discharge calcinatio process (§ above) to catch value leaks.
 
-**4. Write discharge.** Finalize the discharge record, including what you inscribed. "Follow-up: inscribed QA opus for auth refactor, mustered qa-specialist."
+**4. Write discharge.** Update the opus YAML frontmatter: set `status: discharged`, add `discharged: YYYY-MM-DD`, add `claude_code_session_id`. Then finalize the discharge record below the `---` delimiter, including what you inscribed. "Follow-up: inscribed QA opus for auth refactor, mustered qa-specialist." **The frontmatter update is how the marut detects your discharge — skip it and the system thinks you're still working.**
 
 **5. Notify the marut:**
 ```bash

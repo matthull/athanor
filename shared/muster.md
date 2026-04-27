@@ -12,9 +12,9 @@ These are core marut responsibilities — not operator tasks. The marut manages 
 
 When the marut has a charged opus that needs execution:
 
-**1. Create a sandbox (if needed)** — a sandbox isolates code changes. If the opus involves code changes to this repo, create one per the project's environment conventions (e.g. `wtp add <branch-name>`). Note the worktree path from the output.
+**1. Create a sandbox for code-change opera** — a sandbox isolates code changes. **If the opus involves code changes to this repo, always create a worktree** per the project's environment conventions (e.g. `wtp add <branch-name>`). Note the worktree path from the output. This is not optional for code-change opera — two azers working in the same directory will collide (mixed commits, merge conflicts, broken state).
 
-**Skip the sandbox** if the opus is research, investigation, assessment, or work that doesn't modify this repo's code. The azer runs from the main repo directory instead. Not every opus needs code isolation — apply judgment.
+**Skip the sandbox** only if the opus is research, investigation, assessment, or work that doesn't modify this repo's code. The azer runs from the main repo directory instead.
 
 **2. Muster the azer:**
 

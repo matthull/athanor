@@ -1,6 +1,6 @@
 # Job System Specification
 
-**Status:** Implemented (Wave 1 complete, Wave 2 in progress)
+**Status:** Implemented (Waves 1–2 complete, Wave 3 deployed)
 **Created:** 2026-04-21
 **Updated:** 2026-04-27
 **Origin:** Interactive opus, athanor-alignment MO — artifex-directed
@@ -400,36 +400,46 @@ Resolved through the organic model (see § Dynamic orchestration). Summary of an
 
 **6. Job definition path references.** Agent directives (AGENTS.md, azer.md) updated to reference `jobs/<name>/JOB.md` (relative to athanor instance dir, where the symlink lives). Previously said `jobs/` which was unreachable from instance dir.
 
-### Wave 2: Observation and iteration — IN PROGRESS
+### Wave 2: Observation and iteration — COMPLETE
 
-The system is running with these changes. Key observations and open work:
+The system ran with Wave 1 changes. Observations drove the Wave 3 evolution.
 
-**Known gaps (opera inscribed 2026-04-27):**
+**Infrastructure gaps (resolved 2026-04-27):**
 
-- **Structural job injection in muster.** `ath muster` does NOT inject the job definition into the boot prompt — job loading is purely behavioral (azer.md tells the azer to read it). An opus is inscribed to make muster read the `job:` field from opus frontmatter and add the JOB.md path to the boot prompt structurally.
-- **Idempotent ath init/sync.** `ath init` is create-only. `SharedFiles` in `home.go` is stale (missing `attendant.md`, `perceiver.md`) and has no concept of shared directories (like `jobs/`). An opus is inscribed for an idempotent sync mechanism.
+- **Structural job injection in muster.** `ath muster` does NOT yet inject the job definition into the boot prompt — job loading is purely behavioral (azer.md instruction), not structural. Opus inscribed; implementation pending. `[I:implemented — inscription only]`
+- **Idempotent ath init/sync.** `ath sync` command added (commit f6e70be). `ath init` remains create-only; `ath sync` handles updates (symlinks, shared files, shared directories like `jobs/`). `[I:implemented]`
+- **Job symlinks.** Jobs symlinked into all athanor instances (2026-04-27). Agent directive paths fixed to `jobs/<name>/JOB.md`. `[I:implemented]`
 
-**Observation questions (from original spec, still open):**
+**Observation questions (answered from musashi trail evidence and artifex voice notes):**
 
-- Do azers actually inscribe peers? Or do they still try to do everything themselves?
-- Do job prescriptions survive the context? (Core hypothesis — untested at scale)
-- Does the marut's shepherd loop work? Or does it need more structure?
-- Does the discharge relay create momentum? Or do gaps still appear?
+- **Do azers actually inscribe peers?** No. Azers consistently resist leaving their bench to inscribe collaborators. They try to do everything themselves. This was the key finding that drove Wave 3: the marut-as-coordinator model. `[O:observed]`
+- **Do job prescriptions survive the context?** Insufficient data — job definitions weren't reachable from athanor instances until the symlink fix (2026-04-27). Untested at scale. `[U:needs-validation]`
+- **Does the marut's shepherd loop work?** The shepherd loop works for monitoring but was insufficient for driving collaboration. Evolved to the active coordinator model in Wave 3 — the marut now actively dispatches specialists rather than waiting for azers to self-inscribe. `[O:observed]`
+- **Does the discharge relay create momentum?** Partially. Azers consistently forget to update opus frontmatter to `status: discharged`, breaking the marut's ability to detect discharges. Guidance strengthened in azer.md (2026-04-27). Relay inscription (inscribing follow-up at discharge) remains inconsistent. `[O:observed]`
 
-### Wave 3: Marut as active coordinator `[V:voice-note]`
+### Wave 3: Marut as active coordinator — DEPLOYED `[V:voice-note]` `[I:implemented]`
 
-The artifex's voice notes (recording 182, 2026-04-24) signal a potential shift in the collaboration model. The current spec assumes azers will spontaneously inscribe collaborators (Chesed pull). Observation suggests this is the weakest link — azers resist creating collaborators and try to do everything themselves.
+The artifex's voice notes (recording 182, 2026-04-24) signaled a shift in the collaboration model. Wave 2 observation confirmed the hypothesis: azers do not spontaneously inscribe collaborators. They resist leaving their bench and try to do everything themselves. The marut-as-coordinator model was deployed to `shared/marut.md` in commit 24838c8 (2026-04-27).
 
-**The proposed evolution:** Rather than relying on azers to self-collaborate, lean into the marut as the coordination point:
+**What was deployed:**
 
-- **Role discovery.** The marut does something analogous to `/skill-discovery` but for jobs — it knows the full job registry and actively matches work-in-progress to the right specialist roles.
-- **Active dispatch.** The marut watches azers and catches when they're doing work that another job would do better (e.g., a coder debugging local env issues → inscribe an environment-warden). Not preventing them from going outside their lane, but noticing when a specialist would be more effective.
-- **Generative collaboration.** The ideal: marut catches a coder troubleshooting local env issues, inscribes an environment-warden collaborator, whispers the coder to stop and work with the specialist instead.
-- **Shorter marut context.** More aggressive context cycling for the marut itself, so it gets fresh perspective on the workshop state more frequently.
+- **Coordination section in marut.md.** Three facets: match work to the right job when inscribing, dispatch specialists after azer discharge (coder finishes → inscribe qa-specialist), notice role mismatches in active azers. Essentialist framing — perspective, not procedure. `[I:implemented]`
+- **Active dispatch as marut duty.** The marut's operational loop step 3 (shepherd) and step 5 (post-discharge) now explicitly include dispatching the right specialist for follow-up work. `[I:implemented]`
+- **Job-registry awareness.** The marut is directed to know the registry, match `--job general` consciously (not as default), and route work to named specializations. `[I:implemented]`
 
-This is upstream of formulae — a stepping stone to see how much coordination emerges from a marut with job-registry awareness before formalizing into formulae. `[V:voice-note]`
+**What remains to observe:**
 
-**Model selection.** The artifex notes (recording 182-(1), 2026-04-24) that marut should be opus-class but many job-role azers (especially implementation roles) could run on sonnet. Comparison testing needed, but the direction is clear: reserve opus for roles that need deep judgment (marut, assessor), use sonnet for focused execution (coder, qa-specialist). `[V:voice-note]`
+- Does the marut-as-coordinator model actually produce collaboration topology in trails? (Untested — no production azers have run under the new guidance yet.)
+- Does explicit dispatch feel natural or mechanical? The guidance is essentialist but the behavior is new.
+- Is the marut's context large enough to hold coordination awareness alongside monitoring duties?
+- Role discovery (analogous to `/skill-discovery` for jobs) — currently implicit in the marut's judgment; may need tooling if the registry grows.
+
+**Pending items from original proposal:**
+
+- **Shorter marut context cycling.** Not yet addressed — marut still runs full context. May be needed if coordination duties increase context load.
+- **Generative collaboration.** The ideal case (marut catches a coder doing wrong-role work and actively redirects mid-opus) is described in guidance but untested.
+
+**Model selection.** The artifex notes (recording 182-(1), 2026-04-24) that marut should be opus-class but many job-role azers (especially implementation roles) could run on sonnet. Comparison testing needed, but the direction is clear: reserve opus for roles that need deep judgment (marut, assessor), use sonnet for focused execution (coder, qa-specialist). `[V:voice-note]` `[U:needs-validation]`
 
 ### Wave 4: Periodic/patrol roles `[V:voice-note]`
 
@@ -465,13 +475,16 @@ Behavioral scenarios to observe once the system runs: `[D:observe-in-practice]`
 - **Job definition structure held up.** The four-section format (identity, when needed, what you care about, your instinct) plus `## Your tools` works well. The assessor exception (`## Your process`) was warranted — confirmed by use. `[O:observed]`
 - **Two unplanned jobs emerged.** `general` was elevated from "fallback" to a real job with its own identity (breadth-first scout, loneliness signal). `investigator` emerged from a `general` opus that revealed a distinct diagnostic perspective worth naming. Both validated the "jobs grow from observed patterns" design. `[O:observed]`
 - **`ath inscribe --job` enforcement works.** Every opus gets a job assignment. `general` serves the "no specific role fits" case cleanly. `[I:implemented]`
-- **Symlink distribution was a gap.** Job definitions lived in the source repo but weren't reachable from athanor instance dirs. Fixed 2026-04-27 with `jobs/` symlink, but exposed the broader problem: no idempotent sync mechanism for shared components.
+- **Symlink distribution was a gap.** Job definitions lived in the source repo but weren't reachable from athanor instance dirs. Fixed 2026-04-27 with `jobs/` symlink, but exposed the broader problem: no idempotent sync mechanism for shared components. Resolved with `ath sync` (commit f6e70be).
+- **Azers don't self-collaborate.** The Chesed-pull hypothesis — that azers would spontaneously inscribe collaborators — did not hold. Azers resist leaving their bench and try to do everything themselves. This drove the marut-as-coordinator model (Wave 3). `[O:observed]`
+- **Discharge discipline is fragile.** Azers consistently forget to update opus frontmatter to `status: discharged`. The guidance existed in opus.md but was too indirect — azer.md's discharge sequence deferred to opus.md rather than making the frontmatter update explicit. Fixed 2026-04-27. `[O:observed]`
+- **Worktree isolation is essential for parallel azers.** Two azers colliding in the same working directory (commit 16742b1 had mixed changes) showed that code-change opera must always use worktrees, even in no-branch projects. Guidance strengthened in muster.md (2026-04-27). `[O:observed]`
 
 ### Open questions
 
-- [ ] Which jobs proved most valuable? Which weren't used? (Need more production trail data)
+- [ ] Which jobs proved most valuable? Which weren't used? (Need more production trail data — job definitions only reachable since 2026-04-27 symlink fix)
 - [ ] Did the ~100k context limit work? Too tight? Too loose?
-- [ ] Does the marut-as-coordinator model (Wave 3) reduce the collaboration gap, or does it need formulae?
+- [x] Does the marut-as-coordinator model (Wave 3) reduce the collaboration gap, or does it need formulae? → Deployed (commit 24838c8). Observation pending — no production azers have run under the new coordinator guidance yet.
 - [ ] Does structural job injection in muster boot prompt improve prescription survival vs. behavioral loading?
 - [ ] What's the right model tier per job? (opus for marut/assessor, sonnet for coder/qa — needs testing)
 
