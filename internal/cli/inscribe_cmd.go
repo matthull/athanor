@@ -216,17 +216,20 @@ func musterInscribedOpus(instDir, opusPath, slug string) int {
 	}
 
 	moName := athanor.ReadOpusMO(opusPath)
+	job := athanor.ReadOpusJob(opusPath)
+	jobClause := jobBootClause(instDir, job)
+
 	var bootPrompt string
 	if moName != "" {
 		moPath := athanor.MagnumOpusPath(instDir, moName)
 		bootPrompt = fmt.Sprintf(
-			"Read %s/AGENTS.md, then read %s, then read %s/azer.md. Your opus is at %s. Read it and execute.",
-			instDir, moPath, instDir, opusPath,
+			"Read %s/AGENTS.md, then read %s, then read %s/azer.md%s. Your opus is at %s. Read it and execute.",
+			instDir, moPath, instDir, jobClause, opusPath,
 		)
 	} else {
 		bootPrompt = fmt.Sprintf(
-			"Read %s/AGENTS.md, then read %s/azer.md. Your opus is at %s. Read it and execute.",
-			instDir, instDir, opusPath,
+			"Read %s/AGENTS.md, then read %s/azer.md%s. Your opus is at %s. Read it and execute.",
+			instDir, instDir, jobClause, opusPath,
 		)
 	}
 

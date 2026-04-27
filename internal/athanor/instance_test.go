@@ -335,6 +335,50 @@ func TestReadOpusMO(t *testing.T) {
 	})
 }
 
+func TestReadOpusJob(t *testing.T) {
+	t.Run("with job field", func(t *testing.T) {
+		t.Parallel()
+		dir := t.TempDir()
+		content := "---\nstatus: charged\nmagnum_opus: bugsnag\njob: coder\n---\n# Test opus"
+		path := filepath.Join(dir, "test.md")
+		if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+			t.Fatal(err)
+		}
+		got := ReadOpusJob(path)
+		if got != "coder" {
+			t.Errorf("ReadOpusJob = %q, want %q", got, "coder")
+		}
+	})
+
+	t.Run("without job field", func(t *testing.T) {
+		t.Parallel()
+		dir := t.TempDir()
+		content := "---\nstatus: charged\nmagnum_opus: bugsnag\n---\n# Test opus"
+		path := filepath.Join(dir, "test.md")
+		if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+			t.Fatal(err)
+		}
+		got := ReadOpusJob(path)
+		if got != "" {
+			t.Errorf("ReadOpusJob = %q, want empty", got)
+		}
+	})
+
+	t.Run("with empty job field", func(t *testing.T) {
+		t.Parallel()
+		dir := t.TempDir()
+		content := "---\nstatus: charged\njob: \n---\n# Test opus"
+		path := filepath.Join(dir, "test.md")
+		if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+			t.Fatal(err)
+		}
+		got := ReadOpusJob(path)
+		if got != "" {
+			t.Errorf("ReadOpusJob = %q, want empty", got)
+		}
+	})
+}
+
 func TestWriteMOTemplate(t *testing.T) {
 	t.Parallel()
 	dir := t.TempDir()

@@ -186,6 +186,16 @@ func ListMagnaOpera(instanceDir string) ([]string, error) {
 
 // ReadOpusMO reads the magnum_opus field from an opus file's YAML frontmatter.
 func ReadOpusMO(path string) string {
+	return readFrontmatterField(path, "magnum_opus:")
+}
+
+// ReadOpusJob reads the job field from an opus file's YAML frontmatter.
+func ReadOpusJob(path string) string {
+	return readFrontmatterField(path, "job:")
+}
+
+// readFrontmatterField reads a single field from YAML frontmatter.
+func readFrontmatterField(path, prefix string) string {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return ""
@@ -201,8 +211,8 @@ func ReadOpusMO(path string) string {
 	frontmatter := content[3 : 3+end]
 	for _, line := range strings.Split(frontmatter, "\n") {
 		line = strings.TrimSpace(line)
-		if strings.HasPrefix(line, "magnum_opus:") {
-			return strings.TrimSpace(strings.TrimPrefix(line, "magnum_opus:"))
+		if strings.HasPrefix(line, prefix) {
+			return strings.TrimSpace(strings.TrimPrefix(line, prefix))
 		}
 	}
 	return ""

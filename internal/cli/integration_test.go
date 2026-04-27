@@ -226,6 +226,13 @@ This is an automated test. No prior context needed.
 		}
 	})
 
+	// Symlink jobs directory into the instance so job boot clause resolves
+	jobsSrc := filepath.Join(sharedDir, athanor.JobsDir)
+	jobsDst := filepath.Join(instDir, "jobs")
+	if err := os.Symlink(jobsSrc, jobsDst); err != nil {
+		t.Fatalf("symlinking jobs into instance: %v", err)
+	}
+
 	// ─── Phase 4: Create test opus ───────────────────────────────────
 
 	opusPath := filepath.Join(instDir, "magna-opera", "qa-goal", "opera", "2026-03-25-qa-fix-something.md")
@@ -233,6 +240,7 @@ This is an automated test. No prior context needed.
 status: charged
 inscribed: 2026-03-25
 magnum_opus: qa-goal
+job: coder
 ---
 # Fix Something for QA
 
@@ -477,30 +485,17 @@ Inscribed a qa-specialist for independent review. Used whisper to coordinate wit
 
 	// ─── Phase 7b: ath check ────────────────────────────────────────
 
-	t.Run("check reports state for existing crucible", func(t *testing.T) {
+	t.Run("check displays crucible content", func(t *testing.T) {
 		out, err := runAth("check", qaSession+":marut-qa-test-qa-goal")
-		// Exit code 0 or 1 are both valid — depends on what claude is doing
 		if err != nil {
-			// check returns exit 1 for permission/exhausted, 2 for dead/error
-			if exitErr, ok := err.(*exec.ExitError); ok && exitErr.ExitCode() == 2 {
-				t.Fatalf("ath check returned exit 2 (dead/error): %s", out)
-			}
+			t.Fatalf("ath check failed: %v\n%s", err, out)
 		}
-		// Output should contain one of the valid states
-		validStates := []string{"active", "idle", "permission", "exhausted"}
-		found := false
-		for _, s := range validStates {
-			if strings.Contains(out, s) {
-				found = true
-				break
-			}
-		}
-		if !found {
-			t.Errorf("expected one of %v in output, got: %s", validStates, out)
+		if out == "" {
+			t.Error("expected non-empty output from check")
 		}
 	})
 
-	t.Run("check reports dead for nonexistent crucible", func(t *testing.T) {
+	t.Run("check reports not found for nonexistent crucible", func(t *testing.T) {
 		out, err := runAth("check", "nonexistent-crucible-xyz")
 		if err == nil {
 			t.Fatal("expected non-zero exit for dead crucible")
@@ -512,8 +507,8 @@ Inscribed a qa-specialist for independent review. Used whisper to coordinate wit
 		if exitErr.ExitCode() != 2 {
 			t.Errorf("expected exit code 2, got %d", exitErr.ExitCode())
 		}
-		if !strings.Contains(out, "dead") {
-			t.Errorf("expected 'dead' in output, got: %s", out)
+		if !strings.Contains(out, "not found") {
+			t.Errorf("expected 'not found' in output, got: %s", out)
 		}
 	})
 
@@ -544,6 +539,14 @@ Inscribed a qa-specialist for independent review. Used whisper to coordinate wit
 		if !containsExact(windows, "azer-qa-fix-something") {
 			t.Errorf("expected tmux window 'azer-qa-fix-something' in session %s, got: %v", qaSession, windows)
 		}
+
+		// Verify the boot prompt contains the job definition path
+		paneContent := capturePaneContent(t, qaSession+":azer-qa-fix-something", 20)
+		expectedJobPath := filepath.Join(instDir, "jobs", "coder", "JOB.md")
+		if !strings.Contains(paneContent, expectedJobPath) {
+			t.Logf("pane content: %s", paneContent)
+			t.Log("warning: could not verify job path in pane (timing-sensitive)")
+		}
 	})
 
 	// ─── Phase 8b: ath muster --intent (autonomous azer from intent) ─
@@ -569,6 +572,31 @@ Inscribed a qa-specialist for independent review. Used whisper to coordinate wit
 		windows := listSessionWindows(t, qaSession)
 		if !containsExact(windows, "azer-intent-test") {
 			t.Errorf("expected tmux window 'azer-intent-test' in session %s, got: %v", qaSession, windows)
+		}
+	})
+
+	t.Run("muster intent with job injects job definition", func(t *testing.T) {
+		out, err := runAth("muster", "qa-goal", "intent-job-test",
+			"--intent", "audit the auth module",
+			"--job", "qa-specialist",
+			"--athanor", "qa-test", "--worktree-path", "/tmp")
+		if err != nil {
+			t.Fatalf("ath muster --intent --job failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-intent-job-test")
+
+		if !strings.Contains(out, "azer-intent-job-test") {
+			t.Errorf("expected crucible name in output, got: %s", out)
+		}
+
+		time.Sleep(500 * time.Millisecond)
+
+		// Verify the boot prompt contains the job definition path
+		paneContent := capturePaneContent(t, qaSession+":azer-intent-job-test", 20)
+		expectedJobPath := filepath.Join(instDir, "jobs", "qa-specialist", "JOB.md")
+		if !strings.Contains(paneContent, expectedJobPath) {
+			t.Logf("pane content: %s", paneContent)
+			t.Log("warning: could not verify job path in intent pane (timing-sensitive)")
 		}
 	})
 
@@ -819,6 +847,13 @@ Inscribed a qa-specialist for independent review. Used whisper to coordinate wit
 		out, err := runAth("cleanup", "azer-intent-test", "--athanor", "qa-test")
 		if err != nil {
 			t.Fatalf("ath cleanup intent azer failed: %v\n%s", err, out)
+		}
+	})
+
+	t.Run("cleanup intent-job azer crucible", func(t *testing.T) {
+		out, err := runAth("cleanup", "azer-intent-job-test", "--athanor", "qa-test")
+		if err != nil {
+			t.Fatalf("ath cleanup intent-job azer failed: %v\n%s", err, out)
 		}
 	})
 

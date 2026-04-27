@@ -18,6 +18,7 @@ func runMuster(args []string) int {
 		crucName     string
 		athName      string
 		intent       string
+		job          string
 	)
 
 	positional, flagArgs := splitArgs(args)
@@ -28,6 +29,7 @@ func runMuster(args []string) int {
 	fs.StringVar(&crucName, "name", "", "crucible name override")
 	fs.StringVar(&athName, "athanor", "", "athanor name (if $ATHANOR not set)")
 	fs.StringVar(&intent, "intent", "", "natural language intent (launches autonomous azer)")
+	fs.StringVar(&job, "job", "", "job role for the azer (overrides opus frontmatter in opus mode, required source in intent mode)")
 	fs.SetOutput(os.Stderr)
 
 	if err := fs.Parse(flagArgs); err != nil {
@@ -36,14 +38,14 @@ func runMuster(args []string) int {
 
 	// Dispatch based on mode: --intent means intent-driven autonomous azer
 	if intent != "" {
-		return runMusterIntent(positional, intent, worktreePath, model, crucName, athName)
+		return runMusterIntent(positional, intent, worktreePath, model, crucName, athName, job)
 	}
-	return runMusterOpus(positional, worktreePath, model, crucName, athName)
+	return runMusterOpus(positional, worktreePath, model, crucName, athName, job)
 }
 
 // runMusterOpus launches an azer for a pre-inscribed opus file.
 // Usage: ath muster <opus-file> [--worktree-path <path>] [--model <model>] [--athanor <name>]
-func runMusterOpus(positional []string, worktreePath, model, crucName, athName string) int {
+func runMusterOpus(positional []string, worktreePath, model, crucName, athName, job string) int {
 	if len(positional) < 1 {
 		fmt.Fprintln(os.Stderr, "error: opus file required")
 		fmt.Fprintln(os.Stderr, "usage: ath muster <opus-file> [--worktree-path <path>] [--model <model>]")
@@ -111,17 +113,24 @@ func runMusterOpus(positional []string, worktreePath, model, crucName, athName s
 
 	// Build the azer boot prompt
 	moName := athanor.ReadOpusMO(opusPath)
+
+	// Resolve job: --job flag overrides opus frontmatter
+	if job == "" {
+		job = athanor.ReadOpusJob(opusPath)
+	}
+	jobClause := jobBootClause(instDir, job)
+
 	var bootPrompt string
 	if moName != "" {
 		moPath := athanor.MagnumOpusPath(instDir, moName)
 		bootPrompt = fmt.Sprintf(
-			"Read %s/AGENTS.md, then read %s, then read %s/azer.md. Your opus is at %s. Read it and execute.",
-			instDir, moPath, instDir, opusPath,
+			"Read %s/AGENTS.md, then read %s, then read %s/azer.md%s. Your opus is at %s. Read it and execute.",
+			instDir, moPath, instDir, jobClause, opusPath,
 		)
 	} else {
 		bootPrompt = fmt.Sprintf(
-			"Read %s/AGENTS.md, then read %s/azer.md. Your opus is at %s. Read it and execute.",
-			instDir, instDir, opusPath,
+			"Read %s/AGENTS.md, then read %s/azer.md%s. Your opus is at %s. Read it and execute.",
+			instDir, instDir, jobClause, opusPath,
 		)
 	}
 
@@ -146,7 +155,7 @@ func runMusterOpus(positional []string, worktreePath, model, crucName, athName s
 
 // runMusterIntent launches an autonomous azer that inscribes its own opus from intent.
 // Usage: ath muster <mo> <name> --intent <text> [--worktree-path <path>] [--model <model>] [--athanor <name>]
-func runMusterIntent(positional []string, intent, worktreePath, model, crucName, athName string) int {
+func runMusterIntent(positional []string, intent, worktreePath, model, crucName, athName, job string) int {
 	if len(positional) < 2 {
 		fmt.Fprintln(os.Stderr, "error: MO name and crucible name required with --intent")
 		fmt.Fprintln(os.Stderr, "usage: ath muster <mo> <name> --intent <text>")
@@ -190,9 +199,11 @@ func runMusterIntent(positional []string, intent, worktreePath, model, crucName,
 		crucName = "azer-" + sessionName
 	}
 
+	jobClause := jobBootClause(instDir, job)
+
 	bootPrompt := fmt.Sprintf(
-		"Read %s/AGENTS.md, then read %s, then read %s/azer.md. You are an autonomous azer. Your intent: %s. Inscribe an opus for this work under the %s MO using /opus inscribe (dialectical calcinatio), then execute it. Discharge when complete.",
-		instDir, moPath, instDir, intent, moName,
+		"Read %s/AGENTS.md, then read %s, then read %s/azer.md%s. You are an autonomous azer. Your intent: %s. Inscribe an opus for this work under the %s MO using /opus inscribe (dialectical calcinatio), then execute it. Discharge when complete.",
+		instDir, moPath, instDir, jobClause, intent, moName,
 	)
 
 	claudeArgs := fmt.Sprintf(
@@ -237,6 +248,16 @@ func exitCode(err error) int {
 		return 2
 	}
 	return 1
+}
+
+// jobBootClause returns ", then read <path>" for the boot prompt if a job is specified,
+// or an empty string if no job is set.
+func jobBootClause(instDir, job string) string {
+	if job == "" {
+		return ""
+	}
+	jobPath := filepath.Join(instDir, "jobs", job, "JOB.md")
+	return fmt.Sprintf(", then read %s", jobPath)
 }
 
 // launchCrucible creates a tmux window and sends the claude launch command.
