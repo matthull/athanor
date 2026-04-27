@@ -118,7 +118,11 @@ func runMusterOpus(positional []string, worktreePath, model, crucName, athName, 
 	if job == "" {
 		job = athanor.ReadOpusJob(opusPath)
 	}
-	jobClause := jobBootClause(instDir, job)
+	jobClause, err := jobBootClause(instDir, job)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		return 1
+	}
 
 	var bootPrompt string
 	if moName != "" {
@@ -199,7 +203,11 @@ func runMusterIntent(positional []string, intent, worktreePath, model, crucName,
 		crucName = "azer-" + sessionName
 	}
 
-	jobClause := jobBootClause(instDir, job)
+	jobClause, err := jobBootClause(instDir, job)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		return 1
+	}
 
 	bootPrompt := fmt.Sprintf(
 		"Read %s/AGENTS.md, then read %s, then read %s/azer.md%s. You are an autonomous azer. Your intent: %s. Inscribe an opus for this work under the %s MO using /opus inscribe (dialectical calcinatio), then execute it. Discharge when complete.",
@@ -251,13 +259,17 @@ func exitCode(err error) int {
 }
 
 // jobBootClause returns ", then read <path>" for the boot prompt if a job is specified,
-// or an empty string if no job is set.
-func jobBootClause(instDir, job string) string {
+// or an empty string if no job is set. Returns an error if the job is specified but
+// the JOB.md file does not exist at the expected path.
+func jobBootClause(instDir, job string) (string, error) {
 	if job == "" {
-		return ""
+		return "", nil
 	}
 	jobPath := filepath.Join(instDir, "jobs", job, "JOB.md")
-	return fmt.Sprintf(", then read %s", jobPath)
+	if _, err := os.Stat(jobPath); err != nil {
+		return "", fmt.Errorf("job definition not found: %s (is the jobs directory symlinked into the instance?)", jobPath)
+	}
+	return fmt.Sprintf(", then read %s", jobPath), nil
 }
 
 // launchCrucible creates a tmux window and sends the claude launch command.

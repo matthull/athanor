@@ -217,7 +217,11 @@ func musterInscribedOpus(instDir, opusPath, slug string) int {
 
 	moName := athanor.ReadOpusMO(opusPath)
 	job := athanor.ReadOpusJob(opusPath)
-	jobClause := jobBootClause(instDir, job)
+	jobClause, err := jobBootClause(instDir, job)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		return 1
+	}
 
 	var bootPrompt string
 	if moName != "" {
