@@ -33,7 +33,7 @@ magnum_opus: some-mo        # optional — which MO this opus serves
 ---
 ```
 
-The `job:` field is required — `ath inscribe` enforces this. The mustered azer reads the corresponding job definition from `shared/jobs/<job-name>/JOB.md` and adopts it — adopting its perspective, loading relevant skills, and following its professional instincts. Use `general` when no specific role fits.
+The `job:` field is required — `ath inscribe` enforces this. The mustered azer reads the corresponding job definition from `jobs/<job-name>/JOB.md` and adopts it — adopting its perspective, loading relevant skills, and following its professional instincts. Use `general` when no specific role fits.
 
 ```yaml
 ---
@@ -69,8 +69,6 @@ An opus is inscribed only when it is immediately actionable. If it exists, an ag
 If you can't satisfy both, you don't have enough context to inscribe. Investigate further or escalate.
 
 The geas (binding obligation to pursue with integrity, observe verification discipline, and abundantly satisfy) is not part of the opus — it's part of being an agent. See `AGENTS.md § Your Core Geas`. The opus just needs a clear intent and enough context for an agent to pick it up.
-
-**`/task-triage` is your friend for inscription.** It produces solid intent definitions, scope boundaries, and context framing — exactly what an opus needs.
 
 | | Intent | Boundary |
 |---|---|---|
@@ -115,6 +113,8 @@ Use `---` as the delimiter. Everything above it is the inscription. Everything b
 ## Discharging an Opus
 
 When an opus is discharged, update the frontmatter (`status: discharged`, add `discharged: YYYY-MM-DD`, add `claude_code_session_id`) and append three things to the file. The format is yours, but all three must be present — without them the trail is empty footprints.
+
+**For the full discharge sequence** including discharge calcinatio and marut notification, see `azer.md § Discharge and Handoff`. The marut notification step is load-bearing for the coordinator model — skip it and the marut can't detect your discharge or dispatch follow-up specialists.
 
 **Before finalizing:** Apply discharge calcinatio — see `azer.md § Discharge Calcinatio`. Draft the three sections below, then fire a discharge assessor subagent to challenge whether you extracted all the immediate value you could. Review findings, document rationale for overrides, and finalize. This is the "local tests" that catch value leaks before the full assessment cycle ("CI") runs later.
 

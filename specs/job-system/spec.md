@@ -19,6 +19,7 @@
 | `[E:gastown]` | Prior art from Gastown TOML roles/formulae |
 | `[U:topic]` | Unbacked — needs validation |
 | `[V:voice-note]` | From artifex voice note (transcribed) |
+| `[P:pending]` | Designed but not yet implemented |
 | `[I:implemented]` | Verified as implemented |
 | `[O:observed]` | Observed in production behavior |
 
@@ -44,7 +45,7 @@ The job system makes collaboration easier by providing defined specialists to ca
 
 Azers create collaborators by inscribing opera with job roles and mustering peers. This replaces TeamCreate for most use cases. `[B:artifex]`
 
-| TeamCreate (current) | Inscription spawning (proposed) |
+| TeamCreate (lightweight) | Inscription spawning (primary) |
 |---|---|
 | Subagent lives in parent's context budget | Peer azer gets its own crucible |
 | Parent is task-lead, subagent is implementer | Peers collaborate via whisper |
@@ -120,11 +121,13 @@ Jobs are where all prescriptive wisdom lives that currently erodes. `[B:artifex]
 
 The discharge process changes to maintain momentum. Currently, azer.md treats follow-up inscription as optional ("You may inscribe follow-up opera"). With jobs, inscription becomes a structural step in the discharge sequence — executed while the azer has peak context about what needs to happen next. `[B:artifex]`
 
-**Revised discharge sequence:**
+**Revised discharge sequence** (canonical version in `azer.md § Discharge and Handoff`):
 
 1. **Define discharge.** Draft the outcome, evidence, and reflection. You now know what you accomplished and what's left.
 2. **Inscribe + muster immediate follow-up.** While you have peak context: inscribe opera for any immediate follow-on work, assign job roles, and muster the azers. The next wave is already booting by the time you finish. Use lightweight inscription (single fresh-context subagent, one pass — the job definition provides the structure).
-3. **Write discharge.** Finalize the discharge record, including what you inscribed. "Follow-up: inscribed QA opus for auth refactor, mustered qa-specialist."
+3. **Discharge calcinatio.** Fire a discharge assessor subagent to challenge whether all immediate value was extracted — context that will be lost, follow-up not inscribed, witnesses not notified, documentation not updated.
+4. **Write discharge.** Update opus YAML frontmatter (`status: discharged`, `discharged: YYYY-MM-DD`, `claude_code_session_id`). Finalize the discharge record, including what you inscribed. "Follow-up: inscribed QA opus for auth refactor, mustered qa-specialist."
+5. **Notify the marut.** `ath whisper send marut-<athanor> "Opus <name> discharged."` — this is how the marut detects discharge and triggers specialist dispatch under the Wave 3 coordinator model.
 
 **Why this order matters:**
 - **Peak context:** At discharge time you know better than anyone what needs to happen next. Waiting for marut to rediscover this wastes that knowledge.
@@ -388,7 +391,7 @@ Resolved through the organic model (see § Dynamic orchestration). Summary of an
 
 ### Wave 1: The foundation — COMPLETE `[I:implemented]`
 
-**1. Job registry.** `jobs/` created with 5 job definitions: `coder`, `qa-specialist`, `assessor`, `general`, `investigator`. Symlinked as `jobs/` into each athanor instance (athanor-architect, musashi, maneframe) as of 2026-04-27.
+**1. Job registry.** `jobs/` created with initially 5 job definitions (`coder`, `qa-specialist`, `assessor`, `general`, `investigator`), later expanded to 7 with `solution-architect` and `project-manager`. Symlinked as `jobs/` into each athanor instance (athanor-architect, musashi, maneframe) as of 2026-04-27.
 
 **2. azer.md updated.** Collaboration principle (Chesed framing), discharge relay sequence, job awareness (`job:` field → read `jobs/<name>/JOB.md`), ~100k context threshold, subagent vs. peer azer guidance — all deployed.
 
@@ -406,7 +409,7 @@ The system ran with Wave 1 changes. Observations drove the Wave 3 evolution.
 
 **Infrastructure gaps (resolved 2026-04-27):**
 
-- **Structural job injection in muster.** `ath muster` does NOT yet inject the job definition into the boot prompt — job loading is purely behavioral (azer.md instruction), not structural. Opus inscribed; implementation pending. `[I:implemented — inscription only]`
+- **Structural job injection in muster.** `ath muster` does NOT yet inject the job definition into the boot prompt — job loading is purely behavioral (azer.md instruction), not structural. Opus inscribed; implementation pending. `[P:pending]`
 - **Idempotent ath init/sync.** `ath sync` command added (commit f6e70be). `ath init` remains create-only; `ath sync` handles updates (symlinks, shared files, shared directories like `jobs/`). `[I:implemented]`
 - **Job symlinks.** Jobs symlinked into all athanor instances (2026-04-27). Agent directive paths fixed to `jobs/<name>/JOB.md`. `[I:implemented]`
 
