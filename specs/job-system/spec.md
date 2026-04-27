@@ -1,7 +1,8 @@
 # Job System Specification
 
-**Status:** Ready for implementation (YOLO)
+**Status:** Implemented (Wave 1 complete, Wave 2 in progress)
 **Created:** 2026-04-21
+**Updated:** 2026-04-27
 **Origin:** Interactive opus, athanor-alignment MO — artifex-directed
 **Supersedes:** `specs/role-system/spec.md` (concept stage — this spec evolves and replaces it)
 **Related:** `specs/azer-orchestration/spec.md` (diagnosis of the drift problem this solves)
@@ -17,6 +18,9 @@
 | `[E:existing]` | Extends existing system element |
 | `[E:gastown]` | Prior art from Gastown TOML roles/formulae |
 | `[U:topic]` | Unbacked — needs validation |
+| `[V:voice-note]` | From artifex voice note (transcribed) |
+| `[I:implemented]` | Verified as implemented |
+| `[O:observed]` | Observed in production behavior |
 
 ---
 
@@ -24,7 +28,7 @@
 
 Context drift in long-lived agent sessions causes skills not to load and critical tasks like QA to get skipped. The root cause is structural: prescriptive guidance (skills, verification gates, workflow requirements) erodes as builder context accumulates in large context windows. `[E:azer-orchestration/spec.md]`
 
-The job system addresses this by introducing **job roles** — perspective-first specializations that an azer can adopt. Each job is a markdown file (`shared/jobs/<name>/JOB.md`) that defines a professional identity: what you care about, what tools to reach for, what your instincts are. A job-role azer boots into a narrow perspective in a tight ~100k token context. The perspective stays salient because the context is small and the identity constrains what the azer attends to. `[B:artifex]`
+The job system addresses this by introducing **job roles** — perspective-first specializations that an azer can adopt. Each job is a markdown file (`jobs/<name>/JOB.md`) that defines a professional identity: what you care about, what tools to reach for, what your instincts are. A job-role azer boots into a narrow perspective in a tight ~100k token context. The perspective stays salient because the context is small and the identity constrains what the azer attends to. `[B:artifex]`
 
 **Jobs are the flexible prescriptive layer of the system.** They're where crystallized operational learning lives — "load these skills", "follow this verification sequence", "apply these fires". The general-purpose azer remains for novel work. Jobs are an extra tool, not a confinement. `[B:artifex]`
 
@@ -74,7 +78,7 @@ TeamCreate may remain useful for truly mechanical subtasks (search 30 files, run
 | **Job** | A defined specialization an azer can adopt. A `JOB.md` in `shared/jobs/<name>/` that defines the professional perspective — what you care about, what tools to reach for, what your instincts are. Analogous to FF job system — equippable professional identity. Inspired by Gastown roles/formulae but perspective-first, not process-first. | New `[B:artifex]` `[E:gastown]` |
 | **Job-role azer** | An azer mustered with a specific job. Boots into the job's narrow perspective. The job's prescriptions are mandatory, not advisory. Still an azer under the geas — the job constrains perspective, not agency. | New `[B:artifex]` |
 | **General-purpose azer** | Today's azer model. No job role — operates under the geas with full latitude. Used when no defined job fits the work, or when the work is novel/exploratory. The fallback, not the default. | `[E:existing]` |
-| **Job definition** | A `JOB.md` file that defines a job's perspective — identity, concerns, tools, instincts. Lives in `shared/jobs/<name>/JOB.md`. Markdown is the prompt injection — read directly into the azer's context at boot. | New `[E:gastown]` |
+| **Job definition** | A `JOB.md` file that defines a job's perspective — identity, concerns, tools, instincts. Lives in `jobs/<name>/JOB.md`. Markdown is the prompt injection — read directly into the azer's context at boot. | New `[E:gastown]` |
 | **Job boundary** | Not a wall but a professional instinct. A job-role azer naturally thinks in its specialty; when work of a different shape appears, its instinct is to seek collaboration rather than stretch. A QA azer that finds a typo might fix it (good judgment); one that finds a systemic issue inscribes a fixer (professional instinct). The motivation is quality, not compliance. | New `[B:artifex]` |
 | **Job registry** | The set of available job definitions in `shared/jobs/*/JOB.md`. Discoverable at muster time. Grows as the system learns what patterns recur. | New `[E:gastown]` |
 | **Inscription-time job assignment** | The job role is defined at inscription time — when the opus is created. The inscriber (marut, artifex, or another azer) specifies which job applies. | New `[B:artifex]` |
@@ -262,7 +266,7 @@ Discharge
 
 Evolved from the initial Gastown TOML concept toward **perspective-first markdown**. Jobs are about identity, not process — the perspective naturally produces the right behavior. `[B:artifex]` `[E:gastown]`
 
-Each job is a directory in `shared/jobs/` with a `JOB.md` file (mirroring how skills use `SKILL.md`). The markdown IS the prompt injection — it's read directly into the azer's context at boot.
+Each job is a directory in `jobs/` with a `JOB.md` file (mirroring how skills use `SKILL.md`). The markdown IS the prompt injection — it's read directly into the azer's context at boot.
 
 ### Job file structure
 
@@ -292,7 +296,9 @@ The geas remains supreme. A job constrains perspective but not agency — if a Q
 
 ### Jobs and opera
 
-The opus carries the job assignment in frontmatter. The muster command reads it and boots the azer with the job definition loaded. `[D:opus-carries-job]`
+The opus carries the job assignment in frontmatter. `ath inscribe` enforces `--job` at inscription time (validated against the registry). The mustered azer reads its opus, sees the `job:` field, and reads `jobs/<job>/JOB.md`. `[I:implemented]`
+
+**Gap (2026-04-27):** `ath muster` does not yet inject the job definition path into the boot prompt — loading is behavioral (azer.md instruction), not structural. An opus is inscribed to fix this.
 
 ### Jobs and marut — the shepherd model
 
@@ -332,16 +338,35 @@ Jobs live at the **Yesod level** — foundation, the bridge between the environm
 
 ---
 
-## The Job Catalog (Initial)
+## The Job Catalog
 
-Candidate jobs based on recurring work patterns. `[U:needs-validation]`
+### Implemented `[I:implemented]`
+
+Five jobs are defined in `jobs/` and symlinked into each athanor instance as `jobs/`:
 
 | Job | Scope | Key prescriptions |
 |-----|-------|-------------------|
 | `coder` | Write, modify, and review code | Shift-left quality, `/code-review`, `/unit-testing`, builder bias awareness |
-| `qa-specialist` | Review and verify work products | `/calcinatio`, empirical verification, finding reports |
+| `qa-specialist` | Review and verify work products | `/calcinatio`, empirical verification, no-surprises lens |
+| `assessor` | Landscape survey and opus inscription | Structured process (survey → generate → synthesize → inscribe), manifold generation |
+| `general` | Novel, exploratory, cross-cutting work | Breadth-first perspective, loneliness signal for collaboration, scout not fallback |
+| `investigator` | Trace problems to root cause | Evidence over narrative, `/rca`, communication closes the loop |
+
+### Candidate — from voice notes `[V:voice-note]`
+
+The artifex identified recurring work patterns that suggest new job definitions (2026-04-24):
+
+| Job | Scope | Origin signal |
+|-----|-------|---------------|
+| `solution-architect` | Holistic eye on the MO — keeps specs/docs up to date with what's being done, flags architectural issues, makes proposals to artifex. Periodic check-in role, not continuous. | Recording 185 (2026-04-24) |
+| `project-manager` | Stakeholder/witness satisfaction audit — are we progressing toward witness needs? Breaks tunnel vision from opera momentum. Hill-chart style status, audits for missed items, realigns with upstream product docs. | Recording 185-(1) (2026-04-24) |
+| `environment-warden` | Local environment health — when an azer is stuck debugging env issues (missing deps, broken tools, config drift), this specialist takes over instead of the coder going in circles. | Recording 182 (2026-04-24) |
+
+### Candidate — from original spec `[U:needs-validation]`
+
+| Job | Scope | Key prescriptions |
+|-----|-------|-------------------|
 | `spec-writer` | Shape specifications | `/spec`, brownfield discovery, viewpoint review |
-| `assessor` | Landscape survey and opus inscription | Assessment formula from AGENTS.md, manifold generation |
 | `content-editor` | Edit documents, specs, role files | Style consistency, completeness, witness clarity |
 | `researcher` | Deep investigation with citations | `/research`, source verification, citation format |
 | `coordinator` | Facilitate multi-azer collaboration | Inter-azer protocol, status synthesis, bridge comms |
@@ -359,57 +384,56 @@ Resolved through the organic model (see § Dynamic orchestration). Summary of an
 
 ---
 
-## Implementation Plan
+## Implementation Status
 
-YOLO approach — land the minimum viable pieces, let tomorrow's azers test the model in practice. Learning from use beats planning in theory. `[B:artifex]`
+### Wave 1: The foundation — COMPLETE `[I:implemented]`
 
-### Wave 1: The foundation (implement now)
+**1. Job registry.** `jobs/` created with 5 job definitions: `coder`, `qa-specialist`, `assessor`, `general`, `investigator`. Symlinked as `jobs/` into each athanor instance (athanor-architect, musashi, maneframe) as of 2026-04-27.
 
-**1. Job registry location and first definitions.**
-Create `shared/jobs/` as the registry. Write starter job definitions as `<name>/JOB.md`:
-- `qa-specialist/JOB.md` — preventing witness surprises, verification perspective
-- `coder/JOB.md` — clean tested maintainable code, shift-left quality, builder bias awareness
-- `assessor/JOB.md` — panoramic landscape view, manifold generation process
+**2. azer.md updated.** Collaboration principle (Chesed framing), discharge relay sequence, job awareness (`job:` field → read `jobs/<name>/JOB.md`), ~100k context threshold, subagent vs. peer azer guidance — all deployed.
 
-These are the jobs most likely to be exercised tomorrow.
+**3. AGENTS.md updated.** Assessment section slimmed (points to assessor job), collaboration principle in core geas, job/job-registry vocabulary added.
 
-**2. Update azer.md.**
-Key changes to the shared azer role file:
-- Add the collaboration principle (Chesed framing — seek collaboration, inscribe peers)
-- Add the discharge relay sequence (define → inscribe+muster follow-up → write discharge)
-- Add job awareness: "If your opus has a `job:` field, read the job definition from `shared/jobs/` and adopt it — load its required skills, follow its workflow, respect its boundary as professional instinct"
-- Lower context exhaustion threshold to ~100k tokens (currently 65% of ~200k = ~130k; change to explicit ~100k guidance)
-- Reframe subagent vs. peer azer guidance (keep subagents for bounded exchanges, inscribe peers for independent trail-worthy work)
+**4. marut.md updated.** Shepherd model operational loop (observe → notice → nudge → inscribe), assessment delegated to assessor job, multi-azer monitoring guidance.
 
-**3. Update AGENTS.md.**
-- Slim down the Assessment Opera section — point to the `assessor` job definition instead of inlining the full protocol
-- Add the collaboration principle to the core geas section
-- Add job vocabulary to the vocabulary table
+**5. CLI enforcement.** `ath inscribe` requires `--job` flag (validated against registry). `ath collaborate` likewise. Opus frontmatter carries `job:` field.
 
-**4. Update marut.md.**
-- Shift the operational loop toward the shepherd model (observe → notice → nudge → inscribe when needed)
-- Assessment becomes "inscribe an assessor" not "do the assessment"
-- Add guidance on monitoring multiple azers, noticing momentum drops, suggesting collaboration
+**6. Job definition path references.** Agent directives (AGENTS.md, azer.md) updated to reference `jobs/<name>/JOB.md` (relative to athanor instance dir, where the symlink lives). Previously said `jobs/` which was unreachable from instance dir.
 
-**5. Opus frontmatter.**
-- Add `job:` field to opus.md as an optional frontmatter field
-- Update the opus template
+### Wave 2: Observation and iteration — IN PROGRESS
 
-### Wave 2: Let it run (tomorrow)
+The system is running with these changes. Key observations and open work:
 
-Run the system with these changes. The marut boots, musters an assessor, and the organic model plays out. Observe:
+**Known gaps (opera inscribed 2026-04-27):**
+
+- **Structural job injection in muster.** `ath muster` does NOT inject the job definition into the boot prompt — job loading is purely behavioral (azer.md tells the azer to read it). An opus is inscribed to make muster read the `job:` field from opus frontmatter and add the JOB.md path to the boot prompt structurally.
+- **Idempotent ath init/sync.** `ath init` is create-only. `SharedFiles` in `home.go` is stale (missing `attendant.md`, `perceiver.md`) and has no concept of shared directories (like `jobs/`). An opus is inscribed for an idempotent sync mechanism.
+
+**Observation questions (from original spec, still open):**
+
 - Do azers actually inscribe peers? Or do they still try to do everything themselves?
-- Do job prescriptions survive the context? (This is the core hypothesis)
+- Do job prescriptions survive the context? (Core hypothesis — untested at scale)
 - Does the marut's shepherd loop work? Or does it need more structure?
 - Does the discharge relay create momentum? Or do gaps still appear?
 
-### Wave 3: Iterate (based on evidence)
+### Wave 3: Marut as active coordinator `[V:voice-note]`
 
-- Refine job definitions based on what worked and what didn't
-- Add more jobs as patterns emerge
-- Tune the context limit (100k might be too tight or too loose)
-- Evolve the marut's monitoring capabilities
-- Consider CLI changes (`ath muster` reading job definitions, `ath status` showing job roles)
+The artifex's voice notes (recording 182, 2026-04-24) signal a potential shift in the collaboration model. The current spec assumes azers will spontaneously inscribe collaborators (Chesed pull). Observation suggests this is the weakest link — azers resist creating collaborators and try to do everything themselves.
+
+**The proposed evolution:** Rather than relying on azers to self-collaborate, lean into the marut as the coordination point:
+
+- **Role discovery.** The marut does something analogous to `/skill-discovery` but for jobs — it knows the full job registry and actively matches work-in-progress to the right specialist roles.
+- **Active dispatch.** The marut watches azers and catches when they're doing work that another job would do better (e.g., a coder debugging local env issues → inscribe an environment-warden). Not preventing them from going outside their lane, but noticing when a specialist would be more effective.
+- **Generative collaboration.** The ideal: marut catches a coder troubleshooting local env issues, inscribes an environment-warden collaborator, whispers the coder to stop and work with the specialist instead.
+- **Shorter marut context.** More aggressive context cycling for the marut itself, so it gets fresh perspective on the workshop state more frequently.
+
+This is upstream of formulae — a stepping stone to see how much coordination emerges from a marut with job-registry awareness before formalizing into formulae. `[V:voice-note]`
+
+**Model selection.** The artifex notes (recording 182-(1), 2026-04-24) that marut should be opus-class but many job-role azers (especially implementation roles) could run on sonnet. Comparison testing needed, but the direction is clear: reserve opus for roles that need deep judgment (marut, assessor), use sonnet for focused execution (coder, qa-specialist). `[V:voice-note]`
+
+### Wave 4: Periodic/patrol roles `[V:voice-note]`
+
+The artifex (recording 175-(5), 2026-04-23) describes a concept of **patrols** — time-based agent dispatches defined per MO with intent + job role. This extends jobs into scheduled work (Slack channel monitoring, environment health checks, progress audits). See separate patrols/functions concept — not yet specced but the job system provides the foundation (patrol = scheduled muster with a job role).
 
 ---
 
@@ -436,17 +460,26 @@ Behavioral scenarios to observe once the system runs: `[D:observe-in-practice]`
 
 ## Retrospective
 
-When this spec is implemented, review:
+### What shipped vs. spec
 
-### Documentation Updates
-- [ ] How did job definitions evolve vs. the spec?
-- [ ] What job boundary violations occurred and what do they teach?
+- **Job definition structure held up.** The four-section format (identity, when needed, what you care about, your instinct) plus `## Your tools` works well. The assessor exception (`## Your process`) was warranted — confirmed by use. `[O:observed]`
+- **Two unplanned jobs emerged.** `general` was elevated from "fallback" to a real job with its own identity (breadth-first scout, loneliness signal). `investigator` emerged from a `general` opus that revealed a distinct diagnostic perspective worth naming. Both validated the "jobs grow from observed patterns" design. `[O:observed]`
+- **`ath inscribe --job` enforcement works.** Every opus gets a job assignment. `general` serves the "no specific role fits" case cleanly. `[I:implemented]`
+- **Symlink distribution was a gap.** Job definitions lived in the source repo but weren't reachable from athanor instance dirs. Fixed 2026-04-27 with `jobs/` symlink, but exposed the broader problem: no idempotent sync mechanism for shared components.
 
-### Workflow Improvements
-- [ ] Which jobs proved most valuable? Which weren't used?
+### Open questions
+
+- [ ] Which jobs proved most valuable? Which weren't used? (Need more production trail data)
 - [ ] Did the ~100k context limit work? Too tight? Too loose?
-- [ ] How did dynamic spawning actually play out vs. the stately model?
+- [ ] Does the marut-as-coordinator model (Wave 3) reduce the collaboration gap, or does it need formulae?
+- [ ] Does structural job injection in muster boot prompt improve prescription survival vs. behavioral loading?
+- [ ] What's the right model tier per job? (opus for marut/assessor, sonnet for coder/qa — needs testing)
 
-### Knowledge Capture
-- [ ] Patterns for writing good job definitions
-- [ ] Common boundary-crossing patterns that suggest job redesign
+### Patterns for writing good job definitions
+
+Emerging from the five implemented definitions:
+
+- **Identity paragraph is load-bearing.** "Your craft is X" frames everything. If this paragraph is generic, the whole job is generic.
+- **"When this role is needed" helps the inscriber, not the azer.** It's system-level routing guidance — the marut or peer azer reads it to decide when to inscribe this job.
+- **"Your instinct" is the collaboration hinge.** This is where you define the boundary behavior — when to do it yourself vs. inscribe a specialist. Chesed framing (generous, not restrictive) works better than rules.
+- **Avoid procedures.** The assessor's process section is the exception. If you're writing steps, you're writing a skill, not a job.
