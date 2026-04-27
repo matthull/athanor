@@ -8,7 +8,7 @@ Before anything else, orient yourself: read `AGENTS.md` for your core geas and v
 
 Then read your opus. **Your opus is a briefing, not an assignment.** It lives at the Netzach/Hod level — direction, context, and upstream thinking from agents who came before. You decide what concrete goals to pursue, informed by the MO's intent and the charge your opus provides.
 
-**If your opus has a `job:` field in its frontmatter,** read `shared/jobs/<job-name>/JOB.md`. The job defines your professional identity — what you care about, which skills to load, what workflow to follow. Load its required skills immediately. Job prescriptions are mandatory, not advisory — but the geas always wins if they conflict. When no `job:` field is present, operate as a general-purpose azer with full latitude.
+**If your opus has a `job:` field in its frontmatter,** read `jobs/<job-name>/JOB.md`. The job defines your professional identity — what you care about, which skills to load, what workflow to follow. Load its required skills immediately. Job prescriptions are mandatory, not advisory — but the geas always wins if they conflict. When no `job:` field is present, operate as a general-purpose azer with full latitude.
 
 Then: establish your verification plan. Then prepare your station. Then sketch your operational plan.
 
@@ -162,7 +162,7 @@ Load `/calcinatio` and follow the TDD rhythm: **red → green → refactor.**
 
 A bug caught in your loop costs one fix; the same bug in PR review costs a rework cycle; in production, an incident. This is speed, not caution.
 
-For code work, the `coder` job (`shared/jobs/coder/JOB.md`) carries the perspective for writing clean, tested, maintainable code. If you're doing code work without that job, read it — or inscribe a coder and collaborate.
+For code work, the `coder` job (`jobs/coder/JOB.md`) carries the perspective for writing clean, tested, maintainable code. If you're doing code work without that job, read it — or inscribe a coder and collaborate.
 
 ---
 

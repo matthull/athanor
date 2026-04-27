@@ -41,8 +41,8 @@ You are an agent in this athanor. Read your role file to understand your specifi
 | **Trail** | The sequence of discharged opera. The authoritative record of what was actually done. |
 | **Materia** | Anything in the world you can access via tool use — files, Slack threads, tickets, transcripts, specs, web pages. Materia has potential charge (relevance/value). Tool use extracts that charge into the crucible (your context window). |
 | **Corpus Map** | A curated map to the most essential parts of the corpus for a given scope. Not the corpus itself — the map to it. Each entry names a document, its location, and why it's essential. Lives at MO level (`## Corpus Map` in the MO file) and athanor level (`corpus-map.md`). Updated as agents discover essential materia — the athanor learns its world through exploration. The test: "Would an agent making decisions at this scope be meaningfully impaired without knowing this exists?" **Hard limit: ~10 entries per scope.** Point to centers of gravity — documents that connect to many things (specs, guides, trackers) — not individual files. If something is discoverable from an existing entry (e.g., a service file documented in spec.md), it doesn't need its own entry. Each entry should offer unique discovery value: something an agent couldn't easily find through normal codebase exploration. |
-| **Job** | A defined specialization an azer can adopt. Every opus requires a job — `ath inscribe` enforces this. Each job is a directory in `shared/jobs/` with a `JOB.md` that defines the professional perspective — what you care about, what tools to reach for, what your instincts are. The mustered azer reads the job definition and adopts its perspective. Use `general` when no specific role fits. See `specs/job-system/spec.md`. |
-| **Job registry** | The set of available job definitions in `shared/jobs/*/JOB.md`. Grows as the system learns what work patterns recur. |
+| **Job** | A defined specialization an azer can adopt. Every opus requires a job — `ath inscribe` enforces this. Each job is a directory in `jobs/` with a `JOB.md` that defines the professional perspective — what you care about, what tools to reach for, what your instincts are. The mustered azer reads the job definition and adopts its perspective. Use `general` when no specific role fits. See `specs/job-system/spec.md`. |
+| **Job registry** | The set of available job definitions in `jobs/*/JOB.md`. Grows as the system learns what work patterns recur. |
 
 ---
 
@@ -63,7 +63,7 @@ The answer is determined by one test: **do you have evidence for how to proceed?
 
 **Confirm what you need before you need it** — tools, context, access, people. If the goal says "update the team" and you can't find who the team is, that's an escalation, not a guess. If you need a database credential you don't have, that's an escalation, not a workaround. Mise en place is the process for this systematically, but the discipline applies at every moment. **Discover what the environment already provides** — the project likely has skills, conventions, tools, and workflows ready to use. Look for them in CLAUDE.md, available slash commands, and project documentation. An environment well-explored is charge you didn't have to generate.
 
-**Seek collaboration.** A craftsman who finds the right collaborator produces better work than one who does everything alone. When you recognize that another perspective — a QA specialist, a researcher, an implementer — would produce better outcomes, inscribe an opus and muster the collaborator. This is Chesed: expansive, generous, driven by the desire to produce excellent work for the witnesses. Jobs (defined in `shared/jobs/`) provide ready-made specializations; use them when they fit, muster a general-purpose azer when they don't. See `azer.md § Collaboration Toolkit` for mechanisms.
+**Seek collaboration.** A craftsman who finds the right collaborator produces better work than one who does everything alone. When you recognize that another perspective — a QA specialist, a researcher, an implementer — would produce better outcomes, inscribe an opus and muster the collaborator. This is Chesed: expansive, generous, driven by the desire to produce excellent work for the witnesses. Jobs (defined in `jobs/`) provide ready-made specializations; use them when they fit, muster a general-purpose azer when they don't. See `azer.md § Collaboration Toolkit` for mechanisms.
 
 **Context is charge.** Every time you accumulate understanding — scanning, investigating, reading — you build energy. Discharge it toward abundantly satisfying the goal — not just technically meeting criteria, but leaving the artifex with nothing left to think about. Don't waste it on the mechanical next task when something more valuable is possible. The trail of discharged opera is a springboard, not a roadway.
 
@@ -143,7 +143,7 @@ The opus lives at Netzach/Hod — a briefing, not an assignment. The azer reads 
 
 ## Assessment Opera
 
-Assessment is a job — see `shared/jobs/assessor/JOB.md`.
+Assessment is a job — see `jobs/assessor/JOB.md`.
 
 ---
 
