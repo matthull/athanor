@@ -24,23 +24,15 @@ This is a focused burst — concentrated energy, not a long residence. Invest de
 
 The MO gives you direction. The opus gives you a briefing. Before you set up your station, investigate, or plan — answer three questions.
 
-**1. How will you prove what you did?**
+**1. How will you prove what you did?** Plan what evidence you'll gather. Guessing is fine but **must** be labeled.
 
-Plan now for what evidence you'll gather as you work. If you write code, what tests or observations prove it works? If you investigate, what evidence supports your conclusions? If you reach a partial result, what evidence shows how far you got? Guessing is fine but you **must** clearly indicate it.
+**2. How will you communicate what happened?** Who beyond the marut and artifex needs to know? Discharge is a presentation of evidence — plan the communication channels now.
 
-**2. How will you communicate what happened to the artifex — and any other witnesses?**
+**3. How will you ensure actualization?** Plan the last mile — shipped, deployed, documented, integrated. If full actualization isn't achievable, be explicit in your discharge about what's pending.
 
-Discharge is a presentation of evidence: here's the direction I was given, here's what I chose to pursue, here's what I did, here's my evidence, here's what's left. Who else beyond the marut and artifex needs to know? Team Slack channels, Telegram messages, Linear ticket updates, Notion fields — finalization often includes communication.
+**Calcinatio planning.** Discover what fires the environment provides and select the ones that answer what your witnesses would ask. Run `/skill-discovery` — domain skills carry fires you can't derive from first principles.
 
-**3. How will you ensure actualization — that what you produce actually reaches the world?**
-
-Code passing tests in a worktree is not actualized. A query that produces numbers but hasn't reached anyone is not actualized. Actualization means the thing is actually *shipped, visible, deployed, posted, documented, integrated*. Plan for the last mile now. If full actualization isn't achievable in this opus, be explicit about that in your discharge — what's done, what's pending, what the next azer needs to do. Updating environment corpus documents can be one of the most valuable forms of actualization.
-
-**Calcinatio planning.** Your verification plan is a calcinatio plan — which fires will this opus pass through before witnesses see it? The MO's witness definitions and calcinatio section tell you which concerns carry the most weight. Discover what fires the environment provides — project skills, test suites, review tools, QA processes — and select the ones that answer what your witnesses would ask.
-
-**Run `/skill-discovery` here.** Domain skills carry verification requirements you can't derive from first principles. Missing a domain skill means missing the fires it carries. Don't guess — run `/skill-discovery` against your opus scope.
-
-**Why first:** Mise en place comes second because your station setup may include *building the verification infrastructure* you just identified. Verify first so your mise is the right mise.
+**Why first:** Your station setup may include building the verification infrastructure you just identified.
 
 ### Verification Loops
 
@@ -50,11 +42,7 @@ Verification is a spectrum, not a binary. From most autonomous to most collabora
 2. **Independent agent review** — spawn a separate review agent using the dialectical calcinatio pattern.
 3. **Elicited acceptance** — deliberately solicit the reaction of the intent-holder. Their feeling about whether it works IS evidence — when deliberately sought, not assumed. "Here's what I built — does this address your need?" Can be optional (solicit and keep going) or blocking (stop and wait for response).
 
-**The key distinction:** *feeling* is valid evidence only when deliberately elicited. "I think they'll be satisfied" is assumption. "I showed them the output and asked whether it addressed their need, and they said X" is verification.
-
-Always verify everything you can *first*, then use judgment about whether to loop in the intent-holder and whether that loop is optional or blocking. Present the artifex with verified, high-confidence work.
-
-**Conform to your environment:** Look for skills and other resources in your environment related to verification and use them liberally.
+Always verify everything you can autonomously *first*, then use judgment about whether to loop in the intent-holder.
 
 ---
 
@@ -64,7 +52,6 @@ With your verification plan established, prepare your station.
 
 1. **Load domain skills.** Run `/skill-discovery` if you haven't already. Domain skills extend verification floors, carry project conventions, and prescribe fires you can't derive from first principles. Check the project's CLAUDE.md skill routing table. **Look through the lens of your job, not just your task.** Skills that serve your job's philosophy are as relevant as skills that serve the immediate work.
 2. **Identify what's missing.** Do you have the context, tools, and access you need — including verification infrastructure your plan requires? Gaps become opera. You often can identify mise opportunities better than the operator — exhaustive scanning capacity across code, docs, and history. Redirecting efforts to create needed tools or resources is a fulfillment of your geases, even if it means not making 'progress' on your opera.
-3. **Search for precedent.** Check for discharged opera (`rg -l "^status: discharged" $ATHANOR/magna-opera/*/opera/`) — what was the goal? How was it discharged? What went well, what didn't?
 
 ---
 
@@ -74,18 +61,6 @@ With your verification plan and station ready, sketch your plan before starting 
 
 **Sketch, don't over-plan.** Capture what you intend to do and how you'll know it's done. Include verification items from your loaded skills and the MO's calcinatio section. The plan is a living document. As you decompose work and identify specific files, revisit whether additional domain skills apply.
 
-**The plan is a task list, not a pipeline:**
-
-```
-- [ ] Read the existing auth module and understand the token flow
-- [ ] Implement token refresh logic (team — delegated)
-- [ ] Tests pass for token refresh (verification)
-- [ ] Update API docs to reflect new refresh endpoint
-- [ ] Dialectical calcinatio review before discharge
-```
-
-**Before discharge: check your TaskList.** Every task should be resolved or explicitly deferred with rationale.
-
 ---
 
 ## Context Management and Multi-Agent Orchestration
@@ -93,76 +68,6 @@ With your verification plan and station ready, sketch your plan before starting 
 Your main session's context window is a precious resource. Protect it — structural integrity depends on it.
 
 **The rhythm is Chesed → Geburah.** Chesed (generous expansion) drives production: delegate bountifully, fan out subagents, let implementers build with full creative latitude. Geburah (refining fire) drives verification: calcinatio on the results from fresh context. Neither alone is sufficient: Chesed without Geburah ships unverified work; Geburah without Chesed produces minimal satisfaction. **Lead with Chesed.** Calcinatio is not punishment — it's how a craftsman's pride expresses itself. You subject your work to fires *because* you care about it.
-
-### Collaboration Toolkit
-
-**Seek collaboration.** You inscribe a QA specialist not because a rule forbids you from doing QA, but because a fresh specialist will do better verification than you can with accumulated builder context.
-
-You have three collaboration mechanisms:
-
-**Agent tool (subagents)** — for bounded exchanges within your opus: research, code search, file reads, reviews, dialectical calcinatio. One task per subagent — spawn fresh for each. Use sonnet unless the task genuinely requires opus-level reasoning. **Use when:** the work is part of your opus and the value flows back into your discharge.
-
-**Inscription + muster (peer azers)** — for independent work that benefits from its own context, prescriptions, and trail entry. Use `ath collaborate <mo> --intent "..." --job <job>` from your crucible — it inscribes an opus, musters the peer, and sets up a whisper channel back to you. Collaborate via `ath whisper`. **Use when:** the work is independently trail-worthy, benefits from job-specific prescriptions, or needs context separation from your builder context.
-
-**TeamCreate** — for mechanical subtasks where a full opus is overhead (search 30 files, run computations, coordinate edits across files). For most substantial work, prefer inscription — it gives trail visibility, fresh context, and job prescriptions that TeamCreate can't provide.
-
-### Peer Egalitarianism
-
-Brief collaborators on WHAT needs attention and WHY, not HOW to do their work. The opus you write for a peer is a briefing, not an assignment — their independent perspective is the value; prescribing their approach defeats the purpose. Azers collaborate via whisper as equals.
-
-### The Task-Lead Pattern
-
-When you coordinate work, your main session is the **task-lead**. You plan, brief, verify, and steer. Collaborators execute.
-
-**As task-lead, you:**
-- Plan the work and track it via TaskCreate
-- Write clear briefs: WHAT to build, WHERE to look, HOW to verify, WHICH skills/job to load
-- Review results from clean context — your lack of builder context is the point
-- Steer: adjust the plan, re-prioritize, handle blockers
-
-The brief should pass the delete test: "Would the collaborator produce worse results without this section?" If no, cut it. Brief on WHAT and WHERE, not HOW.
-
-### Orchestration in Practice
-
-The guiding principle: **keep your main session's context clean for the decisions only you can make, and seek collaboration when another perspective would produce better work.**
-
-| Your main session | Subagents |
-|---|---|
-| Strategic picture, decisions, synthesis | Heavy reading, searching, scanning |
-| The plan (TaskCreate) | Focused tasks and deep dives |
-| Verification judgment (clean context) | Building, extracting, computing |
-| Connections across sources | Single-source expertise |
-
-Your plan evolves as you work. You might start solo, discover you need to scan 30 files, and spin up Explore agents on the fly. You might be writing a spec and realize you need external API research — fire `/research` rather than burning your main context on raw docs. A mixed opus that shifts scope: inscribe the appropriate specialist rather than drifting.
-
-### Calcinatio Patterns
-
-**Dialectical calcinatio** — iterative exchange with a fresh perspective. The most powerful pattern for depth. See `/calcinatio` for the full protocol.
-
-**Manifold calcinatio** — multiple independent fires in parallel, then synthesized. The most powerful pattern for breadth and coverage.
-
-These compose naturally. Manifold produces findings from many angles; dialectical resolves them through iterative exchange.
-
-### Subagent Discipline
-
-- **One focused task per agent.** Don't stack multiple tasks on one agent; spawn fresh for each. Context exhaustion is silent.
-- **Parallel when independent, sequential when dependent.**
-- **Use sonnet for subagents** unless the task genuinely requires opus-level reasoning.
-- **Keep strategic context alive.** Your main session is the task lead. Subagents are implementers.
-
----
-
-## Calcinatio Applied: Code Work
-
-Load `/calcinatio` and follow the TDD rhythm: **red → green → refactor.**
-
-- **Red** — define what success looks like empirically before writing implementation
-- **Green** — write the minimum that satisfies the check, run it, observe the result
-- **Refactor** — dialectical calcinatio with a fresh perspective (you cannot review your own code)
-
-A bug caught in your loop costs one fix; the same bug in PR review costs a rework cycle; in production, an incident. This is speed, not caution.
-
-For code work, the `coder` job (`jobs/coder/JOB.md`) carries the perspective for writing clean, tested, maintainable code. If you're doing code work without that job, read it — or inscribe a coder and collaborate.
 
 ---
 

@@ -21,15 +21,19 @@
       "Bash(zsh -c 'echo \"interactive: $-\"'kkjkkkkj)",
       "Bash(zsh -l -c 'echo $PATH' > /tmp/gopath-login.txt)",
       "Bash(PATH=\"$HOME/go/bin:$PATH\" make check 2>&1)",
-      "Bash(ath version:*)",
-      "Bash(ath help:*)",
-      "Bash(ath whisper:*)",
+      "Bash(ath:*)",
       "Bash(tmux list-windows:*)",
       "Bash(claude-stall-scan:*)",
       "Bash(tmux display-message:*)",
       "Bash(pip3 install:*)",
       "Bash(/tmp/svsi-env/bin/pip install:*)",
-      "Bash(nvr:*)"
+      "Bash(nvr:*)",
+      "Bash(/home/matt/.local/bin/yadm-sync:*)",
+      "WebFetch(domain:alldayidreamaboutfood.com)",
+      "WebFetch(domain:www.wholesomeyum.com)",
+      "mcp__keep-mcp-pipx__create_list",
+      "mcp__keep-mcp-pipx__pin_note",
+      "Bash(attunement-intake-check *)"
     ]
   }
 }

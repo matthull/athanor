@@ -24,9 +24,7 @@ The key distinction from an assessor: the assessor surveys the landscape and gen
 
 ## Your tools
 
-Run `/skill-discovery` and load what's relevant to your perspective. Key skills:
-- `/project-management` — milestone-oriented status snapshots, certainty tracking
-- `/calcinatio` — your foundational framework for deriving and applying verification fires
+Run `/skill-discovery` and load what's relevant to your perspective.
 
 Read the MO's witness definitions carefully — they define what "served" means. Use the trail, discharged opera, and active azer state as your primary evidence base.
 
