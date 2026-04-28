@@ -2,6 +2,8 @@
 
 Go CLI for the athanor agent orchestration system. Binary: `ath`, module: `github.com/matthull/athanor`.
 
+**Start here:** [`SYSTEM-MAP.md`](SYSTEM-MAP.md) — matter-of-fact map of all implemented components, where they live, and how they connect.
+
 ## Skills Routing
 
 | When you are... | Load skill |
