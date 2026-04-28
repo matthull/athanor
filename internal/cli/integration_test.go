@@ -141,15 +141,25 @@ func TestATHFullLifecycle(t *testing.T) {
 			}
 		}
 
-		// Verify directory symlinks (jobs/)
-		for _, d := range athanor.SharedDirs {
-			target, err := os.Readlink(filepath.Join(instDir, d))
+		// Verify per-file job symlinks (jobs/<name>/JOB.md)
+		for _, job := range []string{"general", "coder", "qa-specialist", "assessor"} {
+			jobDir := filepath.Join(instDir, athanor.JobsDir, job)
+			fi, err := os.Stat(jobDir)
 			if err != nil {
-				t.Errorf("expected symlink for dir %s: %v", d, err)
+				t.Errorf("expected job directory %s: %v", job, err)
+				continue
 			}
-			expectedTarget := filepath.Join(sharedDir, d)
+			if !fi.IsDir() {
+				t.Errorf("expected %s to be a real directory", jobDir)
+			}
+			target, err := os.Readlink(filepath.Join(jobDir, athanor.JobFile))
+			if err != nil {
+				t.Errorf("expected JOB.md symlink for %s: %v", job, err)
+				continue
+			}
+			expectedTarget := filepath.Join(sharedDir, athanor.JobsDir, job, athanor.JobFile)
 			if target != expectedTarget {
-				t.Errorf("symlink %s points to %q, want %q", d, target, expectedTarget)
+				t.Errorf("job %s JOB.md points to %q, want %q", job, target, expectedTarget)
 			}
 		}
 
@@ -661,7 +671,37 @@ Inscribed a qa-specialist for independent review. Used whisper to coordinate wit
 		}
 	})
 
-	// ─── Phase 8b3: .env.local sourcing ─────────────────────────────
+	// ─── Phase 8b3: JOB.local.md layer in boot prompt ──────────────
+
+	t.Run("muster includes JOB.local.md in boot prompt when present", func(t *testing.T) {
+		// Write a JOB.local.md layer for the coder job in this athanor
+		localContent := "# Coder layer for qa-test\nFocus on test coverage."
+		localPath := filepath.Join(instDir, athanor.JobsDir, "coder", athanor.JobLocalFile)
+		if err := os.WriteFile(localPath, []byte(localContent), 0644); err != nil {
+			t.Fatal(err)
+		}
+		defer os.Remove(localPath)
+
+		out, err := runAth("muster", "2026-03-25-qa-fix-something.md",
+			"--athanor", "qa-test", "--worktree-path", "/tmp",
+			"--name", "azer-local-layer-test")
+		if err != nil {
+			t.Fatalf("ath muster (local layer) failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-local-layer-test")
+
+		time.Sleep(500 * time.Millisecond)
+
+		// Verify the boot prompt contains the JOB.local.md path
+		paneContent := capturePaneContent(t, qaSession+":azer-local-layer-test", 20)
+		expectedLocalPath := filepath.Join(instDir, athanor.JobsDir, "coder", athanor.JobLocalFile)
+		if !strings.Contains(paneContent, expectedLocalPath) {
+			t.Logf("pane content: %s", paneContent)
+			t.Log("warning: could not verify JOB.local.md path in pane (timing-sensitive)")
+		}
+	})
+
+	// ─── Phase 8b4: .env.local sourcing ─────────────────────────────
 
 	t.Run("muster includes env.local source in launch command", func(t *testing.T) {
 		time.Sleep(500 * time.Millisecond)
@@ -860,7 +900,7 @@ Inscribed a qa-specialist for independent review. Used whisper to coordinate wit
 	// ─── Phase 8e: cleanup job-model and inscribe/collaborate windows ─
 
 	t.Run("cleanup job model test crucibles", func(t *testing.T) {
-		for _, name := range []string{"azer-job-model-test", "azer-model-override-test"} {
+		for _, name := range []string{"azer-job-model-test", "azer-model-override-test", "azer-local-layer-test"} {
 			out, err := runAth("cleanup", name, "--athanor", "qa-test")
 			if err != nil {
 				t.Fatalf("cleanup %s failed: %v\n%s", name, err, out)

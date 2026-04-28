@@ -620,6 +620,16 @@ func setupSyncTestRepo(t *testing.T) (string, string) {
 			t.Fatal(err)
 		}
 	}
+	// Create shared job definitions for per-file sync testing
+	for _, job := range []string{"coder", "general"} {
+		jobDir := filepath.Join(sharedDir, JobsDir, job)
+		if err := os.MkdirAll(jobDir, 0755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(jobDir, JobFile), []byte("# "+job), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
 	return home, sharedDir
 }
 
@@ -659,6 +669,29 @@ func TestSyncInstance(t *testing.T) {
 			}
 			if target != filepath.Join(sharedDir, d) {
 				t.Errorf("symlink %s -> %q, want %q", d, target, filepath.Join(sharedDir, d))
+			}
+		}
+
+		// Verify per-file job symlinks created
+		for _, job := range []string{"coder", "general"} {
+			jobDir := filepath.Join(instDir, JobsDir, job)
+			fi, err := os.Stat(jobDir)
+			if err != nil {
+				t.Errorf("expected job directory %s: %v", job, err)
+				continue
+			}
+			if !fi.IsDir() {
+				t.Errorf("expected %s to be a real directory", jobDir)
+			}
+			// JOB.md should be a symlink
+			target, err := os.Readlink(filepath.Join(jobDir, JobFile))
+			if err != nil {
+				t.Errorf("expected JOB.md symlink for %s: %v", job, err)
+				continue
+			}
+			expected := filepath.Join(sharedDir, JobsDir, job, JobFile)
+			if target != expected {
+				t.Errorf("job %s JOB.md -> %q, want %q", job, target, expected)
 			}
 		}
 	})
@@ -711,6 +744,132 @@ func TestSyncInstance(t *testing.T) {
 		home, _ := setupSyncTestRepo(t)
 		if err := SyncInstance(home, "nonexistent"); err == nil {
 			t.Error("expected error for nonexistent instance")
+		}
+	})
+
+	t.Run("migrates old directory symlink to per-file symlinks", func(t *testing.T) {
+		home, sharedDir := setupSyncTestRepo(t)
+
+		name := "migrate-test"
+		instDir := InstanceDir(home, name)
+		if err := os.MkdirAll(instDir, 0755); err != nil {
+			t.Fatal(err)
+		}
+
+		// Create old-style directory symlink
+		oldTarget := filepath.Join(sharedDir, JobsDir)
+		if err := os.Symlink(oldTarget, filepath.Join(instDir, JobsDir)); err != nil {
+			t.Fatal(err)
+		}
+
+		if err := SyncInstance(home, name); err != nil {
+			t.Fatalf("SyncInstance: %v", err)
+		}
+
+		// jobs/ should now be a real directory, not a symlink
+		jobsPath := filepath.Join(instDir, JobsDir)
+		if _, err := os.Readlink(jobsPath); err == nil {
+			t.Error("jobs/ should be a real directory after migration, but is still a symlink")
+		}
+		fi, err := os.Stat(jobsPath)
+		if err != nil {
+			t.Fatalf("jobs/ should exist: %v", err)
+		}
+		if !fi.IsDir() {
+			t.Fatal("jobs/ should be a directory")
+		}
+
+		// JOB.md should be a per-file symlink
+		target, err := os.Readlink(filepath.Join(instDir, JobsDir, "coder", JobFile))
+		if err != nil {
+			t.Fatalf("expected JOB.md symlink for coder: %v", err)
+		}
+		expected := filepath.Join(sharedDir, JobsDir, "coder", JobFile)
+		if target != expected {
+			t.Errorf("coder JOB.md -> %q, want %q", target, expected)
+		}
+	})
+
+	t.Run("preserves JOB.local.md during sync", func(t *testing.T) {
+		home, sharedDir := setupSyncTestRepo(t)
+
+		name := "local-layer-test"
+		instDir := InstanceDir(home, name)
+		if err := os.MkdirAll(instDir, 0755); err != nil {
+			t.Fatal(err)
+		}
+
+		// First sync to establish per-file structure
+		if err := SyncInstance(home, name); err != nil {
+			t.Fatalf("SyncInstance: %v", err)
+		}
+
+		// Write a JOB.local.md layer
+		localContent := "# Coder layer for this athanor\nFocus on Go CLI patterns."
+		localPath := filepath.Join(instDir, JobsDir, "coder", JobLocalFile)
+		if err := os.WriteFile(localPath, []byte(localContent), 0644); err != nil {
+			t.Fatal(err)
+		}
+
+		// Sync again — local file should survive
+		if err := SyncInstance(home, name); err != nil {
+			t.Fatalf("SyncInstance (second run): %v", err)
+		}
+
+		data, err := os.ReadFile(localPath)
+		if err != nil {
+			t.Fatalf("JOB.local.md should survive sync: %v", err)
+		}
+		if string(data) != localContent {
+			t.Errorf("JOB.local.md content changed: got %q", string(data))
+		}
+
+		// JOB.md symlink should still be correct
+		target, err := os.Readlink(filepath.Join(instDir, JobsDir, "coder", JobFile))
+		if err != nil {
+			t.Fatalf("expected JOB.md symlink: %v", err)
+		}
+		expected := filepath.Join(sharedDir, JobsDir, "coder", JobFile)
+		if target != expected {
+			t.Errorf("coder JOB.md -> %q, want %q", target, expected)
+		}
+	})
+
+	t.Run("syncs new job added to shared", func(t *testing.T) {
+		home, sharedDir := setupSyncTestRepo(t)
+
+		name := "new-job-test"
+		instDir := InstanceDir(home, name)
+		if err := os.MkdirAll(instDir, 0755); err != nil {
+			t.Fatal(err)
+		}
+
+		// Initial sync
+		if err := SyncInstance(home, name); err != nil {
+			t.Fatalf("SyncInstance: %v", err)
+		}
+
+		// Add a new job to shared
+		newJobDir := filepath.Join(sharedDir, JobsDir, "researcher")
+		if err := os.MkdirAll(newJobDir, 0755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(newJobDir, JobFile), []byte("# researcher"), 0644); err != nil {
+			t.Fatal(err)
+		}
+
+		// Sync again — new job should appear
+		if err := SyncInstance(home, name); err != nil {
+			t.Fatalf("SyncInstance (after new job): %v", err)
+		}
+
+		target, err := os.Readlink(filepath.Join(instDir, JobsDir, "researcher", JobFile))
+		if err != nil {
+			t.Fatalf("expected JOB.md symlink for researcher: %v", err)
+		}
+		expected := filepath.Join(newJobDir, JobFile)
+		if target != expected {
+			t.Errorf("researcher JOB.md -> %q, want %q", target, expected)
 		}
 	})
 

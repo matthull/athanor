@@ -269,15 +269,23 @@ func exitCode(err error) int {
 // jobBootClause returns ", then read <path>" for the boot prompt if a job is specified,
 // or an empty string if no job is set. Returns an error if the job is specified but
 // the JOB.md file does not exist at the expected path.
+// If a JOB.local.md layer exists alongside JOB.md, it is appended to the clause.
 func jobBootClause(instDir, job string) (string, error) {
 	if job == "" {
 		return "", nil
 	}
-	jobPath := filepath.Join(instDir, "jobs", job, "JOB.md")
+	jobPath := filepath.Join(instDir, "jobs", job, athanor.JobFile)
 	if _, err := os.Stat(jobPath); err != nil {
-		return "", fmt.Errorf("job definition not found: %s (is the jobs directory symlinked into the instance?)", jobPath)
+		return "", fmt.Errorf("job definition not found: %s (run 'ath sync' to update job symlinks)", jobPath)
 	}
-	return fmt.Sprintf(", then read %s", jobPath), nil
+	clause := fmt.Sprintf(", then read %s", jobPath)
+
+	// Include athanor-specific layer if present
+	localPath := filepath.Join(instDir, "jobs", job, athanor.JobLocalFile)
+	if _, err := os.Stat(localPath); err == nil {
+		clause += fmt.Sprintf(", then read %s", localPath)
+	}
+	return clause, nil
 }
 
 // envSourcePrefix returns a shell fragment that sources the instance's .env.local

@@ -33,9 +33,16 @@ var SharedFiles = []string{
 }
 
 // SharedDirs are directories symlinked from shared/ into each instance.
-var SharedDirs = []string{
-	"jobs",
-}
+// Note: jobs/ is NOT in this list — it uses per-file symlinks to allow
+// athanor-specific JOB.local.md layers. See syncJobs in instance.go.
+var SharedDirs = []string{}
+
+// JobFile is the shared job definition filename.
+const JobFile = "JOB.md"
+
+// JobLocalFile is the optional per-athanor job layer filename.
+// Purely additive guidance loaded after JOB.md — no frontmatter, no overrides.
+const JobLocalFile = "JOB.local.md"
 
 // Home resolves the athanor home directory path.
 // Checks $ATHANOR_HOME first, then falls back to ~/athanor.

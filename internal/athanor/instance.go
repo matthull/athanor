@@ -184,6 +184,77 @@ func SyncInstance(home, name string) error {
 		}
 	}
 
+	// Sync jobs with per-file symlinks (allows athanor-specific JOB.local.md layers)
+	if err := syncJobs(instDir, sharedDir); err != nil {
+		return fmt.Errorf("syncing jobs: %w", err)
+	}
+
+	return nil
+}
+
+// syncJobs creates per-file symlinks for each job definition.
+// For each job in shared/jobs/<name>/, it creates <instDir>/jobs/<name>/ as a
+// real directory and symlinks JOB.md inside it. This allows athanor-specific
+// JOB.local.md files to coexist alongside the shared definition.
+//
+// Migration: if <instDir>/jobs is an old-style directory symlink (pointing to
+// shared/jobs), it is removed and replaced with the per-file structure.
+func syncJobs(instDir, sharedDir string) error {
+	instJobs := filepath.Join(instDir, JobsDir)
+	sharedJobs := filepath.Join(sharedDir, JobsDir)
+
+	// Check if shared/jobs exists
+	if _, err := os.Stat(sharedJobs); err != nil {
+		if os.IsNotExist(err) {
+			return nil // no jobs to sync
+		}
+		return fmt.Errorf("checking shared jobs: %w", err)
+	}
+
+	// Migration: remove old-style directory symlink
+	if target, err := os.Readlink(instJobs); err == nil {
+		// instJobs is a symlink — check if it points to a directory (old style)
+		if fi, statErr := os.Stat(target); statErr == nil && fi.IsDir() {
+			if err := os.Remove(instJobs); err != nil {
+				return fmt.Errorf("removing old jobs directory symlink: %w", err)
+			}
+		}
+	}
+
+	// Ensure <instDir>/jobs/ exists as a real directory
+	if err := os.MkdirAll(instJobs, 0755); err != nil {
+		return fmt.Errorf("creating jobs directory: %w", err)
+	}
+
+	// List jobs from shared
+	entries, err := os.ReadDir(sharedJobs)
+	if err != nil {
+		return fmt.Errorf("listing shared jobs: %w", err)
+	}
+
+	for _, e := range entries {
+		if !e.IsDir() {
+			continue
+		}
+		jobName := e.Name()
+		srcFile := filepath.Join(sharedJobs, jobName, JobFile)
+		if _, err := os.Stat(srcFile); err != nil {
+			continue // skip dirs without JOB.md
+		}
+
+		// Create <instDir>/jobs/<name>/ as a real directory
+		jobDir := filepath.Join(instJobs, jobName)
+		if err := os.MkdirAll(jobDir, 0755); err != nil {
+			return fmt.Errorf("creating job directory %s: %w", jobName, err)
+		}
+
+		// Symlink JOB.md
+		dstFile := filepath.Join(jobDir, JobFile)
+		if err := ensureSymlink(srcFile, dstFile); err != nil {
+			return fmt.Errorf("syncing job %s: %w", jobName, err)
+		}
+	}
+
 	return nil
 }
 
@@ -311,7 +382,7 @@ func ReadJobModel(instDir, jobName string) string {
 	if jobName == "" {
 		return ""
 	}
-	jobPath := filepath.Join(instDir, "jobs", jobName, "JOB.md")
+	jobPath := filepath.Join(instDir, "jobs", jobName, JobFile)
 	return readFrontmatterField(jobPath, "model:")
 }
 
