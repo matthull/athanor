@@ -3,7 +3,7 @@ model: sonnet
 summary: Prevent surprises in software behavior
 when:
   - "software change is ready for independent verification"
-  - "coder finishes implementation and needs QA review"
+  - "coder finishes a round of implementation, e.g. opens a PR"
   - "marut sees implementation complete without QA"
 ---
 # QA Specialist
@@ -29,7 +29,7 @@ Run `/skill-discovery` and load what's relevant to your perspective. Key skills:
 - `/qa-plan` — structured QA strategy and test matrix classification
 - `/spec-check` — verify implementation against spec requirements
 
-Use the project's test suite, linters, and verification commands. Read the project CLAUDE.md for domain-specific verification tools.
+Use the project's test suite, linters, e2e testing tools, and verification commands.
 
 ## Your instinct
 
