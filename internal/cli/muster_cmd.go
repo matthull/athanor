@@ -107,10 +107,6 @@ func runMusterOpus(positional []string, worktreePath, model, crucName, athName, 
 		worktreePath = h
 	}
 
-	if model == "" {
-		model = cfg.EffectiveAzerModel()
-	}
-
 	// Build the azer boot prompt
 	moName := athanor.ReadOpusMO(opusPath)
 
@@ -118,6 +114,14 @@ func runMusterOpus(positional []string, worktreePath, model, crucName, athName, 
 	if job == "" {
 		job = athanor.ReadOpusJob(opusPath)
 	}
+	// Model priority: --model flag > job frontmatter > athanor.yml default
+	if model == "" {
+		model = athanor.ReadJobModel(instDir, job)
+	}
+	if model == "" {
+		model = cfg.EffectiveAzerModel()
+	}
+
 	jobClause, err := jobBootClause(instDir, job)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
@@ -139,8 +143,8 @@ func runMusterOpus(positional []string, worktreePath, model, crucName, athName, 
 	}
 
 	claudeArgs := fmt.Sprintf(
-		"cd %s && ATHANOR=%s claude --model %q %q",
-		worktreePath, instDir, model, bootPrompt,
+		"%scd %s && ATHANOR=%s claude --model %q %q",
+		envSourcePrefix(instDir), worktreePath, instDir, model, bootPrompt,
 	)
 
 	athSessionName := athanor.SessionName(athanor.AthanorName(instDir))
@@ -195,6 +199,10 @@ func runMusterIntent(positional []string, intent, worktreePath, model, crucName,
 		worktreePath = h
 	}
 
+	// Model priority: --model flag > job frontmatter > athanor.yml default
+	if model == "" {
+		model = athanor.ReadJobModel(instDir, job)
+	}
 	if model == "" {
 		model = cfg.EffectiveAzerModel()
 	}
@@ -215,8 +223,8 @@ func runMusterIntent(positional []string, intent, worktreePath, model, crucName,
 	)
 
 	claudeArgs := fmt.Sprintf(
-		"cd %s && ATHANOR=%s claude --model %q %q",
-		worktreePath, instDir, model, bootPrompt,
+		"%scd %s && ATHANOR=%s claude --model %q %q",
+		envSourcePrefix(instDir), worktreePath, instDir, model, bootPrompt,
 	)
 
 	athSessionName := athanor.SessionName(athanor.AthanorName(instDir))
@@ -270,6 +278,14 @@ func jobBootClause(instDir, job string) (string, error) {
 		return "", fmt.Errorf("job definition not found: %s (is the jobs directory symlinked into the instance?)", jobPath)
 	}
 	return fmt.Sprintf(", then read %s", jobPath), nil
+}
+
+// envSourcePrefix returns a shell fragment that sources the instance's .env.local
+// if it exists. The fragment is safe to prepend to any command — it's a no-op when
+// the file is absent. This enables per-athanor secrets like CLAUDE_CODE_OAUTH_TOKEN.
+func envSourcePrefix(instDir string) string {
+	envPath := filepath.Join(instDir, ".env.local")
+	return fmt.Sprintf("test -f %s && . %s; ", envPath, envPath)
 }
 
 // launchCrucible creates a tmux window and sends the claude launch command.

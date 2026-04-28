@@ -59,6 +59,12 @@ func runInit(args []string) int {
 		return 1
 	}
 
+	// Ensure .env.local is gitignored in the athanor home repo
+	if err := athanor.EnsureEnvGitignore(home); err != nil {
+		fmt.Fprintf(os.Stderr, "warning: could not update .gitignore: %v\n", err)
+		// Non-fatal — the instance was created successfully
+	}
+
 	instDir := athanor.InstanceDir(home, name)
 	fmt.Printf("Athanor %q initialized at %s\n", name, instDir)
 	fmt.Printf("Create a magnum opus in magna-opera/, then `ath kindle %s <mo-name>`.\n", name)

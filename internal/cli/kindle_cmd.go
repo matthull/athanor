@@ -124,8 +124,8 @@ func runKindle(args []string) int {
 	}
 
 	claudeArgs := fmt.Sprintf(
-		"cd %s && ATHANOR=%s claude --model %q %q",
-		workDir, instDir, model, bootPrompt,
+		"%scd %s && ATHANOR=%s claude --model %q %q",
+		envSourcePrefix(instDir), workDir, instDir, model, bootPrompt,
 	)
 
 	if err := launchCrucible(session, crucible, workDir, claudeArgs); err != nil {

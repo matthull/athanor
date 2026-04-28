@@ -3,6 +3,7 @@ package athanor
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -396,6 +397,205 @@ func TestReadOpusJob(t *testing.T) {
 			t.Errorf("ReadOpusJob = %q, want empty", got)
 		}
 	})
+}
+
+func TestReadJobModel(t *testing.T) {
+	t.Run("reads model from JOB.md frontmatter", func(t *testing.T) {
+		t.Parallel()
+		dir := t.TempDir()
+		jobDir := filepath.Join(dir, "jobs", "coder")
+		if err := os.MkdirAll(jobDir, 0755); err != nil {
+			t.Fatal(err)
+		}
+		content := "---\nmodel: sonnet\n---\n# Coder\n\nYou are a coder."
+		if err := os.WriteFile(filepath.Join(jobDir, "JOB.md"), []byte(content), 0644); err != nil {
+			t.Fatal(err)
+		}
+		got := ReadJobModel(dir, "coder")
+		if got != "sonnet" {
+			t.Errorf("ReadJobModel = %q, want %q", got, "sonnet")
+		}
+	})
+
+	t.Run("returns empty for JOB.md without frontmatter", func(t *testing.T) {
+		t.Parallel()
+		dir := t.TempDir()
+		jobDir := filepath.Join(dir, "jobs", "general")
+		if err := os.MkdirAll(jobDir, 0755); err != nil {
+			t.Fatal(err)
+		}
+		content := "# General\n\nYou are a general-purpose azer."
+		if err := os.WriteFile(filepath.Join(jobDir, "JOB.md"), []byte(content), 0644); err != nil {
+			t.Fatal(err)
+		}
+		got := ReadJobModel(dir, "general")
+		if got != "" {
+			t.Errorf("ReadJobModel = %q, want empty", got)
+		}
+	})
+
+	t.Run("returns empty for nonexistent job", func(t *testing.T) {
+		t.Parallel()
+		dir := t.TempDir()
+		got := ReadJobModel(dir, "nonexistent")
+		if got != "" {
+			t.Errorf("ReadJobModel = %q, want empty", got)
+		}
+	})
+
+	t.Run("returns empty for empty job name", func(t *testing.T) {
+		t.Parallel()
+		dir := t.TempDir()
+		got := ReadJobModel(dir, "")
+		if got != "" {
+			t.Errorf("ReadJobModel = %q, want empty", got)
+		}
+	})
+
+	t.Run("reads model with other frontmatter fields", func(t *testing.T) {
+		t.Parallel()
+		dir := t.TempDir()
+		jobDir := filepath.Join(dir, "jobs", "qa-specialist")
+		if err := os.MkdirAll(jobDir, 0755); err != nil {
+			t.Fatal(err)
+		}
+		content := "---\nmodel: sonnet\nother_field: value\n---\n# QA Specialist"
+		if err := os.WriteFile(filepath.Join(jobDir, "JOB.md"), []byte(content), 0644); err != nil {
+			t.Fatal(err)
+		}
+		got := ReadJobModel(dir, "qa-specialist")
+		if got != "sonnet" {
+			t.Errorf("ReadJobModel = %q, want %q", got, "sonnet")
+		}
+	})
+}
+
+func TestWriteEnvTemplate(t *testing.T) {
+	t.Parallel()
+	dir := t.TempDir()
+	if err := WriteEnvTemplate(dir); err != nil {
+		t.Fatalf("WriteEnvTemplate: %v", err)
+	}
+	path := filepath.Join(dir, ".env.local.template")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("template not created: %v", err)
+	}
+	content := string(data)
+	if len(content) == 0 {
+		t.Error("template is empty")
+	}
+	if !containsString(content, "CLAUDE_CODE_OAUTH_TOKEN") {
+		t.Error("template should mention CLAUDE_CODE_OAUTH_TOKEN")
+	}
+}
+
+func TestEnsureEnvGitignore(t *testing.T) {
+	t.Run("creates gitignore entry", func(t *testing.T) {
+		dir := t.TempDir()
+		if err := EnsureEnvGitignore(dir); err != nil {
+			t.Fatalf("EnsureEnvGitignore: %v", err)
+		}
+		data, err := os.ReadFile(filepath.Join(dir, ".gitignore"))
+		if err != nil {
+			t.Fatalf("reading .gitignore: %v", err)
+		}
+		if !containsString(string(data), "athanors/*/.env.local") {
+			t.Error("expected .env.local pattern in .gitignore")
+		}
+	})
+
+	t.Run("appends to existing gitignore", func(t *testing.T) {
+		dir := t.TempDir()
+		existing := "# existing content\n*.tmp\n"
+		if err := os.WriteFile(filepath.Join(dir, ".gitignore"), []byte(existing), 0644); err != nil {
+			t.Fatal(err)
+		}
+		if err := EnsureEnvGitignore(dir); err != nil {
+			t.Fatalf("EnsureEnvGitignore: %v", err)
+		}
+		data, err := os.ReadFile(filepath.Join(dir, ".gitignore"))
+		if err != nil {
+			t.Fatalf("reading .gitignore: %v", err)
+		}
+		content := string(data)
+		if !containsString(content, "*.tmp") {
+			t.Error("existing content was lost")
+		}
+		if !containsString(content, "athanors/*/.env.local") {
+			t.Error("expected .env.local pattern in .gitignore")
+		}
+	})
+
+	t.Run("idempotent", func(t *testing.T) {
+		dir := t.TempDir()
+		if err := EnsureEnvGitignore(dir); err != nil {
+			t.Fatal(err)
+		}
+		if err := EnsureEnvGitignore(dir); err != nil {
+			t.Fatal(err)
+		}
+		data, _ := os.ReadFile(filepath.Join(dir, ".gitignore"))
+		content := string(data)
+		// Count occurrences — should be exactly one
+		count := 0
+		for i := 0; i+len("athanors/*/.env.local") <= len(content); i++ {
+			if content[i:i+len("athanors/*/.env.local")] == "athanors/*/.env.local" {
+				count++
+			}
+		}
+		if count != 1 {
+			t.Errorf("expected exactly 1 occurrence of pattern, got %d", count)
+		}
+	})
+}
+
+func TestEnvLocalPath(t *testing.T) {
+	t.Parallel()
+	got := EnvLocalPath("/home/matt/athanor/athanors/myath")
+	want := "/home/matt/athanor/athanors/myath/.env.local"
+	if got != want {
+		t.Errorf("EnvLocalPath = %q, want %q", got, want)
+	}
+}
+
+func TestInitInstanceCreatesEnvTemplate(t *testing.T) {
+	tmp := t.TempDir()
+	home := filepath.Join(tmp, "athanor")
+	repoDir := filepath.Join(tmp, "repo")
+	t.Setenv("ATHANOR_REPO", repoDir)
+
+	if err := EnsureHome(home); err != nil {
+		t.Fatal(err)
+	}
+	sharedDir := filepath.Join(repoDir, SharedDir)
+	if err := os.MkdirAll(sharedDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	for _, f := range SharedFiles {
+		if err := os.WriteFile(filepath.Join(sharedDir, f), []byte("# "+f), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, d := range SharedDirs {
+		if err := os.MkdirAll(filepath.Join(sharedDir, d), 0755); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if err := InitInstance(home, "env-test", ""); err != nil {
+		t.Fatalf("InitInstance: %v", err)
+	}
+
+	instDir := InstanceDir(home, "env-test")
+	templatePath := filepath.Join(instDir, ".env.local.template")
+	if _, err := os.Stat(templatePath); err != nil {
+		t.Errorf("expected .env.local.template at %s: %v", templatePath, err)
+	}
+}
+
+func containsString(s, substr string) bool {
+	return len(s) >= len(substr) && (s == substr || len(s) > 0 && strings.Contains(s, substr))
 }
 
 // setupSyncTestRepo creates a temp home and repo with shared files/dirs,

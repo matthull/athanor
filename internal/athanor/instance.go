@@ -89,11 +89,59 @@ func InitInstance(home, name, project string) error {
 		return fmt.Errorf("creating magna-opera directory: %w", err)
 	}
 
+	// Create .env.local.template showing expected env vars
+	if err := WriteEnvTemplate(instDir); err != nil {
+		return fmt.Errorf("writing env template: %w", err)
+	}
+
 	// Symlink shared components via SyncInstance
 	if err := SyncInstance(home, name); err != nil {
 		return fmt.Errorf("syncing shared components: %w", err)
 	}
 
+	return nil
+}
+
+// EnvLocalPath returns the path to the per-instance .env.local secrets file.
+func EnvLocalPath(instDir string) string {
+	return filepath.Join(instDir, ".env.local")
+}
+
+// WriteEnvTemplate creates the .env.local.template file showing expected vars.
+// Idempotent — overwrites if already present.
+func WriteEnvTemplate(instDir string) error {
+	content := `# Per-athanor secrets — sourced before launching claude sessions.
+# Copy this to .env.local and fill in values. .env.local is gitignored.
+#
+# CLAUDE_CODE_OAUTH_TOKEN=sk-ant-oat01-...
+`
+	return os.WriteFile(filepath.Join(instDir, ".env.local.template"), []byte(content), 0644)
+}
+
+// EnsureEnvGitignore adds the .env.local gitignore pattern to the athanor home
+// .gitignore if not already present. Idempotent.
+func EnsureEnvGitignore(home string) error {
+	gitignorePath := filepath.Join(home, ".gitignore")
+	pattern := "athanors/*/.env.local"
+
+	existing, err := os.ReadFile(gitignorePath)
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("reading .gitignore: %w", err)
+	}
+
+	if strings.Contains(string(existing), pattern) {
+		return nil // already present
+	}
+
+	entry := "\n# Per-athanor secrets (OAuth tokens, API keys)\n" + pattern + "\n"
+	f, err := os.OpenFile(gitignorePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return fmt.Errorf("opening .gitignore: %w", err)
+	}
+	defer f.Close()
+	if _, err := f.WriteString(entry); err != nil {
+		return fmt.Errorf("writing .gitignore: %w", err)
+	}
 	return nil
 }
 
@@ -255,6 +303,16 @@ func ReadOpusMO(path string) string {
 // ReadOpusJob reads the job field from an opus file's YAML frontmatter.
 func ReadOpusJob(path string) string {
 	return readFrontmatterField(path, "job:")
+}
+
+// ReadJobModel reads the model field from a JOB.md file's YAML frontmatter.
+// Returns empty string if the job has no model specified or the file doesn't exist.
+func ReadJobModel(instDir, jobName string) string {
+	if jobName == "" {
+		return ""
+	}
+	jobPath := filepath.Join(instDir, "jobs", jobName, "JOB.md")
+	return readFrontmatterField(jobPath, "model:")
 }
 
 // readFrontmatterField reads a single field from YAML frontmatter.

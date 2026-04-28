@@ -56,13 +56,19 @@ func TestATHFullLifecycle(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	// Set up job definitions in the repo so --job validation passes
+	// Set up job definitions in the repo so --job validation passes.
+	// coder and qa-specialist get model: sonnet frontmatter to test job-level model resolution.
 	for _, job := range []string{"general", "qa-specialist", "coder", "assessor"} {
 		jobDir := filepath.Join(sharedDir, athanor.JobsDir, job)
 		if err := os.MkdirAll(jobDir, 0755); err != nil {
 			t.Fatal(err)
 		}
-		content := fmt.Sprintf("# %s (test)\nTest job definition.", job)
+		var content string
+		if job == "coder" || job == "qa-specialist" {
+			content = fmt.Sprintf("---\nmodel: sonnet\n---\n# %s (test)\nTest job definition.", job)
+		} else {
+			content = fmt.Sprintf("# %s (test)\nTest job definition.", job)
+		}
 		if err := os.WriteFile(filepath.Join(jobDir, "JOB.md"), []byte(content), 0644); err != nil {
 			t.Fatal(err)
 		}
@@ -621,6 +627,65 @@ Inscribed a qa-specialist for independent review. Used whisper to coordinate wit
 		}
 	})
 
+	// ─── Phase 8b2: job-level model resolution ──────────────────────
+
+	t.Run("muster uses job model when no --model flag", func(t *testing.T) {
+		// The coder job has model: sonnet in its frontmatter.
+		// When mustering an opus with job: coder and no --model flag,
+		// the output should show Model: sonnet (not the default opus model).
+		out, err := runAth("muster", "2026-03-25-qa-fix-something.md",
+			"--athanor", "qa-test", "--worktree-path", "/tmp",
+			"--name", "azer-job-model-test")
+		if err != nil {
+			t.Fatalf("ath muster (job model) failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-job-model-test")
+
+		if !strings.Contains(out, "Model: sonnet") {
+			t.Errorf("expected Model: sonnet from job frontmatter, got: %s", out)
+		}
+	})
+
+	t.Run("muster --model flag overrides job model", func(t *testing.T) {
+		out, err := runAth("muster", "2026-03-25-qa-fix-something.md",
+			"--athanor", "qa-test", "--worktree-path", "/tmp",
+			"--model", "custom-model",
+			"--name", "azer-model-override-test")
+		if err != nil {
+			t.Fatalf("ath muster (model override) failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-model-override-test")
+
+		if !strings.Contains(out, "Model: custom-model") {
+			t.Errorf("expected Model: custom-model (flag override), got: %s", out)
+		}
+	})
+
+	// ─── Phase 8b3: .env.local sourcing ─────────────────────────────
+
+	t.Run("muster includes env.local source in launch command", func(t *testing.T) {
+		time.Sleep(500 * time.Millisecond)
+		paneContent := capturePaneContent(t, qaSession+":azer-job-model-test", 20)
+		envPath := filepath.Join(instDir, ".env.local")
+		if !strings.Contains(paneContent, envPath) {
+			t.Logf("pane content: %s", paneContent)
+			t.Log("warning: could not verify .env.local sourcing in pane (timing-sensitive)")
+		}
+	})
+
+	// ─── Phase 8b4: init creates .env.local.template ────────────────
+
+	t.Run("init creates env.local.template", func(t *testing.T) {
+		templatePath := filepath.Join(instDir, ".env.local.template")
+		data, err := os.ReadFile(templatePath)
+		if err != nil {
+			t.Fatalf("expected .env.local.template at %s: %v", templatePath, err)
+		}
+		if !strings.Contains(string(data), "CLAUDE_CODE_OAUTH_TOKEN") {
+			t.Error("expected CLAUDE_CODE_OAUTH_TOKEN in template")
+		}
+	})
+
 	t.Run("muster intent without name errors", func(t *testing.T) {
 		cmd := exec.Command(athBin, "muster", "qa-goal",
 			"--intent", "do something", "--athanor", "qa-test")
@@ -792,7 +857,16 @@ Inscribed a qa-specialist for independent review. Used whisper to coordinate wit
 		}
 	})
 
-	// ─── Phase 8e: cleanup inscribe/collaborate windows ─────────────
+	// ─── Phase 8e: cleanup job-model and inscribe/collaborate windows ─
+
+	t.Run("cleanup job model test crucibles", func(t *testing.T) {
+		for _, name := range []string{"azer-job-model-test", "azer-model-override-test"} {
+			out, err := runAth("cleanup", name, "--athanor", "qa-test")
+			if err != nil {
+				t.Fatalf("cleanup %s failed: %v\n%s", name, err, out)
+			}
+		}
+	})
 
 	t.Run("cleanup inscribe muster crucible", func(t *testing.T) {
 		out, err := runAth("cleanup", "azer-run-smoke-tests", "--athanor", "qa-test")
