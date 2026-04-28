@@ -207,7 +207,6 @@ func musterInscribedOpus(instDir, opusPath, slug string) int {
 	}
 
 	crucName := "azer-" + slug
-	model := cfg.EffectiveAzerModel()
 
 	worktreePath := cfg.Project
 	if worktreePath == "" {
@@ -217,6 +216,13 @@ func musterInscribedOpus(instDir, opusPath, slug string) int {
 
 	moName := athanor.ReadOpusMO(opusPath)
 	job := athanor.ReadOpusJob(opusPath)
+
+	// Model priority: job frontmatter > athanor.yml default
+	model := athanor.ReadJobModel(instDir, job)
+	if model == "" {
+		model = cfg.EffectiveAzerModel()
+	}
+
 	jobClause, err := jobBootClause(instDir, job)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
@@ -238,8 +244,8 @@ func musterInscribedOpus(instDir, opusPath, slug string) int {
 	}
 
 	claudeArgs := fmt.Sprintf(
-		"cd %s && ATHANOR=%s claude --model %q %q",
-		worktreePath, instDir, model, bootPrompt,
+		"%scd %s && ATHANOR=%s claude --model %q %q",
+		envSourcePrefix(instDir), worktreePath, instDir, model, bootPrompt,
 	)
 
 	athSessionName := athanor.SessionName(athanor.AthanorName(instDir))
