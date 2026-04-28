@@ -119,6 +119,7 @@ _ath() {
         'check:Check crucible health'
         'cleanup:Clean up after a discharged opus'
         'quiesce:Graceful shutdown of an athanor'
+        'jobs:List available jobs'
         'status:Show athanor health'
         'view:Open MO or opus in \$EDITOR'
         'opera:List opera with status'
@@ -200,6 +201,14 @@ _ath() {
                 _ath_mo_names "${words[3]}"
             elif (( CURRENT == 5 )); then
                 _ath_opus_names_ordered "${words[3]}" "${words[4]}"
+            fi
+            ;;
+        jobs)
+            if (( CURRENT == 3 )); then
+                local _repo_dir="${ATHANOR_REPO:-$HOME/code/athanor}"
+                local -a _jobs
+                _jobs=( ${(f)"$(ls -d $_repo_dir/shared/jobs/*/ 2>/dev/null | xargs -I{} basename {})"} )
+                (( ${#_jobs} )) && compadd -- "${_jobs[@]}"
             fi
             ;;
         status|opera)

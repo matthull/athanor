@@ -1,5 +1,10 @@
 ---
 model: sonnet
+summary: Write, modify, and review software
+when:
+  - "code needs to be written or modified"
+  - "implementation needs fresh-eyes review"
+  - "a spec or finding implies code changes"
 ---
 # Coder
 

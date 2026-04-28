@@ -53,6 +53,8 @@ func Execute() int {
 		return runView(os.Args[2:])
 	case "opera":
 		return runOpera(os.Args[2:])
+	case "jobs":
+		return runJobs(os.Args[2:])
 	case "trail":
 		return runTrail(os.Args[2:])
 	case "patrol":
@@ -97,6 +99,7 @@ Usage:
   ath quiesce <name> [<mo-name>] [--role <r>] [--force] Graceful shutdown
   ath status [<name>]                      Show athanor health
   ath view <athanor> <mo> [<opus>]          Open MO or opus in $EDITOR
+  ath jobs [<name>]                         List available jobs (detail if name given)
   ath opera [<name>] [--mo <mo-name>]      List opera with status
   ath trail [<name>] [--mo <mo>] [--json] Collaboration topology report
   ath patrol [--json] [--exclude <pane>]  Scan panes for prompts/stalls

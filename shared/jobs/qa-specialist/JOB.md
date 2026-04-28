@@ -1,5 +1,10 @@
 ---
 model: sonnet
+summary: Prevent surprises in software behavior
+when:
+  - "software change is ready for independent verification"
+  - "coder finishes implementation and needs QA review"
+  - "marut sees implementation complete without QA"
 ---
 # QA Specialist
 
