@@ -28,22 +28,17 @@ func listJobs() int {
 		return 1
 	}
 
-	// Find max name length for alignment
-	maxName := 0
-	for _, info := range infos {
-		if len(info.Name) > maxName {
-			maxName = len(info.Name)
-		}
-	}
-
 	fmt.Println("Available jobs:")
-	fmt.Println()
 	for _, info := range infos {
 		summary := info.Summary
 		if summary == "" {
 			summary = "(no summary)"
 		}
-		fmt.Printf("  %-*s  %s\n", maxName, info.Name, summary)
+		fmt.Println()
+		fmt.Printf("  %s — %s\n", info.Name, summary)
+		for _, w := range info.When {
+			fmt.Printf("    - %s\n", w)
+		}
 	}
 	fmt.Println()
 	return 0
