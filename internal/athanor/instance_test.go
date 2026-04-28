@@ -485,7 +485,7 @@ func TestWriteEnvTemplate(t *testing.T) {
 	if len(content) == 0 {
 		t.Error("template is empty")
 	}
-	if !containsString(content, "CLAUDE_CODE_OAUTH_TOKEN") {
+	if !strings.Contains(content, "CLAUDE_CODE_OAUTH_TOKEN") {
 		t.Error("template should mention CLAUDE_CODE_OAUTH_TOKEN")
 	}
 }
@@ -500,7 +500,7 @@ func TestEnsureEnvGitignore(t *testing.T) {
 		if err != nil {
 			t.Fatalf("reading .gitignore: %v", err)
 		}
-		if !containsString(string(data), "athanors/*/.env.local") {
+		if !strings.Contains(string(data), "athanors/*/.env.local") {
 			t.Error("expected .env.local pattern in .gitignore")
 		}
 	})
@@ -519,10 +519,10 @@ func TestEnsureEnvGitignore(t *testing.T) {
 			t.Fatalf("reading .gitignore: %v", err)
 		}
 		content := string(data)
-		if !containsString(content, "*.tmp") {
+		if !strings.Contains(content, "*.tmp") {
 			t.Error("existing content was lost")
 		}
-		if !containsString(content, "athanors/*/.env.local") {
+		if !strings.Contains(content, "athanors/*/.env.local") {
 			t.Error("expected .env.local pattern in .gitignore")
 		}
 	})
@@ -592,10 +592,6 @@ func TestInitInstanceCreatesEnvTemplate(t *testing.T) {
 	if _, err := os.Stat(templatePath); err != nil {
 		t.Errorf("expected .env.local.template at %s: %v", templatePath, err)
 	}
-}
-
-func containsString(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(s) > 0 && strings.Contains(s, substr))
 }
 
 // setupSyncTestRepo creates a temp home and repo with shared files/dirs,

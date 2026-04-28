@@ -2,6 +2,7 @@ package cli
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -79,5 +80,21 @@ func TestSplitArgs(t *testing.T) {
 				t.Errorf("flags = %v, want %v", flags, tt.wantFlags)
 			}
 		})
+	}
+}
+
+func TestEnvSourcePrefix(t *testing.T) {
+	t.Parallel()
+	prefix := envSourcePrefix("/home/matt/athanor/athanors/myath")
+	// Must contain test -f guard and source command
+	if !strings.Contains(prefix, "test -f /home/matt/athanor/athanors/myath/.env.local") {
+		t.Errorf("expected test -f guard, got: %s", prefix)
+	}
+	if !strings.Contains(prefix, ". /home/matt/athanor/athanors/myath/.env.local") {
+		t.Errorf("expected source command, got: %s", prefix)
+	}
+	// Must end with "; " so it chains cleanly with subsequent commands
+	if !strings.HasSuffix(prefix, "; ") {
+		t.Errorf("expected trailing '; ', got: %q", prefix)
 	}
 }
