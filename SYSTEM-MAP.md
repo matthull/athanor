@@ -2,7 +2,7 @@
 
 A matter-of-fact map of what's implemented, where it lives, and how it connects. Not a spec, not philosophy — just what's here.
 
-Last refreshed: 2026-05-04
+Last refreshed: 2026-05-04 (formulae CLI shipped — see Phase 2 of `specs/formulae-system/spec.md`)
 
 ---
 
@@ -67,11 +67,12 @@ Role files and job definitions are symlinks from the source repo's `shared/` dir
 - `ath reforge` kills and relaunches a marut. `ath quiesce` gracefully shuts down.
 
 **Work management** — creating and assigning work:
-- `ath inscribe` creates an opus (unit of work) under a Magnum Opus with a required job role.
-- `ath muster` launches an azer in a new tmux crucible for an opus.
-- `ath collaborate` combines inscribe + muster for peer azers (used from within a crucible).
+- `ath inscribe` creates an opus (unit of work) under a Magnum Opus with a required job role. Optional `--formula` writes a collaboration pattern into the opus frontmatter.
+- `ath muster` launches an azer in a new tmux crucible for an opus. Optional `--formula` overrides opus frontmatter.
+- `ath collaborate` combines inscribe + muster for peer azers (used from within a crucible). Optional `--formula` for the collaborator's own work.
 - `ath craft` creates a lightweight interactive session for artifex + azer collaboration.
 - `ath craft-mo` creates a new Magnum Opus interactively.
+- `ath jobs [<name>]` lists global jobs (simple tzurot). `ath formulae [<name>]` lists athanor formulae (compound tzurot). `ath tzurot` lists both.
 
 **Observation** — seeing system state:
 - `ath status` shows athanor health (tmux sessions, charged opera, running roles).
@@ -139,8 +140,7 @@ MCP servers (telegram, Slack, Keep, Linear, etc.) are auto-discovered — not li
 
 ## Known Gaps
 
-- **`ath tzurot` / `ath formulae`** — CLI commands for listing tzurot (jobs + formulae) and formula detail are designed (`specs/formulae-system/spec.md`) but not yet implemented. `ath jobs` exists for listing jobs. Use `ls $ATHANOR/formulae/` for formulae until CLI ships.
-- **`--formula` flag** — The `--formula` flag on `ath inscribe`, `ath collaborate`, and `ath muster` is designed but not yet implemented. Formulae can still be read manually by azers — the boot prompt just won't include them automatically yet.
+- **No formulae authored yet.** Phase 2 (CLI) is shipped; Phase 3 (creating the first `coding-dyad` formula in musashi, extracting the dyad section out of `shared/jobs/coder/JOB.md`, and updating `azer.md` / `marut.md` / `opus.md` to be formula-aware) remains. Spec at `specs/formulae-system/spec.md § Phase 3`.
 
 ---
 
