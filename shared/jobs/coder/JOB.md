@@ -1,5 +1,5 @@
 ---
-model: sonnet
+model: opus 
 summary: Write, modify, and review software
 when:
   - "code needs to be written or modified"
@@ -31,18 +31,11 @@ Run `/skill-discovery` and load what's relevant — through the lens of your val
 
 Use whatever domain skills match the code you're touching.
 
-## The coding dyad
+## Your collaboration
 
-When you start implementation, use `ath collaborate` to inscribe a peer coder as your reviewer. This is structural, not optional — builder bias is physics, not a discipline problem. You cannot objectively assess your own code while immersed in building it. The reviewer exists in their own crucible with fresh context, communicating via whisper.
+When your opus carries a `formula:` field, follow the formula's inscription guidance. The coding-dyad formula is the standard formula for implementation work — it pairs you with a peer reviewer in a separate crucible.
 
-The reviewer checks your work at natural checkpoints:
-- **Green step** — when tests pass for a chunk of work, whisper the reviewer. They look at the code with fresh eyes before you move on.
-- **PR creation** — the reviewer examines the full change from their independent context.
-- **Major stage boundaries** — any significant shift in what you're building gets a reviewer checkpoint.
-
-This isn't overhead — it's investment. A bug caught at green is a quick fix. The same bug caught at discharge is a rework cycle. The same bug in production is an incident.
-
-**When you're the reviewer:** bring your own perspective — construction quality, pattern consistency, architecture alignment, blast radius. You're a peer offering a fresh lens, not an auditor running a checklist. Push back when something doesn't hold up. The builder benefits from genuine dialogue, not rubber stamps.
+When no formula is specified, your instinct should still be to seek independent review for any non-trivial implementation. Builder bias is physics, not a discipline problem — a craftsman who knows this seeks fresh perspective out of respect for the craft, not insecurity.
 
 ## Your rhythm
 

@@ -29,11 +29,14 @@ All opera use YAML frontmatter to track status. Opera live in their Magnum Opus'
 status: charged
 inscribed: 2026-03-23
 job: qa-specialist          # required — azer adopts this job from shared/jobs/
+formula: coding-dyad        # optional — collaboration pattern from $ATHANOR/formulae/
 magnum_opus: some-mo        # optional — which MO this opus serves
 ---
 ```
 
 The `job:` field is required — `ath inscribe` enforces this. The mustered azer reads the corresponding job definition from `jobs/<job-name>/JOB.md` and adopts it — adopting its perspective, loading relevant skills, and following its professional instincts. Use `general` when no specific role fits.
+
+The `formula:` field is optional. When present, the azer also reads `formulae/<formula>/FORMULA.md` — an athanor-specific collaboration pattern that prescribes which collaborators to inscribe and how they relate. Formulae are compound tzurot (see AGENTS.md vocabulary). The dispatch hierarchy: formula → job → generalist.
 
 ```yaml
 ---

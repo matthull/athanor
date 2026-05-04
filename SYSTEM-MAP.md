@@ -2,7 +2,7 @@
 
 A matter-of-fact map of what's implemented, where it lives, and how it connects. Not a spec, not philosophy — just what's here.
 
-Last refreshed: 2026-04-28
+Last refreshed: 2026-05-04
 
 ---
 
@@ -45,14 +45,17 @@ Each instance in `athanors/<name>/` has the same shape:
 athanors/<name>/
 ├── athanor.yml            # Config: name, project path
 ├── AGENTS.md → shared/    # Symlinked role files (azer.md, marut.md, etc.)
-├── jobs/ → shared/jobs/   # Symlinked job definitions
+├── jobs/ → shared/jobs/   # Symlinked job definitions (simple tzurot)
+├── formulae/              # Athanor-specific collaboration patterns (compound tzurot)
+│   └── <name>/
+│       └── FORMULA.md     # Formula definition: topology + inscription guidance
 └── magna-opera/
     └── <mo-name>/
         ├── <mo-name>.md   # Magnum Opus definition (intent, witnesses, calcinatio)
         └── opera/          # Opera files — the trail of work done under this MO
 ```
 
-Role files and job definitions are symlinks from the source repo's `shared/` directory. `ath init` creates the instance; `ath sync` reconciles symlinks when the source repo adds new files.
+Role files and job definitions are symlinks from the source repo's `shared/` directory. Formulae are athanor-specific (not symlinked) — each athanor defines its own collaboration patterns. `ath init` creates the instance; `ath sync` reconciles symlinks when the source repo adds new files.
 
 ---
 
@@ -136,7 +139,8 @@ MCP servers (telegram, Slack, Keep, Linear, etc.) are auto-discovered — not li
 
 ## Known Gaps
 
-- **`ath jobs`** — No CLI command to list available job definitions. You have to `ls shared/jobs/` or just know them.
+- **`ath tzurot` / `ath formulae`** — CLI commands for listing tzurot (jobs + formulae) and formula detail are designed (`specs/formulae-system/spec.md`) but not yet implemented. `ath jobs` exists for listing jobs. Use `ls $ATHANOR/formulae/` for formulae until CLI ships.
+- **`--formula` flag** — The `--formula` flag on `ath inscribe`, `ath collaborate`, and `ath muster` is designed but not yet implemented. Formulae can still be read manually by azers — the boot prompt just won't include them automatically yet.
 
 ---
 
