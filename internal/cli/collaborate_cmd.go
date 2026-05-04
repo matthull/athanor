@@ -13,9 +13,10 @@ import (
 )
 
 type collaborateArgs struct {
-	moName string
-	intent string
-	job    string
+	moName  string
+	intent  string
+	job     string
+	formula string
 }
 
 func parseCollaborateArgs(args []string) (*collaborateArgs, error) {
@@ -26,6 +27,7 @@ func parseCollaborateArgs(args []string) (*collaborateArgs, error) {
 	fs := flag.NewFlagSet("collaborate", flag.ContinueOnError)
 	fs.StringVar(&ca.intent, "intent", "", "natural language intent for the opus (required)")
 	fs.StringVar(&ca.job, "job", "", "job role for the peer azer (required)")
+	fs.StringVar(&ca.formula, "formula", "", "collaboration formula for the peer azer's own work (optional)")
 	fs.SetOutput(os.Stderr)
 
 	if err := fs.Parse(flagArgs); err != nil {
@@ -84,6 +86,14 @@ func runCollaborate(args []string) int {
 		return 1
 	}
 
+	// Validate formula (optional) — formulae live in the athanor instance
+	if ca.formula != "" {
+		if err := athanor.ValidateFormula(instDir, ca.formula); err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			return 1
+		}
+	}
+
 	// Build opus filename
 	datestamp := time.Now().Format("2006-01-02")
 	slug := slugify(ca.intent, maxSlugLen)
@@ -109,7 +119,7 @@ func runCollaborate(args []string) int {
 	}
 
 	// Build opus content
-	content := buildOpusContent(datestamp, ca.moName, ca.job, ca.intent, collabContext)
+	content := buildOpusContent(datestamp, ca.moName, ca.job, ca.formula, ca.intent, collabContext)
 
 	if err := os.WriteFile(opusPath, []byte(content), 0644); err != nil {
 		fmt.Fprintf(os.Stderr, "error writing opus: %v\n", err)

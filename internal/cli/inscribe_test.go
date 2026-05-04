@@ -201,7 +201,7 @@ func TestParseInscribeArgs(t *testing.T) {
 
 func TestBuildOpusContent(t *testing.T) {
 	t.Run("basic content without job", func(t *testing.T) {
-		content := buildOpusContent("2026-04-22", "my-mo", "", "Fix the widget", "")
+		content := buildOpusContent("2026-04-22", "my-mo", "", "", "Fix the widget", "")
 		if !strings.Contains(content, "status: charged") {
 			t.Error("missing 'status: charged' in frontmatter")
 		}
@@ -214,6 +214,9 @@ func TestBuildOpusContent(t *testing.T) {
 		if strings.Contains(content, "job:") {
 			t.Error("should not contain job field when empty")
 		}
+		if strings.Contains(content, "formula:") {
+			t.Error("should not contain formula field when empty")
+		}
 		if !strings.Contains(content, "# Fix the widget") {
 			t.Error("missing heading")
 		}
@@ -223,14 +226,39 @@ func TestBuildOpusContent(t *testing.T) {
 	})
 
 	t.Run("content with job", func(t *testing.T) {
-		content := buildOpusContent("2026-04-22", "my-mo", "qa-specialist", "Verify it", "")
+		content := buildOpusContent("2026-04-22", "my-mo", "qa-specialist", "", "Verify it", "")
 		if !strings.Contains(content, "job: qa-specialist") {
 			t.Error("missing job field")
 		}
 	})
 
+	t.Run("content with formula emits formula field after job", func(t *testing.T) {
+		content := buildOpusContent("2026-04-22", "my-mo", "coder", "coding-dyad", "Implement it", "")
+		if !strings.Contains(content, "job: coder") {
+			t.Error("missing job field")
+		}
+		if !strings.Contains(content, "formula: coding-dyad") {
+			t.Error("missing formula field")
+		}
+		// Verify ordering — formula must come after job in the frontmatter
+		jobIdx := strings.Index(content, "job: coder")
+		formulaIdx := strings.Index(content, "formula: coding-dyad")
+		if formulaIdx < jobIdx {
+			t.Errorf("formula field at %d should come after job field at %d", formulaIdx, jobIdx)
+		}
+	})
+
+	t.Run("formula without job still emits formula", func(t *testing.T) {
+		// Degenerate case — job is enforced by parseInscribeArgs but the
+		// builder shouldn't crash if called directly with formula only.
+		content := buildOpusContent("2026-04-22", "my-mo", "", "coding-dyad", "Edge case", "")
+		if !strings.Contains(content, "formula: coding-dyad") {
+			t.Error("missing formula field")
+		}
+	})
+
 	t.Run("content with collaboration context", func(t *testing.T) {
-		content := buildOpusContent("2026-04-22", "my-mo", "", "Fix it", "Inscribed by: azer-foo. Whisper back to azer-foo when complete.")
+		content := buildOpusContent("2026-04-22", "my-mo", "", "", "Fix it", "Inscribed by: azer-foo. Whisper back to azer-foo when complete.")
 		if !strings.Contains(content, "## Collaboration") {
 			t.Error("missing Collaboration section")
 		}
@@ -302,6 +330,77 @@ func TestParseCollaborateArgs(t *testing.T) {
 		}
 		if !strings.Contains(err.Error(), "--intent") {
 			t.Errorf("error = %q, want mention of --intent", err.Error())
+		}
+	})
+}
+
+func TestParseInscribeArgsFormula(t *testing.T) {
+	t.Run("parses --formula flag", func(t *testing.T) {
+		args := []string{"my-athanor", "my-mo",
+			"--intent", "Fix it",
+			"--job", "coder",
+			"--formula", "coding-dyad"}
+		ia, err := parseInscribeArgs(args)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if ia.formula != "coding-dyad" {
+			t.Errorf("formula = %q, want %q", ia.formula, "coding-dyad")
+		}
+	})
+
+	t.Run("omitting --formula is valid", func(t *testing.T) {
+		args := []string{"my-athanor", "my-mo",
+			"--intent", "Fix it",
+			"--job", "general"}
+		ia, err := parseInscribeArgs(args)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if ia.formula != "" {
+			t.Errorf("formula = %q, want empty", ia.formula)
+		}
+	})
+
+	t.Run("--formula without --job still requires --job", func(t *testing.T) {
+		args := []string{"my-athanor", "my-mo",
+			"--intent", "Fix it",
+			"--formula", "coding-dyad"}
+		_, err := parseInscribeArgs(args)
+		if err == nil {
+			t.Fatal("expected error for missing --job")
+		}
+		if !strings.Contains(err.Error(), "--job is required") {
+			t.Errorf("error = %q, want mention of --job", err.Error())
+		}
+	})
+}
+
+func TestParseCollaborateArgsFormula(t *testing.T) {
+	t.Run("parses --formula flag", func(t *testing.T) {
+		args := []string{"my-mo",
+			"--intent", "Implement frontend",
+			"--job", "coder",
+			"--formula", "coding-dyad"}
+		ca, err := parseCollaborateArgs(args)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if ca.formula != "coding-dyad" {
+			t.Errorf("formula = %q, want %q", ca.formula, "coding-dyad")
+		}
+	})
+
+	t.Run("omitting --formula is valid", func(t *testing.T) {
+		args := []string{"my-mo",
+			"--intent", "Review",
+			"--job", "general"}
+		ca, err := parseCollaborateArgs(args)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if ca.formula != "" {
+			t.Errorf("formula = %q, want empty", ca.formula)
 		}
 	})
 }

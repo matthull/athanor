@@ -55,6 +55,10 @@ func Execute() int {
 		return runOpera(os.Args[2:])
 	case "jobs":
 		return runJobs(os.Args[2:])
+	case "formulae":
+		return runFormulae(os.Args[2:])
+	case "tzurot":
+		return runTzurot(os.Args[2:])
 	case "trail":
 		return runTrail(os.Args[2:])
 	case "patrol":
@@ -86,12 +90,14 @@ Usage:
   ath sync [<name>]                        Reconcile symlinks (all instances if no name)
   ath kindle <name> [<mo-name>] [--role <r>] Launch a presence-driven role
   ath reforge <name> [<mo-name>]           Kill and relaunch a marut
-  ath inscribe <athanor> <mo> --intent <text> [--job <job>] [--muster]
+  ath inscribe <athanor> <mo> --intent <text> [--job <job>] [--formula <formula>] [--muster]
                                            Create an opus file
-  ath collaborate <mo> --intent <text> [--job <job>]
+  ath collaborate <mo> --intent <text> [--job <job>] [--formula <formula>]
                                            Inscribe + muster a peer azer (from crucible)
-  ath muster <opus-file> [--worktree-path <path>]    Launch an azer for an opus
-  ath muster <mo> <name> --intent <text>   Launch autonomous azer from intent
+  ath muster <opus-file> [--formula <formula>] [--worktree-path <path>]
+                                           Launch an azer for an opus
+  ath muster <mo> <name> --intent <text> [--formula <formula>]
+                                           Launch autonomous azer from intent
   ath craft <athanor> <mo> <name>           Interactive session with the artifex
   ath craft-mo <athanor>                   Create a new Magnum Opus interactively
   ath check <crucible>                      Check crucible health
@@ -100,6 +106,8 @@ Usage:
   ath status [<name>]                      Show athanor health
   ath view <athanor> <mo> [<opus>]          Open MO or opus in $EDITOR
   ath jobs [<name>]                         List available jobs (detail if name given)
+  ath formulae [<name>]                    List athanor formulae (detail if name given)
+  ath tzurot                                List both jobs and formulae
   ath opera [<name>] [--mo <mo-name>]      List opera with status
   ath trail [<name>] [--mo <mo>] [--json] Collaboration topology report
   ath patrol [--json] [--exclude <pane>]  Scan panes for prompts/stalls

@@ -399,6 +399,44 @@ func TestReadOpusJob(t *testing.T) {
 	})
 }
 
+func TestReadOpusFormula(t *testing.T) {
+	t.Run("with formula field", func(t *testing.T) {
+		t.Parallel()
+		dir := t.TempDir()
+		content := "---\nstatus: charged\njob: coder\nformula: coding-dyad\n---\n# Test"
+		path := filepath.Join(dir, "test.md")
+		if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+			t.Fatal(err)
+		}
+		got := ReadOpusFormula(path)
+		if got != "coding-dyad" {
+			t.Errorf("ReadOpusFormula = %q, want %q", got, "coding-dyad")
+		}
+	})
+
+	t.Run("without formula field", func(t *testing.T) {
+		t.Parallel()
+		dir := t.TempDir()
+		content := "---\nstatus: charged\njob: coder\n---\n# Test"
+		path := filepath.Join(dir, "test.md")
+		if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+			t.Fatal(err)
+		}
+		got := ReadOpusFormula(path)
+		if got != "" {
+			t.Errorf("ReadOpusFormula = %q, want empty", got)
+		}
+	})
+
+	t.Run("missing file returns empty", func(t *testing.T) {
+		t.Parallel()
+		got := ReadOpusFormula("/nonexistent/path.md")
+		if got != "" {
+			t.Errorf("ReadOpusFormula = %q, want empty", got)
+		}
+	})
+}
+
 func TestReadJobModel(t *testing.T) {
 	t.Run("reads model from JOB.md frontmatter", func(t *testing.T) {
 		t.Parallel()

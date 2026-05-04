@@ -121,6 +121,13 @@ func EnsureHome(home string) error {
 // JobsDir is the subdirectory containing job definitions in the source repo.
 const JobsDir = "jobs"
 
+// FormulaFile is the formula definition filename.
+const FormulaFile = "FORMULA.md"
+
+// FormulaeDir is the subdirectory containing formulae in an athanor instance.
+// Latin plural matches the system vocabulary (formulae, not formulas).
+const FormulaeDir = "formulae"
+
 // ValidateJob checks that a named job exists in the shared job registry.
 // Returns nil if shared/jobs/<name>/JOB.md exists, or an error describing
 // what's wrong and listing available jobs.
@@ -229,6 +236,104 @@ func ReadJobDetail(jobName string) (JobInfo, string, error) {
 		return info, "", err
 	}
 	path := filepath.Join(jobsDir, jobName, "JOB.md")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return info, "", err
+	}
+	return info, string(data), nil
+}
+
+// ValidateFormula checks that a named formula exists in the athanor instance.
+// Unlike jobs (validated against the global shared registry), formulae live
+// directly in the athanor instance directory at formulae/<name>/FORMULA.md.
+func ValidateFormula(instDir, formulaName string) error {
+	formulaPath := filepath.Join(instDir, FormulaeDir, formulaName, FormulaFile)
+	if _, err := os.Stat(formulaPath); err != nil {
+		if os.IsNotExist(err) {
+			available, _ := ListFormulae(instDir)
+			return fmt.Errorf("unknown formula %q (available: %s)",
+				formulaName, formatJobList(available))
+		}
+		return fmt.Errorf("checking formula %q: %w", formulaName, err)
+	}
+	return nil
+}
+
+// ListFormulae returns the names of all formulae in an athanor instance.
+// Returns nil (no error) when the formulae/ directory doesn't exist —
+// directory creation is on demand.
+func ListFormulae(instDir string) ([]string, error) {
+	formulaeDir := filepath.Join(instDir, FormulaeDir)
+	entries, err := os.ReadDir(formulaeDir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("listing formulae: %w", err)
+	}
+	var names []string
+	for _, e := range entries {
+		if e.IsDir() {
+			fmd := filepath.Join(formulaeDir, e.Name(), FormulaFile)
+			if _, err := os.Stat(fmd); err == nil {
+				names = append(names, e.Name())
+			}
+		}
+	}
+	return names, nil
+}
+
+// FormulaInfo holds the structured frontmatter from a FORMULA.md file.
+type FormulaInfo struct {
+	Name    string
+	Summary string
+	When    []string
+}
+
+// ReadFormulaInfo reads structured frontmatter from a FORMULA.md file.
+func ReadFormulaInfo(instDir, formulaName string) (FormulaInfo, error) {
+	info := FormulaInfo{Name: formulaName}
+	path := filepath.Join(instDir, FormulaeDir, formulaName, FormulaFile)
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return info, fmt.Errorf("reading formula %q: %w", formulaName, err)
+	}
+	content := string(data)
+	if !hasYAMLFrontmatter(content) {
+		return info, nil
+	}
+	fm := extractFrontmatter(content)
+	info.Summary = extractField(fm, "summary:")
+	info.When = extractListField(fm, "when:")
+	return info, nil
+}
+
+// ListFormulaInfos returns FormulaInfo for all formulae in an athanor instance.
+func ListFormulaInfos(instDir string) ([]FormulaInfo, error) {
+	names, err := ListFormulae(instDir)
+	if err != nil {
+		return nil, err
+	}
+	var infos []FormulaInfo
+	for _, name := range names {
+		info, err := ReadFormulaInfo(instDir, name)
+		if err != nil {
+			// Skip unreadable formulae but still list them
+			infos = append(infos, FormulaInfo{Name: name})
+			continue
+		}
+		infos = append(infos, info)
+	}
+	return infos, nil
+}
+
+// ReadFormulaDetail reads the full content of a FORMULA.md file.
+func ReadFormulaDetail(instDir, formulaName string) (FormulaInfo, string, error) {
+	info, err := ReadFormulaInfo(instDir, formulaName)
+	if err != nil {
+		return info, "", err
+	}
+	path := filepath.Join(instDir, FormulaeDir, formulaName, FormulaFile)
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return info, "", err

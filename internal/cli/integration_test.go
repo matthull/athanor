@@ -897,7 +897,309 @@ Inscribed a qa-specialist for independent review. Used whisper to coordinate wit
 		}
 	})
 
-	// ─── Phase 8e: cleanup job-model and inscribe/collaborate windows ─
+	// ─── Phase 8e: ath formulae system ─────────────────────────────
+
+	// Set up a test formula in the qa-test instance for the formula scenarios.
+	formulaName := "coding-dyad"
+	formulaDir := filepath.Join(instDir, athanor.FormulaeDir, formulaName)
+	if err := os.MkdirAll(formulaDir, 0755); err != nil {
+		t.Fatalf("creating formula dir: %v", err)
+	}
+	formulaContent := `---
+summary: Implementation with independent code review
+when:
+  - "code needs to be written or modified"
+  - "any implementation work that will ship to production"
+---
+# Coding Dyad
+
+Test formula for the QA harness — pairs implementer with reviewer.
+`
+	formulaPath := filepath.Join(formulaDir, athanor.FormulaFile)
+	if err := os.WriteFile(formulaPath, []byte(formulaContent), 0644); err != nil {
+		t.Fatalf("writing formula: %v", err)
+	}
+
+	t.Run("inscribe with formula writes formula to frontmatter", func(t *testing.T) {
+		out, err := runAth("inscribe", "qa-test", "qa-goal",
+			"--intent", "Implement formula widget", "--job", "coder",
+			"--formula", "coding-dyad")
+		if err != nil {
+			t.Fatalf("ath inscribe --formula failed: %v\n%s", err, out)
+		}
+		opusOut := strings.TrimSpace(out)
+		data, err := os.ReadFile(opusOut)
+		if err != nil {
+			t.Fatalf("opus file not readable: %v", err)
+		}
+		content := string(data)
+		if !strings.Contains(content, "formula: coding-dyad") {
+			t.Errorf("missing formula field in frontmatter:\n%s", content)
+		}
+		// Verify formula appears after job in frontmatter
+		jobIdx := strings.Index(content, "job: coder")
+		formulaIdx := strings.Index(content, "formula: coding-dyad")
+		if formulaIdx < jobIdx {
+			t.Errorf("formula field should come after job field in frontmatter")
+		}
+	})
+
+	t.Run("inscribe with unknown formula errors", func(t *testing.T) {
+		out, err := runAth("inscribe", "qa-test", "qa-goal",
+			"--intent", "Bad formula", "--job", "coder",
+			"--formula", "nonexistent-formula")
+		if err == nil {
+			t.Fatal("expected error for unknown formula")
+		}
+		if !strings.Contains(out, "unknown formula") {
+			t.Errorf("expected 'unknown formula' in output, got: %s", out)
+		}
+	})
+
+	t.Run("muster with formula opus includes formula clause", func(t *testing.T) {
+		// Inscribe an opus with formula, then muster it and verify the boot
+		// prompt contains the formula path.
+		out, err := runAth("inscribe", "qa-test", "qa-goal",
+			"--intent", "Implement with dyad", "--job", "coder",
+			"--formula", "coding-dyad")
+		if err != nil {
+			t.Fatalf("inscribe failed: %v\n%s", err, out)
+		}
+		opusFile := filepath.Base(strings.TrimSpace(out))
+
+		out, err = runAth("muster", opusFile,
+			"--athanor", "qa-test", "--worktree-path", "/tmp",
+			"--name", "azer-formula-opus-test")
+		if err != nil {
+			t.Fatalf("muster failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-formula-opus-test")
+
+		time.Sleep(500 * time.Millisecond)
+
+		paneContent := capturePaneContent(t, qaSession+":azer-formula-opus-test", 20)
+		if !strings.Contains(paneContent, formulaPath) {
+			t.Logf("pane content: %s", paneContent)
+			t.Log("warning: could not verify formula path in pane (timing-sensitive)")
+		}
+	})
+
+	t.Run("muster with --formula flag overrides opus frontmatter", func(t *testing.T) {
+		// Muster the existing fix-something opus (no formula in frontmatter)
+		// with --formula override.
+		out, err := runAth("muster", "2026-03-25-qa-fix-something.md",
+			"--athanor", "qa-test", "--worktree-path", "/tmp",
+			"--formula", "coding-dyad",
+			"--name", "azer-formula-override-test")
+		if err != nil {
+			t.Fatalf("muster --formula failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-formula-override-test")
+
+		time.Sleep(500 * time.Millisecond)
+		paneContent := capturePaneContent(t, qaSession+":azer-formula-override-test", 20)
+		if !strings.Contains(paneContent, formulaPath) {
+			t.Logf("pane content: %s", paneContent)
+			t.Log("warning: could not verify formula path in pane (timing-sensitive)")
+		}
+	})
+
+	t.Run("muster --intent with --formula injects formula", func(t *testing.T) {
+		out, err := runAth("muster", "qa-goal", "intent-formula-test",
+			"--intent", "rebuild the auth flow",
+			"--job", "coder",
+			"--formula", "coding-dyad",
+			"--athanor", "qa-test", "--worktree-path", "/tmp")
+		if err != nil {
+			t.Fatalf("muster --intent --formula failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-intent-formula-test")
+
+		time.Sleep(500 * time.Millisecond)
+		paneContent := capturePaneContent(t, qaSession+":azer-intent-formula-test", 20)
+		if !strings.Contains(paneContent, formulaPath) {
+			t.Logf("pane content: %s", paneContent)
+			t.Log("warning: could not verify formula path in intent pane (timing-sensitive)")
+		}
+	})
+
+	t.Run("muster errors when formula opus references missing formula", func(t *testing.T) {
+		// Manually craft an opus with formula: ghost-formula and verify
+		// muster refuses to launch.
+		ghostOpusPath := filepath.Join(instDir, "magna-opera", "qa-goal", "opera",
+			"2026-03-26-ghost-formula.md")
+		ghostContent := `---
+status: charged
+inscribed: 2026-03-26
+magnum_opus: qa-goal
+job: coder
+formula: ghost-formula
+---
+# Ghost formula opus
+`
+		if err := os.WriteFile(ghostOpusPath, []byte(ghostContent), 0644); err != nil {
+			t.Fatal(err)
+		}
+		out, err := runAth("muster", "2026-03-26-ghost-formula.md",
+			"--athanor", "qa-test", "--worktree-path", "/tmp",
+			"--name", "azer-ghost-formula-test")
+		if err == nil {
+			t.Fatal("expected error for missing formula")
+		}
+		if !strings.Contains(out, "formula definition not found") {
+			t.Errorf("expected 'formula definition not found' in output, got: %s", out)
+		}
+	})
+
+	t.Run("collaborate with formula writes formula to frontmatter", func(t *testing.T) {
+		cmd := exec.Command(athBin, "collaborate", "qa-goal",
+			"--intent", "Implement frontend tab",
+			"--job", "coder",
+			"--formula", "coding-dyad")
+		cmd.Env = append(os.Environ(),
+			"ATHANOR_HOME="+tmpHome,
+			"ATHANOR_REPO="+tmpRepo,
+			"ATHANOR="+instDir)
+		outBytes, err := cmd.CombinedOutput()
+		out := string(outBytes)
+		if err != nil {
+			t.Fatalf("ath collaborate --formula failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-implement-frontend-tab")
+
+		// Find the opus file and verify it has the formula
+		entries, err := os.ReadDir(filepath.Join(instDir, "magna-opera", "qa-goal", "opera"))
+		if err != nil {
+			t.Fatalf("reading opera dir: %v", err)
+		}
+		found := false
+		for _, e := range entries {
+			if strings.Contains(e.Name(), "implement-frontend-tab") {
+				data, _ := os.ReadFile(filepath.Join(instDir, "magna-opera", "qa-goal", "opera", e.Name()))
+				if !strings.Contains(string(data), "formula: coding-dyad") {
+					t.Errorf("collaborate opus missing formula field:\n%s", string(data))
+				}
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Error("collaborate opus file not found in opera dir")
+		}
+	})
+
+	t.Run("ath tzurot lists jobs and formulae", func(t *testing.T) {
+		// Run with ATHANOR set so formulae section appears
+		cmd := exec.Command(athBin, "tzurot")
+		cmd.Env = append(os.Environ(),
+			"ATHANOR_HOME="+tmpHome,
+			"ATHANOR_REPO="+tmpRepo,
+			"ATHANOR="+instDir)
+		outBytes, err := cmd.CombinedOutput()
+		out := string(outBytes)
+		if err != nil {
+			t.Fatalf("ath tzurot failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "Jobs (global):") {
+			t.Errorf("expected 'Jobs (global):' header, got: %s", out)
+		}
+		if !strings.Contains(out, "coder") {
+			t.Errorf("expected 'coder' in jobs list, got: %s", out)
+		}
+		if !strings.Contains(out, "Formulae (qa-test):") {
+			t.Errorf("expected 'Formulae (qa-test):' header, got: %s", out)
+		}
+		if !strings.Contains(out, "coding-dyad") {
+			t.Errorf("expected 'coding-dyad' in formulae list, got: %s", out)
+		}
+	})
+
+	t.Run("ath tzurot omits formulae section when no athanor context", func(t *testing.T) {
+		cmd := exec.Command(athBin, "tzurot")
+		// Explicit minimal env — no ATHANOR
+		cmd.Env = []string{
+			"PATH=" + os.Getenv("PATH"),
+			"HOME=" + os.Getenv("HOME"),
+			"ATHANOR_HOME=" + tmpHome,
+			"ATHANOR_REPO=" + tmpRepo,
+		}
+		outBytes, err := cmd.CombinedOutput()
+		out := string(outBytes)
+		if err != nil {
+			t.Fatalf("ath tzurot (no athanor) failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "Jobs (global):") {
+			t.Errorf("expected jobs header, got: %s", out)
+		}
+		if strings.Contains(out, "Formulae") {
+			t.Errorf("expected no formulae section without athanor, got: %s", out)
+		}
+	})
+
+	t.Run("ath formulae lists formulae", func(t *testing.T) {
+		cmd := exec.Command(athBin, "formulae")
+		cmd.Env = append(os.Environ(),
+			"ATHANOR_HOME="+tmpHome,
+			"ATHANOR_REPO="+tmpRepo,
+			"ATHANOR="+instDir)
+		outBytes, err := cmd.CombinedOutput()
+		out := string(outBytes)
+		if err != nil {
+			t.Fatalf("ath formulae failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "coding-dyad") {
+			t.Errorf("expected 'coding-dyad' in output, got: %s", out)
+		}
+		if !strings.Contains(out, "Implementation with independent code review") {
+			t.Errorf("expected formula summary, got: %s", out)
+		}
+		if !strings.Contains(out, "code needs to be written or modified") {
+			t.Errorf("expected when entry, got: %s", out)
+		}
+	})
+
+	t.Run("ath formulae <name> shows detail", func(t *testing.T) {
+		out, err := runAth("formulae", "coding-dyad", "--athanor", "qa-test")
+		if err != nil {
+			t.Fatalf("ath formulae coding-dyad failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "Formula: coding-dyad") {
+			t.Errorf("expected 'Formula: coding-dyad' header, got: %s", out)
+		}
+		if !strings.Contains(out, "Test formula for the QA harness") {
+			t.Errorf("expected formula body, got: %s", out)
+		}
+		// Frontmatter should be stripped from the body
+		if strings.Contains(out, "summary:") {
+			t.Errorf("frontmatter should be stripped from body, got: %s", out)
+		}
+	})
+
+	t.Run("ath formulae <unknown> errors", func(t *testing.T) {
+		out, err := runAth("formulae", "no-such-formula", "--athanor", "qa-test")
+		if err == nil {
+			t.Fatal("expected error for unknown formula")
+		}
+		if !strings.Contains(out, "unknown formula") {
+			t.Errorf("expected 'unknown formula' in output, got: %s", out)
+		}
+	})
+
+	t.Run("cleanup formula test crucibles", func(t *testing.T) {
+		for _, name := range []string{
+			"azer-formula-opus-test",
+			"azer-formula-override-test",
+			"azer-intent-formula-test",
+			"azer-implement-frontend-tab",
+		} {
+			out, err := runAth("cleanup", name, "--athanor", "qa-test")
+			if err != nil {
+				t.Fatalf("cleanup %s failed: %v\n%s", name, err, out)
+			}
+		}
+	})
+
+	// ─── Phase 8f: cleanup job-model and inscribe/collaborate windows ─
 
 	t.Run("cleanup job model test crucibles", func(t *testing.T) {
 		for _, name := range []string{"azer-job-model-test", "azer-model-override-test", "azer-local-layer-test"} {

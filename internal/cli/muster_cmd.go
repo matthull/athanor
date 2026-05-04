@@ -19,6 +19,7 @@ func runMuster(args []string) int {
 		athName      string
 		intent       string
 		job          string
+		formula      string
 	)
 
 	positional, flagArgs := splitArgs(args)
@@ -30,6 +31,7 @@ func runMuster(args []string) int {
 	fs.StringVar(&athName, "athanor", "", "athanor name (if $ATHANOR not set)")
 	fs.StringVar(&intent, "intent", "", "natural language intent (launches autonomous azer)")
 	fs.StringVar(&job, "job", "", "job role for the azer (overrides opus frontmatter in opus mode, required source in intent mode)")
+	fs.StringVar(&formula, "formula", "", "collaboration formula (overrides opus frontmatter in opus mode; optional in intent mode)")
 	fs.SetOutput(os.Stderr)
 
 	if err := fs.Parse(flagArgs); err != nil {
@@ -38,14 +40,14 @@ func runMuster(args []string) int {
 
 	// Dispatch based on mode: --intent means intent-driven autonomous azer
 	if intent != "" {
-		return runMusterIntent(positional, intent, worktreePath, model, crucName, athName, job)
+		return runMusterIntent(positional, intent, worktreePath, model, crucName, athName, job, formula)
 	}
-	return runMusterOpus(positional, worktreePath, model, crucName, athName, job)
+	return runMusterOpus(positional, worktreePath, model, crucName, athName, job, formula)
 }
 
 // runMusterOpus launches an azer for a pre-inscribed opus file.
 // Usage: ath muster <opus-file> [--worktree-path <path>] [--model <model>] [--athanor <name>]
-func runMusterOpus(positional []string, worktreePath, model, crucName, athName, job string) int {
+func runMusterOpus(positional []string, worktreePath, model, crucName, athName, job, formula string) int {
 	if len(positional) < 1 {
 		fmt.Fprintln(os.Stderr, "error: opus file required")
 		fmt.Fprintln(os.Stderr, "usage: ath muster <opus-file> [--worktree-path <path>] [--model <model>]")
@@ -114,6 +116,10 @@ func runMusterOpus(positional []string, worktreePath, model, crucName, athName, 
 	if job == "" {
 		job = athanor.ReadOpusJob(opusPath)
 	}
+	// Resolve formula: --formula flag overrides opus frontmatter
+	if formula == "" {
+		formula = athanor.ReadOpusFormula(opusPath)
+	}
 	// Model priority: --model flag > job frontmatter > athanor.yml default
 	if model == "" {
 		model = athanor.ReadJobModel(instDir, job)
@@ -128,17 +134,23 @@ func runMusterOpus(positional []string, worktreePath, model, crucName, athName, 
 		return 1
 	}
 
+	formulaClause, err := formulaBootClause(instDir, formula)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		return 1
+	}
+
 	var bootPrompt string
 	if moName != "" {
 		moPath := athanor.MagnumOpusPath(instDir, moName)
 		bootPrompt = fmt.Sprintf(
-			"Read %s/AGENTS.md, then read %s, then read %s/azer.md%s. Your opus is at %s. Read it and execute.",
-			instDir, moPath, instDir, jobClause, opusPath,
+			"Read %s/AGENTS.md, then read %s, then read %s/azer.md%s%s. Your opus is at %s. Read it and execute.",
+			instDir, moPath, instDir, jobClause, formulaClause, opusPath,
 		)
 	} else {
 		bootPrompt = fmt.Sprintf(
-			"Read %s/AGENTS.md, then read %s/azer.md%s. Your opus is at %s. Read it and execute.",
-			instDir, instDir, jobClause, opusPath,
+			"Read %s/AGENTS.md, then read %s/azer.md%s%s. Your opus is at %s. Read it and execute.",
+			instDir, instDir, jobClause, formulaClause, opusPath,
 		)
 	}
 
@@ -163,7 +175,7 @@ func runMusterOpus(positional []string, worktreePath, model, crucName, athName, 
 
 // runMusterIntent launches an autonomous azer that inscribes its own opus from intent.
 // Usage: ath muster <mo> <name> --intent <text> [--worktree-path <path>] [--model <model>] [--athanor <name>]
-func runMusterIntent(positional []string, intent, worktreePath, model, crucName, athName, job string) int {
+func runMusterIntent(positional []string, intent, worktreePath, model, crucName, athName, job, formula string) int {
 	if len(positional) < 2 {
 		fmt.Fprintln(os.Stderr, "error: MO name and crucible name required with --intent")
 		fmt.Fprintln(os.Stderr, "usage: ath muster <mo> <name> --intent <text>")
@@ -217,9 +229,15 @@ func runMusterIntent(positional []string, intent, worktreePath, model, crucName,
 		return 1
 	}
 
+	formulaClause, err := formulaBootClause(instDir, formula)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		return 1
+	}
+
 	bootPrompt := fmt.Sprintf(
-		"Read %s/AGENTS.md, then read %s, then read %s/azer.md%s. You are an autonomous azer. Your intent: %s. Inscribe an opus for this work under the %s MO using /opus inscribe (dialectical calcinatio), then execute it. Discharge when complete.",
-		instDir, moPath, instDir, jobClause, intent, moName,
+		"Read %s/AGENTS.md, then read %s, then read %s/azer.md%s%s. You are an autonomous azer. Your intent: %s. Inscribe an opus for this work under the %s MO using /opus inscribe (dialectical calcinatio), then execute it. Discharge when complete.",
+		instDir, moPath, instDir, jobClause, formulaClause, intent, moName,
 	)
 
 	claudeArgs := fmt.Sprintf(
@@ -264,6 +282,22 @@ func exitCode(err error) int {
 		return 2
 	}
 	return 1
+}
+
+// formulaBootClause returns ", then read <path>" for the boot prompt if a formula
+// is specified, or an empty string if no formula is set. Returns an error if the
+// formula is specified but the FORMULA.md file does not exist at the expected path.
+// The clause is appended after the job clause so the formula layers collaboration
+// guidance on top of professional identity.
+func formulaBootClause(instDir, formula string) (string, error) {
+	if formula == "" {
+		return "", nil
+	}
+	formulaPath := filepath.Join(instDir, athanor.FormulaeDir, formula, athanor.FormulaFile)
+	if _, err := os.Stat(formulaPath); err != nil {
+		return "", fmt.Errorf("formula definition not found: %s", formulaPath)
+	}
+	return fmt.Sprintf(", then read %s", formulaPath), nil
 }
 
 // jobBootClause returns ", then read <path>" for the boot prompt if a job is specified,

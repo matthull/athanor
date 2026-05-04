@@ -376,6 +376,12 @@ func ReadOpusJob(path string) string {
 	return readFrontmatterField(path, "job:")
 }
 
+// ReadOpusFormula reads the formula field from an opus file's YAML frontmatter.
+// Returns empty string when the field is absent or the file can't be read.
+func ReadOpusFormula(path string) string {
+	return readFrontmatterField(path, "formula:")
+}
+
 // ReadJobModel reads the model field from a JOB.md file's YAML frontmatter.
 // Returns empty string if the job has no model specified or the file doesn't exist.
 func ReadJobModel(instDir, jobName string) string {

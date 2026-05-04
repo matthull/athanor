@@ -66,6 +66,7 @@ type inscribeArgs struct {
 	moName      string
 	intent      string
 	job         string
+	formula     string
 	name        string
 	muster      bool
 }
@@ -78,6 +79,7 @@ func parseInscribeArgs(args []string) (*inscribeArgs, error) {
 	fs := flag.NewFlagSet("inscribe", flag.ContinueOnError)
 	fs.StringVar(&ia.intent, "intent", "", "natural language intent for the opus (required)")
 	fs.StringVar(&ia.job, "job", "", "job role for the azer (required)")
+	fs.StringVar(&ia.formula, "formula", "", "collaboration formula from $ATHANOR/formulae/ (optional)")
 	fs.StringVar(&ia.name, "name", "", "opus filename override (default: slugified intent)")
 	fs.BoolVar(&ia.muster, "muster", false, "immediately muster an azer for this opus")
 	fs.SetOutput(os.Stderr)
@@ -133,6 +135,14 @@ func runInscribe(args []string) int {
 		return 1
 	}
 
+	// Validate formula (optional) — formulae live in the athanor instance
+	if ia.formula != "" {
+		if err := athanor.ValidateFormula(instDir, ia.formula); err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			return 1
+		}
+	}
+
 	// Build opus filename
 	datestamp := time.Now().Format("2006-01-02")
 	slug := ""
@@ -156,7 +166,7 @@ func runInscribe(args []string) int {
 	opusPath := filepath.Join(operaDir, opusFilename)
 
 	// Build opus content
-	content := buildOpusContent(datestamp, ia.moName, ia.job, ia.intent, "")
+	content := buildOpusContent(datestamp, ia.moName, ia.job, ia.formula, ia.intent, "")
 
 	if err := os.WriteFile(opusPath, []byte(content), 0644); err != nil {
 		fmt.Fprintf(os.Stderr, "error writing opus: %v\n", err)
@@ -173,7 +183,8 @@ func runInscribe(args []string) int {
 }
 
 // buildOpusContent generates the markdown content for an inscribed opus.
-func buildOpusContent(datestamp, moName, job, intent, collaborationContext string) string {
+// formula is optional — when non-empty it is emitted in frontmatter after job.
+func buildOpusContent(datestamp, moName, job, formula, intent, collaborationContext string) string {
 	// YAML frontmatter
 	var fm strings.Builder
 	fm.WriteString("---\n")
@@ -182,6 +193,9 @@ func buildOpusContent(datestamp, moName, job, intent, collaborationContext strin
 	fm.WriteString(fmt.Sprintf("magnum_opus: %s\n", moName))
 	if job != "" {
 		fm.WriteString(fmt.Sprintf("job: %s\n", job))
+	}
+	if formula != "" {
+		fm.WriteString(fmt.Sprintf("formula: %s\n", formula))
 	}
 	fm.WriteString("---\n")
 
@@ -216,6 +230,7 @@ func musterInscribedOpus(instDir, opusPath, slug string) int {
 
 	moName := athanor.ReadOpusMO(opusPath)
 	job := athanor.ReadOpusJob(opusPath)
+	formula := athanor.ReadOpusFormula(opusPath)
 
 	// Model priority: job frontmatter > athanor.yml default
 	model := athanor.ReadJobModel(instDir, job)
@@ -229,17 +244,23 @@ func musterInscribedOpus(instDir, opusPath, slug string) int {
 		return 1
 	}
 
+	formulaClause, err := formulaBootClause(instDir, formula)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		return 1
+	}
+
 	var bootPrompt string
 	if moName != "" {
 		moPath := athanor.MagnumOpusPath(instDir, moName)
 		bootPrompt = fmt.Sprintf(
-			"Read %s/AGENTS.md, then read %s, then read %s/azer.md%s. Your opus is at %s. Read it and execute.",
-			instDir, moPath, instDir, jobClause, opusPath,
+			"Read %s/AGENTS.md, then read %s, then read %s/azer.md%s%s. Your opus is at %s. Read it and execute.",
+			instDir, moPath, instDir, jobClause, formulaClause, opusPath,
 		)
 	} else {
 		bootPrompt = fmt.Sprintf(
-			"Read %s/AGENTS.md, then read %s/azer.md%s. Your opus is at %s. Read it and execute.",
-			instDir, instDir, jobClause, opusPath,
+			"Read %s/AGENTS.md, then read %s/azer.md%s%s. Your opus is at %s. Read it and execute.",
+			instDir, instDir, jobClause, formulaClause, opusPath,
 		)
 	}
 
