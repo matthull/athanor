@@ -140,7 +140,7 @@ MCP servers (telegram, Slack, Keep, Linear, etc.) are auto-discovered — not li
 
 ## Known Gaps
 
-- **No formulae authored yet.** Phase 2 (CLI) is shipped; Phase 3 (creating the first `coding-dyad` formula in musashi, extracting the dyad section out of `shared/jobs/coder/JOB.md`, and updating `azer.md` / `marut.md` / `opus.md` to be formula-aware) remains. Spec at `specs/formulae-system/spec.md § Phase 3`.
+- **Formulae adoption observation pending.** Phases 1-3 of the formulae system are shipped (spec, CLI, first formula `coding-dyad` in musashi, formula-aware guidance files). Phase 4 — observing whether the marut uses formulae in dispatch and whether azers read and follow them — is the open work. Spec at `specs/formulae-system/spec.md § Phase 4`.
 
 ---
 
