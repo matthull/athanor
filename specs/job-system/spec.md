@@ -2,10 +2,11 @@
 
 **Status:** Implemented (Waves 1–2 complete, Wave 3 deployed)
 **Created:** 2026-04-21
-**Updated:** 2026-04-27
+**Updated:** 2026-05-04
 **Origin:** Interactive opus, athanor-alignment MO — artifex-directed
 **Supersedes:** `specs/role-system/spec.md` (concept stage — this spec evolves and replaces it)
 **Related:** `specs/azer-orchestration/spec.md` (diagnosis of the drift problem this solves)
+**Extended by:** `specs/formulae-system/spec.md` (compound tzurot — collaboration patterns across jobs)
 
 ---
 
@@ -83,6 +84,8 @@ TeamCreate may remain useful for truly mechanical subtasks (search 30 files, run
 | **Job boundary** | Not a wall but a professional instinct. A job-role azer naturally thinks in its specialty; when work of a different shape appears, its instinct is to seek collaboration rather than stretch. A QA azer that finds a typo might fix it (good judgment); one that finds a systemic issue inscribes a fixer (professional instinct). The motivation is quality, not compliance. | New `[B:artifex]` |
 | **Job registry** | The set of available job definitions in `shared/jobs/*/JOB.md`. Discoverable at muster time. Grows as the system learns what patterns recur. | New `[E:gastown]` |
 | **Inscription-time job assignment** | The job role is defined at inscription time — when the opus is created. The inscriber (marut, artifex, or another azer) specifies which job applies. | New `[B:artifex]` |
+| **Tzurah** (pl. tzurot) | A form that gives shape to work. Jobs are simple tzurot (one professional perspective). Formulae are compound tzurot (collaboration patterns across perspectives). See `specs/formulae-system/spec.md`. | New `[B:artifex]` |
+| **Formula** (pl. formulae) | A compound tzurah — an athanor-specific collaboration pattern. Lives in `$ATHANOR/formulae/<name>/FORMULA.md`. Dispatch hierarchy: formula → job → generalist. See `specs/formulae-system/spec.md`. | New `[B:artifex]` |
 
 ---
 
