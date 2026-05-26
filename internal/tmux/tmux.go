@@ -174,6 +174,15 @@ func (r *Runner) NewWindow(session, name, dir string) error {
 	return err
 }
 
+// RenameWindow renames a tmux window. Idempotent — returns nil if the window doesn't exist.
+func (r *Runner) RenameWindow(target, newName string) error {
+	_, err := r.run("rename-window", "-t", target, newName)
+	if err != nil && (strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "can't find")) {
+		return nil // idempotent
+	}
+	return err
+}
+
 // KillWindow kills a tmux window by name. Idempotent — returns nil if window doesn't exist.
 func (r *Runner) KillWindow(name string) error {
 	_, err := r.run("kill-window", "-t", name)

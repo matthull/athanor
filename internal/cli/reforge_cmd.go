@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/matthull/athanor/internal/athanor"
 	"github.com/matthull/athanor/internal/tmux"
@@ -69,14 +68,12 @@ func runReforge(args []string) int {
 	r := tmux.NewRunner()
 	session := athanor.SessionName(name)
 
-	// Kill old crucible
+	// Rename old crucible to avoid name collision with the new one.
+	// This must happen before creating the new window (same name).
+	// Idempotent — no-op if the old window doesn't exist.
 	oldTarget := session + ":" + crucible
-	_ = r.SendKeys(oldTarget, "C-c")
-	time.Sleep(500 * time.Millisecond)
-	_ = r.SendKeysLiteral(oldTarget, "exit")
-	_ = r.SendKeys(oldTarget, "Enter")
-	time.Sleep(1 * time.Second)
-	_ = r.KillWindow(oldTarget)
+	dyingName := crucible + "-dying"
+	_ = r.RenameWindow(oldTarget, dyingName)
 
 	workDir := cfg.Project
 	if workDir == "" {
@@ -116,6 +113,11 @@ func runReforge(args []string) int {
 		fmt.Fprintf(os.Stderr, "error launching marut: %v\n", err)
 		return 1
 	}
+
+	// Kill old crucible last. Even if this propagates SIGHUP to our caller
+	// (when reforge is invoked from within the old marut window), all
+	// important work — new window created, claude launched — is already done.
+	_ = r.KillWindow(session + ":" + dyingName)
 
 	fmt.Printf("Marut reforged for %q in crucible %q\n", moName, crucible)
 

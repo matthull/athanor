@@ -1313,6 +1313,31 @@ formula: ghost-formula
 		}
 	})
 
+	t.Run("reforge is reliable over 5 consecutive runs", func(t *testing.T) {
+		for i := 1; i <= 5; i++ {
+			out, err := runAth("reforge", "qa-test", "qa-goal")
+			if err != nil {
+				t.Fatalf("reforge iteration %d failed: %v\n%s", i, err, out)
+			}
+			if !strings.Contains(out, "reforged") {
+				t.Fatalf("reforge iteration %d: expected 'reforged' in output, got: %s", i, out)
+			}
+
+			time.Sleep(500 * time.Millisecond)
+			windows := listSessionWindows(t, qaSession)
+			if !containsExact(windows, "marut-qa-test-qa-goal") {
+				t.Fatalf("reforge iteration %d: marut window missing after reforge, got: %v", i, windows)
+			}
+
+			// Verify no stale -dying windows leaked
+			for _, w := range windows {
+				if strings.HasSuffix(w, "-dying") {
+					t.Errorf("reforge iteration %d: stale dying window %q not cleaned up", i, w)
+				}
+			}
+		}
+	})
+
 	// ─── Phase 12: Discharge opus and verify opera ───────────────────
 
 	t.Run("opera reflects discharged status", func(t *testing.T) {
