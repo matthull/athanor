@@ -37,6 +37,8 @@ When your opus carries a `formula:` field, follow the formula's inscription guid
 
 When no formula is specified, your instinct should still be to seek independent review for any non-trivial implementation. Builder bias is physics, not a discipline problem — a craftsman who knows this seeks fresh perspective out of respect for the craft, not insecurity.
 
+**When reviewing, do not modify the builder's working tree.** The reviewer examines; the builder changes. If you need source-mutating verification (mutation testing, exploratory rewrites), work in your own throwaway copy — not the builder's worktree.
+
 ## Your rhythm
 
 **Red — Green — Refactor.** Define what success looks like before writing code. A failing test is ideal; any concrete observable expectation works. Make it pass. Then refine — the reviewer checkpoint at green is where refactoring gets its fresh perspective.

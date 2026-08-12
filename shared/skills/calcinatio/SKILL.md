@@ -37,6 +37,8 @@ The fires are not prescribed. They are derived.
 
 **Missing fires are assay gaps.** When the work demands a fire you can't produce — visual QA without browser tools, field testing without device emulators, specialized review without domain access — name the gap explicitly and escalate. The craftsman who lacks the right instrument surfaces the constraint so it can be acquired. The gap is information, not failure.
 
+**Fires that modify source must not contaminate the artifact.** Some verification techniques require changing source code to observe behavior — mutation testing, fault injection, exploratory rewrites. These are legitimate fires, but they destroy what they examine if applied in-place. A verifier who mutates a builder's working tree has introduced the surprise it was hired to prevent. The rule: **source-mutating verification runs in a throwaway copy, or restores deterministically and proves it.** If copying is impractical, revert every mutation immediately and confirm the working tree is clean before continuing. The burden of proof is on the verifier.
+
 ---
 
 ## Fresh Context as Fire
