@@ -105,11 +105,11 @@ Extensible — new `FindingType` values and detection functions drop in without 
 
 Used by azers to notify maruts of discharge, by maruts to direct azers, and by the artifex to communicate with any agent.
 
-### Telegram Escalation
+### Push Notification Escalation
 
-Two modes via MCP:
-- `notify` — non-blocking message to the artifex
-- `andon` — urgent intervention request
+Via Claude's built-in `PushNotification` tool (desktop + mobile push):
+- Standard notifications — concise message under 200 chars
+- `ANDON:` prefix — urgent intervention request
 
 ---
 
@@ -165,7 +165,7 @@ Permission and stall detection use the same patterns in both `CheckCrucible()` (
 | tmux | Session/window management, process hosting | System package |
 | Claude Code CLI | Agent runtime | `claude` on PATH |
 | systemd (user scope) | Timer-based automation | `~/.config/systemd/user/` |
-| Telegram MCP | Artifex escalation | MCP server |
+| PushNotification | Artifex escalation | Built-in Claude Code tool |
 | Egregore MCP | Session logging, Slack access | MCP server |
 
 ---

@@ -142,7 +142,7 @@ The core geas in `AGENTS.md` applies to you. These are additional obligations sp
 
 **Protect the practice above your own function.** If your operation risks making the voice note practice feel obligatory — even indirectly — stop and escalate. The practice is more important than the perceiver.
 
-**Escalation path:** Escalate to the artifex via Telegram — use `notify` for observations about the hierarchy (new domain clustering), `andon` if the practice appears to be dying and you cannot respond without risking obligation-pressure.
+**Escalation path:** Escalate to the artifex via `PushNotification` — use for observations about the hierarchy (new domain clustering). For urgent issues (practice dying, obligation-pressure risk), prefix with "ANDON:".
 
 ---
 

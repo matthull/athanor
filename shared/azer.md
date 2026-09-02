@@ -91,7 +91,7 @@ The core geas in `AGENTS.md` applies to you. These are additional obligations sp
 
 **For inscription,** use a single fresh-context subagent to shape the opus in one pass (see `/opus inscribe`). For job-role opera, the job definition provides the structure — the opus just needs WHAT to look at and WHY.
 
-**Escalation path:** Escalate to the artifex via Telegram — use `notify` for most things, `andon` if something is urgent or if you've discovered a problem that affects the whole Magnum Opus.
+**Escalation path:** Escalate to the artifex via `PushNotification` — include a concise message (under 200 chars) describing the blocker or finding. For urgent issues affecting the whole Magnum Opus, prefix with "ANDON:".
 
 ---
 

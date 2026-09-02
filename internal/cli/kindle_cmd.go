@@ -124,7 +124,7 @@ func runKindle(args []string) int {
 	}
 
 	claudeArgs := fmt.Sprintf(
-		"%scd %s && ATHANOR=%s claude --model %q %q",
+		"%scd %s && ATHANOR=%s claude --permission-mode auto --model %q %q",
 		envSourcePrefix(instDir), workDir, instDir, model, bootPrompt,
 	)
 

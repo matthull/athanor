@@ -155,7 +155,7 @@ func runMusterOpus(positional []string, worktreePath, model, crucName, athName, 
 	}
 
 	claudeArgs := fmt.Sprintf(
-		"%scd %s && ATHANOR=%s claude --model %q %q",
+		"%scd %s && ATHANOR=%s claude --permission-mode auto --model %q %q",
 		envSourcePrefix(instDir), worktreePath, instDir, model, bootPrompt,
 	)
 
@@ -241,7 +241,7 @@ func runMusterIntent(positional []string, intent, worktreePath, model, crucName,
 	)
 
 	claudeArgs := fmt.Sprintf(
-		"%scd %s && ATHANOR=%s claude --model %q %q",
+		"%scd %s && ATHANOR=%s claude --permission-mode auto --model %q %q",
 		envSourcePrefix(instDir), worktreePath, instDir, model, bootPrompt,
 	)
 

@@ -101,7 +101,7 @@ These run on timers and provide the autonomous glue between interactive sessions
 | `voice-notes-process` | 5 min | Downloads and processes voice recordings from Google Drive. |
 | `triage-router` | path-activated | Routes signals from the triage inbox to appropriate domains. |
 | `headless-log-cleanup` | daily | Cleans up headless Claude session logs older than 48 hours. |
-| `telegram-mcp` | always-on | Telegram MCP server (SSE singleton) — the escalation and notification channel. |
+| ~~`telegram-mcp`~~ | ~~always-on~~ | **Retired (2026-09-02).** Replaced by Claude's built-in `PushNotification` tool for escalation and notification. |
 | `yadm-sync` | 10 min | Syncs dotfiles via yadm. |
 
 ---
@@ -124,7 +124,7 @@ MCP servers (telegram, Slack, Keep, Linear, etc.) are auto-discovered — not li
                        ├── tmux sessions ──→ Crucibles (maruts, azers, perceivers, attendants)
                        │                       │
                        │                       ├── whisper ──→ inter-agent messages
-                       │                       ├── telegram-mcp ──→ artifex escalation
+                       │                       ├── PushNotification ──→ artifex escalation (built-in)
                        │                       └── egregore-mcp ──→ Slack, meetings
                        │
                        └── opera/ ──→ trail of work (git-tracked)

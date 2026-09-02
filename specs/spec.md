@@ -73,7 +73,7 @@ Agents fall into two lifecycle classes:
 
 **Perceiver** *(alchemical)* — Mirror for the artifex's state. Presence-driven singleton. Processes interoceptive signals (voice notes, check-ins) into a living portrait of the artifex's current state. Internal to the system — the portrait is a means to an end, supporting attunement-aware decisions by other agents.
 
-**Attendant** *(alchemical)* — The artifex's attunement companion. Presence-driven singleton. Always active — the artifex communicates with it via Telegram. Incorporates interoception, surfaces materia as invitations, supports the "noticing moment before action." The primary interface between the life athanor and the artifex's daily experience.
+**Attendant** *(alchemical)* — The artifex's attunement companion. Presence-driven singleton. Always active — the artifex communicates with it by walking up to the crucible. Push notifications (`PushNotification`) for time-sensitive alerts. Incorporates interoception, surfaces materia as invitations, supports the "noticing moment before action." The primary interface between the life athanor and the artifex's daily experience.
 
 **Beholder** *(monster manual)* — Watcher. Scans channels and conditions, creates work when it finds something that needs doing. (Designed, not yet built.)
 
@@ -287,7 +287,7 @@ Agents have two layers with different lifetimes:
 
 **Hooks as Hard Constraints** — PreToolUse hooks that block dangerous operations based on role. Examples: `no-push-to-master.sh`, `no-merge-pr.sh`, `bounded-scope.sh` (no edits outside working directory). Hooks are small, single-purpose scripts. Roles compose them. **Important context:** most behavioral enforcement lives at the *project* level (CLAUDE.md, CI hooks, project settings), not the athanor level. The athanor operates *within* environments that already enforce their own constraints. Athanor-level hooks would only cover athanor-specific boundaries (e.g., "maruts don't write code," "azers don't modify shared components"). No clear application has arisen yet — signal will emerge from operation.
 
-**Escalation Bus** — Routing alerts from any agent to the operator through a consistent channel. Currently: Telegram via `mcp__telegram-mcp__notify`
+**Escalation Bus** — Routing alerts from any agent to the operator through a consistent channel. Currently: Claude's built-in `PushNotification` tool (sends desktop + mobile push notifications).
 
 ### Key Decisions
 
@@ -369,10 +369,10 @@ At every boundary — discharge, assessment, session end — accumulated context
 - What went well and what didn't (brief, honest)
 - Anything learned that should update the system (role definitions, assay templates, MO context)
 - Documentation updates (specs, architecture docs, CLAUDE.md)
-- External updates (Slack messages, Linear ticket status/comments, PR body updates, Telegram notification to operator)
+- External updates (Slack messages, Linear ticket status/comments, PR body updates, push notification to operator)
 - Raw learnings that don't have an obvious home → dump to markdown in project dir (`specs/<project>/` or similar)
 
-**Where context goes:** Opus outcome/reflection → appended to the opus file (so precedent search finds it). Documentation → targeted updates to the relevant docs. Notifications → Slack, Telegram, Linear as appropriate. Everything else → markdown in project dir, findable by future assay.
+**Where context goes:** Opus outcome/reflection → appended to the opus file (so precedent search finds it). Documentation → targeted updates to the relevant docs. Notifications → Slack, PushNotification, Linear as appropriate. Everything else → markdown in project dir, findable by future assay.
 
 **The test:** If a fresh azer picks up a similar opus tomorrow, can it find what the previous azer learned? If not, the context preservation failed.
 
@@ -710,7 +710,7 @@ Built, fired, and working.
 | Beholder role | Medium | Needed for auto-dispatch patterns. |
 | ~~Project corpus definition~~ | ~~Medium~~ | Defined — see "Corpus Map" in vocabulary. Formal concept at MO level (`## Corpus Map` section) and athanor level (`corpus-map.md`). |
 | Primus as agent | Low | Currently manual. `ath` provides tooling (status, opera, muster) but Primus loop is still the artifex. |
-| Escalation bus format | Low | Telegram works; message format not standardized. |
+| ~~Escalation bus format~~ | ~~Low~~ | Resolved — migrated to `PushNotification` (2026-09-02). Format is inherently concise (200 char limit). |
 | Forced discharge on context exhaustion | Medium | Protocol exists (azer self-discharges on budget guard warning, marut cleans up and reads trail on `exhausted`/`dead`). Gap: discharge is advisory — azer can ignore the warning and die with unreleased context. Discharge is non-deterministic so forcing it is non-trivial. |
 
 ### Infrastructure Gaps (Discovered in Operation)

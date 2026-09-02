@@ -90,8 +90,8 @@ func runReforge(args []string) int {
 	)
 
 	claudeArgs := fmt.Sprintf(
-		"cd %s && ATHANOR=%s claude --model %q %q",
-		workDir, instDir, model, reforgePrompt,
+		"%scd %s && ATHANOR=%s claude --permission-mode auto --model %q %q",
+		envSourcePrefix(instDir), workDir, instDir, model, reforgePrompt,
 	)
 
 	if err := r.EnsureSession(session); err != nil {

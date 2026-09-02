@@ -33,7 +33,7 @@ The #bugsnag athanor is the first test bed. The goal is NOT a fully autonomous e
 | `claude-run` on PATH | Done | Headless + passthrough modes, system prompt injection |
 | `wtp` for sandboxes | Done | Worktree isolation for azers |
 | `whisper` CLI | Done | Reliable inter-crucible communication |
-| Telegram escalation | Done | notify + andon via MCP, tested |
+| Push notification escalation | Done | Via Claude's built-in `PushNotification` tool (migrated from Telegram MCP 2026-09-02) |
 | Context budget guard | Done | Warns at 75/85/92%, fail-open, all advisory |
 | Role enforcement hooks | Deferred | Prompt-only enforcement — observe drift under supervision |
 | `claude-run` role awareness | Deferred | Manual session config for now |
