@@ -6,7 +6,7 @@
 **Created:** 2026-03-22
 **Instance:** `specs/athanors/docker-cleanup/` (the materialized athanor agents read)
 **Blueprint:** `specs/athanor/spec.md` (the system design — off-limits to agents)
-**Model:** Based on the bugsnag athanor (kadmon.md) — first test bed
+**Model:** Based on the my-project athanor (kadmon.md) — first test bed
 
 ---
 
@@ -16,20 +16,20 @@
 
 This IS a practical problem. The hope is to start using athanors for day-to-day work next week. But we are not rushing to that — just testing that hypothesis without taking shortcuts like overspecifying. `/orchestrate` remains the workhorse for as long as needed. The athanor earns its place by demonstrating value, not by being declared ready.
 
-**Key tension:** Docker cleanup is finite. The bugsnag athanor is a patrol — a continuous state-maintenance goal. This athanor will resolve its problem and... then what? Does the marut declare victory and quiesce? Does it expand scope toward "build the infrastructure layer that lets worktree environments be truly ephemeral at scale"? Does it notice the meta-circularity — that the athanor system itself depends on clean worktree lifecycle? Watch for this. Don't prescribe it.
+**Key tension:** Docker cleanup is finite. The my-project athanor is a patrol — a continuous state-maintenance goal. This athanor will resolve its problem and... then what? Does the marut declare victory and quiesce? Does it expand scope toward "build the infrastructure layer that lets worktree environments be truly ephemeral at scale"? Does it notice the meta-circularity — that the athanor system itself depends on clean worktree lifecycle? Watch for this. Don't prescribe it.
 
 ---
 
 ## Testing Variety
 
-The bugsnag athanor tests "software error patrol" — scan, triage, fix, PR. This athanor tests "infrastructure investigation and improvement" — diagnose a system problem, fix scripts/tooling, verify at the system level.
+The my-project athanor tests "software error patrol" — scan, triage, fix, PR. This athanor tests "infrastructure investigation and improvement" — diagnose a system problem, fix scripts/tooling, verify at the system level.
 
 **Future athanor test candidates should seek orthogonal problem types:**
 
 | Type | Example | What it tests |
 |------|---------|---------------|
 | Software ticket execution | Feature work from Linear | The bread and butter — can it ship PRs? |
-| Error patrol (continuous) | #bugsnag athanor | State maintenance, ongoing scanning |
+| Error patrol (continuous) | #my-project athanor | State maintenance, ongoing scanning |
 | Infrastructure (finite) | Docker cleanup (this one) | Investigation, system-level fixes |
 | Product management | Shaping, spec writing, stakeholder comms | Non-code value creation |
 | Self-improvement | Athanor system building from kadmon.md | Meta-capability — can it help architect itself? |
@@ -54,7 +54,7 @@ Not yet. But worth watching for the moment when it makes sense.
 | Date | Decision | Rationale |
 |------|----------|-----------|
 | 2026-03-22 | One athanor per magnum opus | Each athanor pursues a single goal. Multiple goals = multiple athanors. |
-| 2026-03-22 | Finite problem as second test | Deliberately different from bugsnag patrol to test versatility. |
+| 2026-03-22 | Finite problem as second test | Deliberately different from my-project patrol to test versatility. |
 | 2026-03-22 | Don't overspecify the magnum opus | Let the marut discover the problem space. Entrypoints, not instructions. |
 | 2026-03-22 | Seek variety in test athanors | Bug fixes, infra, PM, product, self-improvement — test orthogonal problem types. |
 | 2026-03-22 | Rename myrmidon → azer (system-wide) | Azers are D&D fire dwarves who reproduce by sharing their inner flame — master craftsmen, not worker ants. The agents are mini-artificers in a bottle: creative echoes of the master who bring real craft and judgment but understand their limits. "Myrmidon" connoted obedient execution; "azer" connotes skilled autonomy within bounds. Applied across all athanors and the system spec. |
@@ -63,7 +63,7 @@ Not yet. But worth watching for the moment when it makes sense.
 
 ## Architecture Notes
 
-### Relationship to bugsnag athanor
+### Relationship to my-project athanor
 
 Same materia structure, same vocabulary, same core geas. Domain-specific differences:
 

@@ -12,15 +12,15 @@
 |-----|---------|
 | `[B:session-2026-03-24]` | From artifex shaping session 2026-03-24 |
 | `[B:seismic-observation]` | Triggered by seismic-classifier-mapping athanor observations |
-| `[E:CLAUDE.md]` | Extends existing musashi CLAUDE.md patterns |
-| `[E:CLAUDE.local.md]` | Extends existing musashi CLAUDE.local.md |
+| `[E:CLAUDE.md]` | Extends existing my-app CLAUDE.md patterns |
+| `[E:CLAUDE.local.md]` | Extends existing my-app CLAUDE.local.md |
 | `[D:reason]` | Design decision with rationale |
 
 ---
 
 ## Overview
 
-Athanor agents operating in musashi have access to a rich ecosystem of skills, documentation, and operational context — but can't reliably find or use most of it. The seismic-classifier-mapping athanor produced excellent technical work but missed project management concerns (UX complexity risk, status snapshots, witness notifications) because agents didn't load skills like `/nfr-product-lens`, `/project-management`, or `/qa-plan` that would have surfaced those concerns naturally. `[B:seismic-observation]`
+Athanor agents operating in my-app have access to a rich ecosystem of skills, documentation, and operational context — but can't reliably find or use most of it. The seismic-classifier-mapping athanor produced excellent technical work but missed project management concerns (UX complexity risk, status snapshots, witness notifications) because agents didn't load skills like `/nfr-product-lens`, `/project-management`, or `/qa-plan` that would have surfaced those concerns naturally. `[B:seismic-observation]`
 
 This spec addresses three gaps:
 
@@ -48,7 +48,7 @@ All changes live in the environment (CLAUDE.local.md, hooks, scripts) — not in
 
 ### Current State
 
-An athanor azer working on a musashi project:
+An athanor azer working on a my-app project:
 
 1. Reads its opus (intent + context)
 2. Reads AGENTS.md, azer.md (athanor protocol)
@@ -75,7 +75,7 @@ An athanor azer working on a musashi project:
 
 ### D1: Skill Directory in CLAUDE.local.md
 
-Add a curated skill directory to CLAUDE.local.md organized by *purpose* (not by workflow or domain). This makes personal skills visible to all agents working in musashi, including athanor agents.
+Add a curated skill directory to CLAUDE.local.md organized by *purpose* (not by workflow or domain). This makes personal skills visible to all agents working in my-app, including athanor agents.
 
 **Intent:** An athanor agent doing assessment work sees "Risk detection & project management" and naturally loads `/nfr-product-lens` or `/project-management`. `[B:session-2026-03-24]`
 
@@ -176,7 +176,7 @@ T1 and T2 are independent and ready now. T3 is investigation. T4 depends on T3. 
 - Changes to shared athanor components beyond the assessment template Context line (D4)
 - Automated skill recommendation (too complex for now — start with visibility)
 - Skill effectiveness measurement (need usage data first)
-- Changes to the musashi project CLAUDE.md routing table or skill catalog
+- Changes to the my-app project CLAUDE.md routing table or skill catalog
 - New skills — this spec is about making existing skills findable
 
 ---

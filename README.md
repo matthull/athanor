@@ -2,9 +2,33 @@
 
 *The alchemist's furnace that burns continuously — maintaining constant temperature for sustained transformation.*
 
-The athanor is an agent orchestration system built on Claude Code. It accepts goals stated in stakeholder-value terms and produces satisfying results — doing everything an agent system reasonably can, without micromanagement, communicating and escalating intelligently to keep the operator informed of what genuinely needs them.
+## What This Is
 
-For its operator (who has ADHD and autism), this is not a productivity tool. It is executive function infrastructure — the accommodation that makes sustained professional work possible.
+A multi-agent orchestration system I built on top of Claude Code and run daily. It manages persistent goals across agent sessions that die, crash, or exhaust their context — progress survives because the architecture absorbs those failures instead of losing work.
+
+I built it because I have ADHD and autism. Sustained professional work requires executive function infrastructure that doesn't exist off the shelf. The athanor is that infrastructure — it holds the goals, tracks the work, escalates when it needs me, and keeps going when I can't hold the thread.
+
+## What It Demonstrates
+
+- **Multi-agent coordination** — supervisor agents (maruts) dispatch workers (azers) to isolated environments, monitor progress, and handle session failures
+- **Behavioral architecture** — agents are bound by a "geas" (behavioral compulsion) rather than procedural checklists, which produces verification discipline and clean escalation without enumerating every procedure
+- **Systematic verification (calcinatio)** — every piece of work gets independent review from fresh context before it ships, because accumulated builder context self-confirms
+- **Go CLI** — the `ath` binary handles instance management, agent lifecycle, inter-agent communication, and tmux orchestration
+- **Role specialization** — 7+ defined specialist roles (coder, QA specialist, investigator, solution architect, etc.) that shape how agents approach work
+- **ADHD as architecture driver** — not a caveat, a design constraint. Persistent state because working memory is unreliable. Escalation-as-success because executive function load is a real cost. The accommodation produced better architecture.
+
+## Evidence
+
+In measured use on a production codebase, this system produced ~7 merged PRs/day — up from ~1/day pre-system. That was 3x the next-best contributor on the team and a 7x self-improvement over baseline, with quality independently reviewed as comparable to manual work.
+
+## Key Design Decisions
+
+- **Geas over checklists.** A behavioral compulsion ("pursue this with integrity and abundantly satisfy the goal") channels completion bias toward genuine value. Checklists get gamed; a well-formed geas makes gaming feel like a violation.
+- **Fresh context as verification.** Accumulated builder context self-confirms. A fresh agent reviewing the same work catches what the builder rationalized away. This is structural, not a quality preference.
+- **Opera and trail over task lists.** Each unit of work (opus) carries its own intent, boundary, and discharge record. The trail of discharged opera is the authoritative history — what actually happened, not what was planned.
+- **Escalation as success.** Agents that can't proceed with evidence escalate instead of guessing. The architecture makes escalation feel like compliance, so the system produces useful signals instead of hallucinated progress.
+
+---
 
 ## Motivation
 
@@ -29,7 +53,9 @@ The athanor makes progress **inevitable** — not through individual agent relia
 
 **Abundant satisfaction** — The completion standard is "would the witnesses feel this is completely handled?" not "were the requirements technically met?" Agents close the tail — coordination, communication, documentation — so the operator engages only where genuine human judgment is required.
 
-## Repository Structure
+## Setup & Usage
+
+### Repository Structure
 
 ```
 cmd/ath/             -- CLI entry point
@@ -40,15 +66,14 @@ internal/
 specs/
   spec.md            -- system specification (start here)
   cli/spec.md        -- ath CLI specification
-  kadmon.md          -- operational runbook (first athanor instance)
-  issues.md          -- known issues discovered in operation
+  kadmon.md          -- operational runbook
 ```
 
 The athanor home (`~/athanor/`) lives outside this repo — it contains shared components and all athanor instances. This repo is the CLI source and system spec.
 
 The system spec at [`specs/spec.md`](specs/spec.md) is the canonical reference for principles, architecture, vocabulary, and design decisions.
 
-## The `ath` CLI
+### The `ath` CLI
 
 The `ath` binary is the operational backbone. Install with `make install` (puts it at `~/.local/bin/ath`).
 
@@ -79,17 +104,17 @@ ath completion zsh > ~/.zsh/completions/_ath
 
 ```bash
 # 1. Create the instance
-ath init bugsnag --project ~/code/musashi
+ath init my-project --project ~/code/my-app
 
 # 2. Create a magnum opus — define the goal, witnesses, and context
-vim ~/athanor/athanors/bugsnag/magna-opera/slack-monitoring.md
+vim ~/athanor/athanors/my-project/magna-opera/error-monitoring.md
 
 # 3. Kindle the marut for that MO
-ath kindle bugsnag slack-monitoring
+ath kindle my-project error-monitoring
 
 # 4. Check on it
 ath status
-ath status bugsnag
+ath status my-project
 ```
 
 ### Workflow: Marut musters an azer
@@ -98,10 +123,10 @@ From within a running marut session (or manually):
 
 ```bash
 # Muster an azer for a charged opus
-ath muster 2026-03-25-fix-nil-error.md --athanor bugsnag --worktree-path ~/code/musashi-worktree
+ath muster 2026-03-25-fix-nil-error.md --athanor my-project --worktree-path ~/code/my-app-worktree
 
 # Check opera status
-ath opera bugsnag
+ath opera my-project
 
 # Clean up after the azer finishes
 ath cleanup azer-fix-nil-error
@@ -111,7 +136,7 @@ ath cleanup azer-fix-nil-error
 
 ```bash
 # Send a message to a crucible
-ath whisper send marut-bugsnag "Status check — are you making progress?"
+ath whisper send marut-my-project "Status check — are you making progress?"
 
 # Wait for an agent to be idle, then send
 ath whisper wait-and-send azer-fix-nil-error "Your opus has been updated" --timeout 60s
@@ -121,13 +146,13 @@ ath whisper wait-and-send azer-fix-nil-error "Your opus has been updated" --time
 
 ```bash
 # Reforge a crashed/exhausted marut (kills session, relaunches fresh)
-ath reforge bugsnag
+ath reforge my-project
 
 # Graceful shutdown
-ath quiesce bugsnag
+ath quiesce my-project
 
 # Force shutdown (even with active azers)
-ath quiesce bugsnag --force
+ath quiesce my-project --force
 ```
 
 ### All commands

@@ -63,7 +63,7 @@ The athanor CLI (`ath`) is the operational backbone of the athanor system. It re
 │   ├── muster.md
 │   └── opus.md
 └── athanors/                       # All instances
-    ├── bugsnag/
+    ├── my-project/
     │   ├── athanor.yml             # Instance config (project path, models, etc.)
     │   ├── AGENTS.md               → ../shared/AGENTS.md
     │   ├── magnum-opus.md          # Authored per-instance (the goal)
@@ -131,8 +131,8 @@ ath whisper wait-and-send azer-fix-nil-error "Your opus has been updated" --time
 ### athanor.yml (per-instance)
 
 ```yaml
-name: bugsnag
-project: /home/matt/code/musashi    # Working directory for agents
+name: my-project
+project: /home/matt/code/my-app    # Working directory for agents
 marut_model: sonnet                  # Model for marut sessions
 azer_model: opus                     # Model for azer sessions
 ```
@@ -228,16 +228,16 @@ Show athanor health at a glance.
 **Without name — all athanors:**
 ```
 ATHANOR     TYPE         MARUT    AZERS  OPERA (C/D/A)
-bugsnag     state-based  active   1      1/5/3
+my-project     state-based  active   1      1/5/3
 sal-117     task-based   idle     0      0/2/2
 blogging    task-based   -        0      0/0/0
 ```
 
 **With name — detailed view:**
 ```
-Athanor: bugsnag
-Project: /home/matt/code/musashi
-Marut: active (marut-bugsnag)
+Athanor: my-project
+Project: /home/matt/code/my-app
+Marut: active (marut-my-project)
 Azers:
   azer-fix-nil-error (active)
 Opera:
@@ -386,7 +386,7 @@ Zsh completion is a first-class requirement, not an afterthought. `[D:ergonomics
 | `ath whisper send <TAB>` | Active tmux windows/panes |
 | `ath whisper idle <TAB>` | Active tmux windows/panes |
 
-**Athanor name completion** reads directory names from `~/athanor/athanors/`. This is the critical one — the artifex will type `ath kindle b<TAB>` and get `bugsnag`. `[D:athanor-name-completion-is-primary]`
+**Athanor name completion** reads directory names from `~/athanor/athanors/`. This is the critical one — the artifex will type `ath kindle b<TAB>` and get `my-project`. `[D:athanor-name-completion-is-primary]`
 
 **Implementation:** `ath completion zsh` outputs a zsh completion function. Dynamic completions (athanor names, tmux targets, opus files) use shell commands at completion time, not static lists.
 

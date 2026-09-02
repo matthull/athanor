@@ -64,7 +64,7 @@ These decisions are settled. They came directly from the artifex in the MO tempe
 $ATHANOR/formulae/<name>/FORMULA.md
 ```
 
-Unlike jobs (global, symlinked from `shared/jobs/`), formulae live directly in the athanor instance directory. Musashi's software development formulae differ from maneframe's life-domain formulae. `[B:artifex]`
+Unlike jobs (global, symlinked from `shared/jobs/`), formulae live directly in the athanor instance directory. A work domain's software development formulae differ from a life-domain's formulae. `[B:artifex]`
 
 **Directory creation is on demand.** `ath init` does not create the `formulae/` directory. It's created when the first formula is added (manually or by a future `ath formula create` command). `[D:on-demand — avoids empty dirs in athanors that don't use formulae yet]`
 
@@ -223,7 +223,7 @@ Follows the same pattern as `ReadOpusJob`. `[P:pending]`
 Optional flag. When provided, adds `formula:` to opus frontmatter. Validated against `$ATHANOR/formulae/<name>/FORMULA.md` in the resolved instance directory.
 
 ```bash
-ath inscribe musashi my-mo \
+ath inscribe my-app my-mo \
   --job coder \
   --formula coding-dyad \
   --intent "Implement the auth token refresh logic"
@@ -277,7 +277,7 @@ Jobs (global):
   qa-specialist — Prevent surprises in software behavior
   solution-architect — Periodic holistic architecture and spec-reality review
 
-Formulae (musashi):
+Formulae (my-app):
   coding-dyad — Implementation with independent code review
 ```
 
@@ -499,7 +499,7 @@ Ordered by dependency and value.
 7. Tests: unit tests for formula parsing, acceptance test extensions
 
 **Phase 3: First formula and guidance updates** (after CLI ships)
-1. Create `coding-dyad` formula in musashi's `formulae/` directory
+1. Create `coding-dyad` formula in my-app's `formulae/` directory
 2. Update coder JOB.md: extract coding dyad → formula reference
 3. Update azer.md: formula-aware mise en place
 4. Update marut.md: formula-first dispatch

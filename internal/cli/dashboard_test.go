@@ -134,7 +134,7 @@ func TestReadFrontmatterField(t *testing.T) {
 	fm := `---
 status: charged
 inscribed: 2026-03-25
-magnum_opus: bugsnag
+magnum_opus: my-project
 ---
 # Title
 `
@@ -144,7 +144,7 @@ magnum_opus: bugsnag
 	}{
 		{"status", "charged"},
 		{"inscribed", "2026-03-25"},
-		{"magnum_opus", "bugsnag"},
+		{"magnum_opus", "my-project"},
 		{"nonexistent", ""},
 	}
 

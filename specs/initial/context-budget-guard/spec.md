@@ -14,14 +14,14 @@
 | `[R:gastown]` | Derived from gastown codebase analysis |
 | `[B:bottleneck]` | Addresses the critical orchestrator context bottleneck |
 | `[D:reason]` | Design decision with rationale |
-| `[E:existing]` | Extends existing musashi infrastructure |
+| `[E:existing]` | Extends existing my-app infrastructure |
 | `[U:topic]` | Unbacked — needs validation |
 
 ---
 
 ## Overview
 
-Add a context budget guard to musashi's agentic infrastructure. When a Claude Code
+Add a context budget guard to my-app's agentic infrastructure. When a Claude Code
 session approaches context exhaustion, the guard detects it and injects escalating
 warnings — culminating in a hard gate that blocks further work and forces graceful
 shutdown or handoff.
@@ -36,7 +36,7 @@ The guard ensures agents either hand off cleanly or stop before producing degrad
 - **Zero new infrastructure required.** Claude Code already has `UserPromptSubmit` hooks
   and JSONL session transcripts with token usage. This is a shell script + config. `[E:existing]`
 - **Solves the #1 reliability problem today.** Context exhaustion is the single biggest
-  source of degraded agent output in musashi. `[B:bottleneck]`
+  source of degraded agent output in my-app. `[B:bottleneck]`
 - **Proven pattern.** Gastown's `context-budget-guard.sh` is battle-tested. We're adapting,
   not inventing. `[R:gastown]`
 - **Composable.** Works independently of `/orchestrate` — improves ALL Claude Code sessions
@@ -81,7 +81,7 @@ Gastown's `scripts/guards/context-budget-guard.sh` provides the proven pattern: 
 - **Token calculation:** Sum of `input_tokens` + `cache_creation_input_tokens` + `cache_read_input_tokens`
   from the last assistant message's `usage` object in the JSONL transcript
 
-## Adaptation for Musashi
+## Adaptation for My-app
 
 ### What transfers directly `[R:gastown]`
 - Guard script structure and threshold logic
@@ -89,18 +89,18 @@ Gastown's `scripts/guards/context-budget-guard.sh` provides the proven pattern: 
 - Fail-open error handling
 - Environment variable configuration pattern
 
-### What needs adaptation `[D:musashi-context]`
+### What needs adaptation `[D:my-app-context]`
 
-| Gastown | Musashi | Notes |
+| Gastown | My-app | Notes |
 |---------|---------|-------|
-| Roles: mayor, deacon, crew, polecat | Roles: TBD — interactive, autonomous, orchestrator, implementer | Map to musashi's session types |
-| `gt handoff` (Go CLI, bead state) | `/direct-handoff` skill or manual session cycling | Musashi doesn't have `gt handoff` yet |
-| Daemon-driven compaction (CompactorDog) | Claude Code's built-in auto-compaction | Musashi relies on CC's native compaction |
-| Bead checkpoint recovery | task-plan.md phase results + git state | Musashi's persistence is plan-doc-based |
+| Roles: mayor, deacon, crew, polecat | Roles: TBD — interactive, autonomous, orchestrator, implementer | Map to my-app's session types |
+| `gt handoff` (Go CLI, bead state) | `/direct-handoff` skill or manual session cycling | My-app doesn't have `gt handoff` yet |
+| Daemon-driven compaction (CompactorDog) | Claude Code's built-in auto-compaction | My-app relies on CC's native compaction |
+| Bead checkpoint recovery | task-plan.md phase results + git state | My-app's persistence is plan-doc-based |
 
 ### Role Mapping (Needs Refinement) `[U:roles]`
 
-| Musashi Session Type | Gating Behavior | Rationale |
+| My-app Session Type | Gating Behavior | Rationale |
 |---------------------|-----------------|-----------|
 | Interactive (user at keyboard) | Warn only | User can decide what to do |
 | `/orchestrate` orchestrator | Hard gate | Most valuable to protect — context drift here cascades |
@@ -120,7 +120,7 @@ agent should:
 
 **Future:** Integrate with `/direct-handoff` for automatic session chaining.
 
-## Configuration `[R:gastown]` `[D:musashi-defaults]`
+## Configuration `[R:gastown]` `[D:my-app-defaults]`
 
 ```bash
 # Thresholds (percentage of max context)
@@ -169,8 +169,8 @@ reads the most recent `.jsonl` in the directory. `[U:transcript-discovery]`
 ## Out of Scope
 
 - **Automatic session chaining** — that's a separate, larger effort (the `/direct-handoff` evolution)
-- **Daemon-driven compaction** — gastown's CompactorDog pattern; musashi uses CC's built-in compaction
-- **Checkpoint/crash recovery** — gastown's bead checkpointing; musashi's plan-doc persistence is sufficient for now
+- **Daemon-driven compaction** — gastown's CompactorDog pattern; my-app uses CC's built-in compaction
+- **Checkpoint/crash recovery** — gastown's bead checkpointing; my-app's plan-doc persistence is sufficient for now
 - **Subagent context monitoring** — CC manages Agent tool subagents internally
 
 ## Implementation Notes

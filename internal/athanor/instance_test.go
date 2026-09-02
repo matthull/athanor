@@ -36,8 +36,8 @@ func TestWriteReadConfig(t *testing.T) {
 	dir := t.TempDir()
 
 	cfg := &Config{
-		Name:    "bugsnag",
-		Project: "/home/matt/code/musashi",
+		Name:    "my-project",
+		Project: "/home/matt/code/my-app",
 	}
 
 	if err := WriteConfig(dir, cfg); err != nil {
@@ -247,7 +247,7 @@ func TestListMagnaOpera(t *testing.T) {
 	t.Run("multi-MO", func(t *testing.T) {
 		t.Parallel()
 		dir := t.TempDir()
-		for _, name := range []string{"bugsnag", "slack-monitoring"} {
+		for _, name := range []string{"my-project", "slack-monitoring"} {
 			moDir := filepath.Join(dir, MagnaOperaDir, name)
 			if err := os.MkdirAll(moDir, 0755); err != nil {
 				t.Fatal(err)
@@ -304,8 +304,8 @@ func TestMagnumOpusPath(t *testing.T) {
 		if err := os.MkdirAll(filepath.Join(dir, MagnaOperaDir), 0755); err != nil {
 			t.Fatal(err)
 		}
-		got := MagnumOpusPath(dir, "bugsnag")
-		want := filepath.Join(dir, MagnaOperaDir, "bugsnag", "bugsnag.md")
+		got := MagnumOpusPath(dir, "my-project")
+		want := filepath.Join(dir, MagnaOperaDir, "my-project", "my-project.md")
 		if got != want {
 			t.Errorf("MagnumOpusPath = %q, want %q", got, want)
 		}
@@ -329,14 +329,14 @@ func TestReadOpusMO(t *testing.T) {
 	t.Run("with magnum_opus field", func(t *testing.T) {
 		t.Parallel()
 		dir := t.TempDir()
-		content := "---\nstatus: charged\nmagnum_opus: bugsnag\n---\n# Test opus"
+		content := "---\nstatus: charged\nmagnum_opus: my-project\n---\n# Test opus"
 		path := filepath.Join(dir, "test.md")
 		if err := os.WriteFile(path, []byte(content), 0644); err != nil {
 			t.Fatal(err)
 		}
 		got := ReadOpusMO(path)
-		if got != "bugsnag" {
-			t.Errorf("ReadOpusMO = %q, want %q", got, "bugsnag")
+		if got != "my-project" {
+			t.Errorf("ReadOpusMO = %q, want %q", got, "my-project")
 		}
 	})
 
@@ -359,7 +359,7 @@ func TestReadOpusJob(t *testing.T) {
 	t.Run("with job field", func(t *testing.T) {
 		t.Parallel()
 		dir := t.TempDir()
-		content := "---\nstatus: charged\nmagnum_opus: bugsnag\njob: coder\n---\n# Test opus"
+		content := "---\nstatus: charged\nmagnum_opus: my-project\njob: coder\n---\n# Test opus"
 		path := filepath.Join(dir, "test.md")
 		if err := os.WriteFile(path, []byte(content), 0644); err != nil {
 			t.Fatal(err)
@@ -373,7 +373,7 @@ func TestReadOpusJob(t *testing.T) {
 	t.Run("without job field", func(t *testing.T) {
 		t.Parallel()
 		dir := t.TempDir()
-		content := "---\nstatus: charged\nmagnum_opus: bugsnag\n---\n# Test opus"
+		content := "---\nstatus: charged\nmagnum_opus: my-project\n---\n# Test opus"
 		path := filepath.Join(dir, "test.md")
 		if err := os.WriteFile(path, []byte(content), 0644); err != nil {
 			t.Fatal(err)

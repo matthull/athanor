@@ -6,7 +6,7 @@
 **Created:** 2026-03-20
 **Location:** `specs/athanor/` (off-limits to athanor agents — this is the blueprint, not the materialized system)
 **Purpose:** Domain model, architectural principles, and bootstrap strategy for the athanor system. This is the artifex's reference for architect sessions.
-**Litmus test:** The #bugsnag autonomous patrol — a fully semi-autonomous system that watches for AppSignal errors and actions them, escalating intelligently while keeping AppSignal clean.
+**Litmus test:** The #my-project autonomous patrol — a fully semi-autonomous system that watches for AppSignal errors and actions them, escalating intelligently while keeping AppSignal clean.
 
 ---
 
@@ -202,7 +202,7 @@ Mixed freely.
 
 ### The Athanor Instance
 
-The athanor is not one global system — it's instantiated per domain, each with its own Magna Opera, supervision, and state. An athanor maps roughly to the existing concept of "domain" (Musashi, life, agentic) and generally one-to-one with a primary repo.
+The athanor is not one global system — it's instantiated per domain, each with its own Magna Opera, supervision, and state. An athanor maps roughly to the existing concept of "domain" (my-app, life, agentic) and generally one-to-one with a primary repo.
 
 **What defines an athanor instance:**
 - Its active Magna Opera (the goals it's pursuing)
@@ -237,7 +237,7 @@ specs/athanors/<name>/
 
 **Initialization:** See `kadmon.md § Initializing a New Athanor` for the step-by-step protocol.
 
-**Registry:** Currently implicit — `specs/athanors/` directory listing is the registry. Active instances: `bugsnag` (state-based, AppSignal patrol), `sal-117-l2-metrics` (task-based, L2 metrics visibility), `seismic-classifier-mapping` (task-based, classifier → Seismic property mapping feature).
+**Registry:** Currently implicit — `specs/athanors/` directory listing is the registry. Active instances: `my-project` (state-based, AppSignal patrol), `sal-117-l2-metrics` (task-based, L2 metrics visibility), `seismic-classifier-mapping` (task-based, classifier → Seismic property mapping feature).
 
 **What goes in `magnum-opus.md` — and what doesn't:**
 
@@ -370,7 +370,7 @@ Agents have three layers with different lifetimes. Sessions die constantly. The 
 | **Task-based** | Goal with assessable end state | Abundantly satisfied → done | "Ship the asset management feature" |
 | **State-based** | Ideal state definition — the athanor maintains/returns to this state indefinitely | Operator decides diminishing returns → done | "AppSignal is clean and stays clean" |
 
-**State-based Magna Opera** are permanent operational concerns — the "path of return." The athanor is always trying to get back to the ideal state, like a thermostat. This maps to what project management calls an operational concern (vs. a delivery project). Examples: keep #bugsnag clean, keep the inbox triaged, route signals from the inbox. The daily #bugsnag triage is a state-based MO — it doesn't "complete," it maintains a standard.
+**State-based Magna Opera** are permanent operational concerns — the "path of return." The athanor is always trying to get back to the ideal state, like a thermostat. This maps to what project management calls an operational concern (vs. a delivery project). Examples: keep #my-project clean, keep the inbox triaged, route signals from the inbox. The daily #my-project triage is a state-based MO — it doesn't "complete," it maintains a standard.
 
 **Abundant satisfaction — the completion standard:**
 
@@ -429,8 +429,8 @@ A Magnum Opus should be the **broadest goal that aligns agent behavior with huma
 **Stakeholder personas in the MO.** The MO should name real people who care about this goal — not just "the artifex" as an abstract role. Include:
 - **Identity:** Name, Slack handle, GitHub username — so agents can communicate with them, tag them in PRs, post updates to relevant channels.
 - **Org role:** What they do. A staff engineer, a PM, a team lead — this shapes how the agent communicates (technical depth, business framing, etc.).
-- **Why they care:** What makes this goal matter to *them* specifically. The same MO hits different stakeholders differently. An engineer cares about noise in #bugsnag because it obscures new regressions from their feature launch. A PM cares because it signals product health to leadership.
-- **What satisfaction looks like:** From *their* perspective. Not the geas (which is verifiable completion criteria) but the human experience: "When I look at #bugsnag, I can immediately see if my feature caused problems."
+- **Why they care:** What makes this goal matter to *them* specifically. The same MO hits different stakeholders differently. An engineer cares about noise in #my-project because it obscures new regressions from their feature launch. A PM cares because it signals product health to leadership.
+- **What satisfaction looks like:** From *their* perspective. Not the geas (which is verifiable completion criteria) but the human experience: "When I look at #my-project, I can immediately see if my feature caused problems."
 
 This expands the product lens — agents that know their stakeholders can make better judgment calls about what's valuable, how to communicate, and when something is worth escalating vs. handling quietly. It also enables direct communication: an azer that knows the stakeholder's Slack handle can post a summary to the relevant channel, tag the right person in a PR description, or frame an escalation in terms that matter to the person receiving it.
 
@@ -528,7 +528,7 @@ These are the different ways work gets coordinated. `/orchestrate` is ONE patter
 
 **Shape:** Poll queue → for each opus: muster a azer in a sandbox → charge with opus → marut monitors.
 
-**Status:** Does not exist. Need it for #bugsnag phase 2.
+**Status:** Does not exist. Need it for #my-project phase 2.
 
 ---
 
@@ -650,11 +650,11 @@ Built, fired, and working.
 
 | Concept | Where It Lives | Notes |
 |---------|---------------|-------|
-| Athanor instance pattern | `specs/athanors/<name>/` | AGENTS.md, magnum-opus.md, role files, opera dirs. Active instances: bugsnag (state-based), sal-117-l2-metrics (task-based), seismic-classifier-mapping (task-based). |
+| Athanor instance pattern | `specs/athanors/<name>/` | AGENTS.md, magnum-opus.md, role files, opera dirs. Active instances: my-project (state-based), sal-117-l2-metrics (task-based), seismic-classifier-mapping (task-based). |
 | Shared materia | `specs/athanors/shared/` | Universal AGENTS.md, azer.md, marut.md, muster.md, opus.md. Symlinked into each instance — change once, applies everywhere. |
 | Magnum Opus format | `magnum-opus.md` per instance | Goal + abundant satisfaction + instance constraints + getting-started pointer. Intent only — no procedures, no discovery findings (those go in `specs/`). |
 | Opus lifecycle | `opera/charged/` + `opera/discharged/` | Inscription / charge / discharge / trail. Datestamp filename prefix: `YYYY-MM-DD-<name>.md`. |
-| Core geas + escalation-as-geas | `AGENTS.md` (shared) | "Both are equally valid fulfillments of your geas." Tested in first bugsnag firing. |
+| Core geas + escalation-as-geas | `AGENTS.md` (shared) | "Both are equally valid fulfillments of your geas." Tested in first my-project firing. |
 | Azer role | `azer.md` (shared) | Verification-first (three questions before mise), mise en place, context management, proof of fulfillment at discharge. |
 | Marut role | `marut.md` (shared) | Operational loop, assessment opera, monitoring/stall detection, reforging. |
 | Muster protocol | `muster.md` (shared) | Crucible kindling, reforging, monitoring, cleanup. Marut → azer dispatch. |
@@ -679,7 +679,7 @@ Built, fired, and working.
 | Roles (TOML + claude-run) | High | TOML role definitions + claude-run evolution. Dependency of hard constraints. |
 | Hooks as hard constraints | High | `no-push-to-master.sh`, `no-merge-pr.sh` etc. composable per-role. Trivial individually; needs role system to compose. |
 | Role-aware crucible creation | Medium | Depends on roles. |
-| Beholder role | Medium | Needed for #bugsnag phase 2 (auto-dispatch). |
+| Beholder role | Medium | Needed for #my-project phase 2 (auto-dispatch). |
 | Primus as agent | Low | Currently manual. Could be a cron/bootstrap script. Not a bottleneck yet. |
 | Escalation bus format | Low | Telegram works; message format not standardized. |
 | Handoff protocol | Medium | `/direct-handoff` is crude. Full protocol needs reliable whisper. |
@@ -724,7 +724,7 @@ Constraints                    /permission-manager)
                                 per-role expectations]
        │                           │
        ▼                           ▼
-#bugsnag Phase 1              #bugsnag Phase 2
+#my-project Phase 1              #my-project Phase 2
   (Beholder: triage)           (Dispatch: auto-fix)
   [needs: beholder role]       [needs: azer role,
                                 marut watching,
@@ -739,11 +739,11 @@ Two things can start in parallel with zero dependencies:
 
 ## v1: Light the First Crucible
 
-Everything below is needed for autonomous #bugsnag. Each piece delivers incremental value on its own. The system will creak at first — 50% of daily errors resolved autonomously is a win. The other 50% escalate, and each escalation teaches the system. We don't need perfection; we need the loop running.
+Everything below is needed for autonomous #my-project. Each piece delivers incremental value on its own. The system will creak at first — 50% of daily errors resolved autonomously is a win. The other 50% escalate, and each escalation teaches the system. We don't need perfection; we need the loop running.
 
 ### Infrastructure (build first, enables everything)
 
-**Context budget guard** — shell script + hook. Already spec'd. Prevents silent context degradation across ALL sessions, not just #bugsnag.
+**Context budget guard** — shell script + hook. Already spec'd. Prevents silent context degradation across ALL sessions, not just #my-project.
 
 **`whisper` Go CLI** — built. Reliable NudgeSession, WaitForIdle, send locks. All automated inter-crucible communication goes through whisper.
 
@@ -751,20 +751,20 @@ Everything below is needed for autonomous #bugsnag. Each piece delivers incremen
 
 **Opus format** — standard markdown template. Goal + geas + context + parent reference. Simple enough for a beholder to generate automatically, rich enough for a azer to pick up and execute.
 
-### The #bugsnag Daily Magnum Opus
+### The #my-project Daily Magnum Opus
 
 Replace the phased rollout with the real model: a **daily Magnum Opus** generated from a template.
 
-**Template: `#bugsnag daily triage`**
+**Template: `#my-project daily triage`**
 
 Input: date. Output: a Magnum Opus.
 
 ```
-Magnum Opus: "#bugsnag daily triage — 2026-03-20"
+Magnum Opus: "#my-project daily triage — 2026-03-20"
 Geas: All errors from today are actioned (fixed, muted, or escalated to operator)
 
 1. Context gathering:
-   - Scan #bugsnag for today's errors
+   - Scan #my-project for today's errors
    - Check recent "fixed" errors — are they actually resolved?
      (or leverage AppSignal error lifecycle if elegant)
    - Classify each error: new vs recurring vs regression
@@ -928,7 +928,7 @@ No deep nesting. A Magnum Opus has goals and completion criteria. Opera belong t
 
 ```
 Magnum Opus: "AppSignal is clean and stays clean"
-  Entry point: Linear project SAL-XX / specs/athanors/bugsnag/magnum-opus.md
+  Entry point: Linear project SAL-XX / specs/athanors/my-project/magnum-opus.md
   ├── Opus: "Fix NoMethodError in ProofRecommendationService"
   ├── Opus: "Fix timeout in SalesforceSync"
   ├── Opus: "Investigate vague alert — /rca then proceed"
@@ -947,7 +947,7 @@ Magnum Opus: "AppSignal is clean and stays clean"
 
 **The Magnum Opus has a single context entry point.** One URL or path that links to everything relevant. Could be a Linear project, could be `specs/<project>/spec.md`, could be anything. During assay, you make sure all useful context is reachable from this entry point — directly or through breadcrumbs.
 
-The LLM is good at following breadcrumbs. If the entry point is `specs/bugsnag/spec.md`, the agent intuitively knows to search the `specs/bugsnag/` directory. If there's a link to a Slack thread buried somewhere in there, it'll find it. Perfect organization is nice but the main thing is: **there is a clear trail from entry point to all relevant context.**
+The LLM is good at following breadcrumbs. If the entry point is `specs/my-project/spec.md`, the agent intuitively knows to search the `specs/my-project/` directory. If there's a link to a Slack thread buried somewhere in there, it'll find it. Perfect organization is nice but the main thing is: **there is a clear trail from entry point to all relevant context.**
 
 **Any agent without clear context goes back to the entry point.** That's the reset — follow the breadcrumbs, assay what's available, then inscribe the next opus based on what you find.
 
@@ -1090,7 +1090,7 @@ When an opus is discharged (or when a session ends for any reason), the discharg
 
 **See also:** `kadmon.md` for the detailed bootstrap spec.
 
-The first athanor is bootstrapped through deliberate minimalism. The evolutionary process of building the athanor IS the artifex's Magnum Opus — but this MO is not defined within the athanor itself (not yet). The #bugsnag athanor is the test bed for the system, not the meta-goal.
+The first athanor is bootstrapped through deliberate minimalism. The evolutionary process of building the athanor IS the artifex's Magnum Opus — but this MO is not defined within the athanor itself (not yet). The #my-project athanor is the test bed for the system, not the meta-goal.
 
 ### The Principle: Prima Materia
 
@@ -1129,7 +1129,7 @@ The Adam Kadmon (primordial form) is the first marut running from minimal materi
 
 ### What Success Looks Like on Day 0
 
-The marut scans #bugsnag, hits real gaps (no tooling to spawn azers, insufficient context to classify errors, etc.), and produces clear, useful escalations that tell the artifex exactly what to build next. The quality of the escalations — not the number of errors actioned — is the measure of day 0.
+The marut scans #my-project, hits real gaps (no tooling to spawn azers, insufficient context to classify errors, etc.), and produces clear, useful escalations that tell the artifex exactly what to build next. The quality of the escalations — not the number of errors actioned — is the measure of day 0.
 
 ---
 

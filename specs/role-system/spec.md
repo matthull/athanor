@@ -161,7 +161,7 @@ Since this is a concept spec, test scenarios describe how to validate the concep
 
 1. **Prototype with viewpoint-based manifold calcinatio.** Author 3-5 role definitions for a concrete task (e.g., spec review). Use them as subagent briefings in a viewpoint-based review. Compare output quality vs. ad-hoc perspective derivation.
 2. **Cross-task reuse.** Use the same "security auditor" role in both a code review and a spec review. Does the role definition produce relevant findings in both contexts?
-3. **Project-specific roles.** Author a project-specific role (e.g., "PowerSync offline-first analyst" for musashi). Does it produce findings that generic roles miss?
+3. **Project-specific roles.** Author a project-specific role (e.g., "PowerSync offline-first analyst" for a specific codebase). Does it produce findings that generic roles miss?
 
 ---
 

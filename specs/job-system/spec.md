@@ -394,7 +394,7 @@ Resolved through the organic model (see § Dynamic orchestration). Summary of an
 
 ### Wave 1: The foundation — COMPLETE `[I:implemented]`
 
-**1. Job registry.** `jobs/` created with initially 5 job definitions (`coder`, `qa-specialist`, `assessor`, `general`, `investigator`), later expanded to 7 with `solution-architect` and `project-manager`. Symlinked as `jobs/` into each athanor instance (athanor-architect, musashi, maneframe) as of 2026-04-27.
+**1. Job registry.** `jobs/` created with initially 5 job definitions (`coder`, `qa-specialist`, `assessor`, `general`, `investigator`), later expanded to 7 with `solution-architect` and `project-manager`. Symlinked as `jobs/` into each athanor instance (athanor-architect, my-app, maneframe) as of 2026-04-27.
 
 **2. azer.md updated.** Collaboration principle (Chesed framing), discharge relay sequence, job awareness (`job:` field → read `jobs/<name>/JOB.md`), ~100k context threshold, subagent vs. peer azer guidance — all deployed.
 
@@ -416,7 +416,7 @@ The system ran with Wave 1 changes. Observations drove the Wave 3 evolution.
 - **Idempotent ath init/sync.** `ath sync` command added (commit f6e70be). `ath init` remains create-only; `ath sync` handles updates (symlinks, shared files, shared directories like `jobs/`). `[I:implemented]`
 - **Job symlinks.** Jobs symlinked into all athanor instances (2026-04-27). Agent directive paths fixed to `jobs/<name>/JOB.md`. `[I:implemented]`
 
-**Observation questions (answered from musashi trail evidence and artifex voice notes):**
+**Observation questions (answered from my-app trail evidence and artifex voice notes):**
 
 - **Do azers actually inscribe peers?** No. Azers consistently resist leaving their bench to inscribe collaborators. They try to do everything themselves. This was the key finding that drove Wave 3: the marut-as-coordinator model. `[O:observed]`
 - **Do job prescriptions survive the context?** Insufficient data — job definitions weren't reachable from athanor instances until the symlink fix (2026-04-27). Untested at scale. `[U:needs-validation]`

@@ -33,9 +33,9 @@ func TestSplitArgs(t *testing.T) {
 		},
 		{
 			name:      "multiple flags mixed",
-			args:      []string{"opus.md", "--dir", "/tmp", "--model", "opus", "--athanor", "bugsnag"},
+			args:      []string{"opus.md", "--dir", "/tmp", "--model", "opus", "--athanor", "my-project"},
 			wantPos:   []string{"opus.md"},
-			wantFlags: []string{"--dir", "/tmp", "--model", "opus", "--athanor", "bugsnag"},
+			wantFlags: []string{"--dir", "/tmp", "--model", "opus", "--athanor", "my-project"},
 		},
 		{
 			name:      "flag with equals",

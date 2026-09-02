@@ -30,7 +30,7 @@ The system spans two directory trees.
 ```
 ~/athanor/
 └── athanors/
-    ├── musashi/           # Work domain — software development
+    ├── my-app/            # Work domain — software development
     ├── athanor-architect/ # Meta domain — evolving the athanor system itself
     └── maneframe/         # Life domain — personal systems
 ```
@@ -96,7 +96,7 @@ These run on timers and provide the autonomous glue between interactive sessions
 |---------|----------|--------------|
 | `athanor-liveness` | 5 min | Checks that kindled roles (maruts, perceivers, attendants) have active tmux sessions. Relaunches if missing. |
 | `agentic-inbox` | 1 min | Processes the agentic domain inbox — routes incoming signals to the right athanor. |
-| `musashi-inbox` | 1 min | Processes the musashi domain inbox. |
+| `my-app-inbox` | 1 min | Processes the my-app domain inbox. |
 | `attunement-intake` | 30 min | Invokes the perceiver to process attunement signals (sensor data, state changes). |
 | `voice-notes-process` | 5 min | Downloads and processes voice recordings from Google Drive. |
 | `triage-router` | path-activated | Routes signals from the triage inbox to appropriate domains. |
@@ -140,7 +140,7 @@ MCP servers (telegram, Slack, Keep, Linear, etc.) are auto-discovered — not li
 
 ## Known Gaps
 
-- **Formulae adoption observation pending.** Phases 1-3 of the formulae system are shipped (spec, CLI, first formula `coding-dyad` in musashi, formula-aware guidance files). Phase 4 — observing whether the marut uses formulae in dispatch and whether azers read and follow them — is the open work. Spec at `specs/formulae-system/spec.md § Phase 4`.
+- **Formulae adoption observation pending.** Phases 1-3 of the formulae system are shipped (spec, CLI, first formula `coding-dyad` in my-app, formula-aware guidance files). Phase 4 — observing whether the marut uses formulae in dispatch and whether azers read and follow them — is the open work. Spec at `specs/formulae-system/spec.md § Phase 4`.
 
 ---
 

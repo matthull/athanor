@@ -134,7 +134,7 @@ Full MCP integration with 19 tools. nvr covers all current needs. Revisit if nvr
 
 **Invocation:**
 ```
-/explore "walk me through the seismic classifier mapping in musashi"
+/explore "walk me through the seismic classifier mapping in my-app"
 /explore "what changed in the API layer this sprint"  
 /explore "deep dive into the auth module"
 ```
@@ -170,7 +170,7 @@ Full MCP integration with 19 tools. nvr covers all current needs. Revisit if nvr
 - Developer leads, Claude follows — but Claude can suggest "look at this next" `[R:design]`
 - No neovim control required at Tier 2 — all via conversation `[D:incremental]`
 
-**Validation test:** Run a real exploration session on the musashi project's seismic classifier mapping solution. The session should produce genuine comprehension, not just a report.
+**Validation test:** Run a real exploration session on the my-app project's seismic classifier mapping solution. The session should produce genuine comprehension, not just a report.
 
 ---
 
@@ -235,7 +235,7 @@ Developer invokes: /explore "<topic>"
 | `/explore` pre-analysis completes in <30s | Subagents return useful results quickly |
 | `/explore` generates accurate architecture diagram | Diagram reflects actual code structure |
 | `/explore` handles unfamiliar codebase | Works on a project the developer hasn't seen |
-| `/explore` session on musashi seismic classifier | Produces genuine comprehension of the mapping solution |
+| `/explore` session on my-app seismic classifier | Produces genuine comprehension of the mapping solution |
 
 ---
 

@@ -53,9 +53,9 @@ athanor-dev      # athanor system development
 ├── azer-*       # active azer windows
 └── marut-*      # marut supervisor windows
 
-musashi          # product development
+my-app           # product development
 ├── artifex
-├── marut-musashi-*
+├── marut-my-app-*
 └── azer-*
 ```
 

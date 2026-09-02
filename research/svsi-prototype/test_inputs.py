@@ -16,13 +16,13 @@ WITNESSES = {
         "label": "Artifex (Matt) — Harvest",
         "type": "witness",
         "mo": "harvest",
-        "text": """Primary and ultimately only witness who can confirm this MO is working. He feels secure — not anxious that the productivity delta will be discovered awkwardly, not worried that a bad week erases his standing. He has shaped the narrative proactively and it has landed. He feels compensated — the value flowing to UseEvidence is visibly, materially reciprocated. Not promised; reciprocated. He feels protected — the gains don't isolate him from teammates, don't create a golden cage, don't make him the single point of failure for everything technical. He feels portable — the athanor system is understood as his IP, his capability, his career asset.""",
+        "text": """Primary and ultimately only witness who can confirm this MO is working. He feels secure — not anxious that the productivity delta will be discovered awkwardly, not worried that a bad week erases his standing. He has shaped the narrative proactively and it has landed. He feels compensated — the value flowing to the employer is visibly, materially reciprocated. Not promised; reciprocated. He feels protected — the gains don't isolate him from teammates, don't create a golden cage, don't make him the single point of failure for everything technical. He feels portable — the athanor system is understood as his IP, his capability, his career asset.""",
     },
     "artifex_anvil": {
         "label": "Artifex (Matt) — Anvil",
         "type": "witness",
         "mo": "anvil",
-        "text": """Matt Hull (artifex) — primary; EF load, orientation speed, not being second-guessed. The artifex sits down to work on musashi and finds a capable, oriented partner already there — not just briefed, but genuinely oriented to the codebase, conventions, and sensibilities. EF overhead shifts to the azer. The artifex directs judgment, not logistics.""",
+        "text": """Matt Hull (artifex) — primary; EF load, orientation speed, not being second-guessed. The artifex sits down to work on the product codebase and finds a capable, oriented partner already there — not just briefed, but genuinely oriented to the codebase, conventions, and sensibilities. EF overhead shifts to the azer. The artifex directs judgment, not logistics.""",
     },
     "artifex_seismic": {
         "label": "Artifex (Matt) — Seismic",
@@ -108,7 +108,7 @@ WITNESSES = {
         "label": "Appnigma (vendor)",
         "type": "witness",
         "mo": "sf-proof-recommender-launch",
-        "text": """Appnigma (AJ, Lester) — vendor partner who has done their side. Need Library component decision and trusted domain answer so their docs and managed package configuration are complete. Satisfaction: they have everything from UE needed to support customer installs.""",
+        "text": """Appnigma (AJ, Lester) — vendor partner who has done their side. Need Library component decision and trusted domain answer so their docs and managed package configuration are complete. Satisfaction: they have everything from the company needed to support customer installs.""",
     },
     "running_athanors": {
         "label": "Running Athanors",
@@ -212,7 +212,7 @@ INTENTS = {
         "label": "Seismic — fix broken integration",
         "type": "intent",
         "mo": "seismic-classifier-mapping",
-        "text": """Enterprise Seismic customers experience the UE integration as broken. Assets sync but arrive unpublished and invisible to sales reps. Seismic admins see duplicate UE-prefixed properties cluttering their taxonomy. Tom fields calls from frustrated customers. Kelly can't tell stakeholders the integration is enterprise-ready.""",
+        "text": """Enterprise Seismic customers experience the product integration as broken. Assets sync but arrive unpublished and invisible to sales reps. Seismic admins see duplicate product-prefixed properties cluttering their taxonomy. Tom fields calls from frustrated customers. Kelly can't tell stakeholders the integration is enterprise-ready.""",
     },
     "analytics_intent": {
         "label": "Analytics — engagement attribution",
@@ -224,7 +224,7 @@ INTENTS = {
         "label": "SF Proof Recommender — launch readiness",
         "type": "intent",
         "mo": "sf-proof-recommender-launch",
-        "text": """Engineering completes its side of launch readiness. The runbooks are done. Appnigma has what they need from UE. The Library component question is answered. Matt can clearly say engineering is ready here is the evidence and hand the baton to Kelly without reservation.""",
+        "text": """Engineering completes its side of launch readiness. The runbooks are done. Appnigma has what they need from UE. The Library component question is answered. Matt can clearly say engineering is ready here is the evidence and hand the baton to the PM without reservation.""",
     },
 }
 

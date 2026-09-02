@@ -91,8 +91,8 @@ func TestEnsureHome(t *testing.T) {
 
 func TestInstanceDir(t *testing.T) {
 	t.Parallel()
-	got := InstanceDir("/home/matt/athanor", "bugsnag")
-	want := "/home/matt/athanor/athanors/bugsnag"
+	got := InstanceDir("/home/matt/athanor", "my-project")
+	want := "/home/matt/athanor/athanors/my-project"
 	if got != want {
 		t.Errorf("InstanceDir() = %q, want %q", got, want)
 	}
@@ -116,7 +116,7 @@ func TestListInstances(t *testing.T) {
 	if err := EnsureHome(home); err != nil {
 		t.Fatal(err)
 	}
-	for _, name := range []string{"bugsnag", "blogging"} {
+	for _, name := range []string{"my-project", "blogging"} {
 		if err := os.MkdirAll(filepath.Join(home, AthanorsDir, name), 0755); err != nil {
 			t.Fatal(err)
 		}

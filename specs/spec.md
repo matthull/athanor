@@ -623,8 +623,8 @@ Opera already marked `assessed` are skipped.
 ~/athanor/athanors/<name>/
 ├── AGENTS.md          ← core vocabulary, geas, constraints (all agents read)
 ├── magna-opera/       ← one directory per magnum opus
-│   ├── bugsnag/
-│   │   ├── bugsnag.md          ← MO document
+│   ├── my-project/
+│   │   ├── my-project.md       ← MO document
 │   │   └── opera/              ← opera for this MO
 │   │       └── YYYY-MM-DD-<descriptive-name>.md
 │   └── slack-monitoring/
@@ -671,11 +671,11 @@ Built, fired, and working.
 
 | Concept | Where It Lives | Notes |
 |---------|---------------|-------|
-| Athanor instance pattern | `~/athanor/athanors/<name>/` | AGENTS.md, magna-opera/ (each MO is a directory with its own opera/), role files. Multiple MOs per instance supported. Active instances: bugsnag, sal-117-l2-metrics, seismic-classifier-mapping, blogging. |
+| Athanor instance pattern | `~/athanor/athanors/<name>/` | AGENTS.md, magna-opera/ (each MO is a directory with its own opera/), role files. Multiple MOs per instance supported. Multiple active instances in production use. |
 | Shared components | Source repo `shared/` | Universal AGENTS.md, azer.md, marut.md, muster.md, opus.md. Symlinked directly from the source repo into each instance — change once, applies everywhere. These define the athanor itself — they are not materia. Source of truth is the repo at `$ATHANOR_REPO` (default `~/code/athanor`). |
 | Magnum Opus format | `magna-opera/<name>/<name>.md` per instance | Each MO is a directory containing its document and an `opera/` subdir. Goal + abundant satisfaction + witnesses + corpus map (`## Corpus Map` — curated essential materia for this MO). Intent only — no procedures, no discovery findings. Legacy `magnum-opus.md` backward compat. |
 | Opus lifecycle | `magna-opera/<mo>/opera/` with YAML frontmatter | Inscription / charge / discharge / assess. Datestamp filename prefix: `YYYY-MM-DD-<name>.md`. Opera nested under their MO — correlation is structural. |
-| Core geas + escalation-as-geas | `AGENTS.md` (shared) | "Both are equally valid fulfillments of your geas." Tested in first bugsnag firing. |
+| Core geas + escalation-as-geas | `AGENTS.md` (shared) | "Both are equally valid fulfillments of your geas." Tested in first production firing. |
 | Azer role | `azer.md` (shared) | Verification-first (three questions before mise), mise en place, context management, proof of fulfillment at discharge. |
 | Marut role | `marut.md` (shared) | Operational loop, assessment opera, monitoring/stall detection, reforging. |
 | Muster protocol | `muster.md` (shared) | Crucible kindling, reforging, monitoring, cleanup. Marut → azer dispatch. |

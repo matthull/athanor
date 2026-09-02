@@ -17,13 +17,13 @@
 - **Clean up stale worktrees.** `fix-missing-size-group-column` and `fix-rag-sync-race-condition` can be removed (`wtp remove`).
 - **Launch second marut.** One charged opus remains (`fix-nomethoderror-asset-list-searcher`). Docker optimizations in progress — test them with this firing.
 - **Test agent role updates in practice.** Azer discharge now includes specs push, PR body-file guidance, and permission-manager has dynamic pane discovery note. Observe whether these changes land.
-- **Add stakeholder personas to bugsnag magna-opera.** Before next firing: name the real people who care about #bugsnag channel health — Slack handles, GitHub usernames, org roles, why they care, what satisfaction looks like from their perspective. This expands the product lens and enables direct communication (agents can tag people in PRs, post to relevant channels). See spec.md § Magnum Opus for the full stakeholder persona guidance.
+- **Add stakeholder personas to my-project magna-opera.** Before next firing: name the real people who care about #my-project channel health — Slack handles, GitHub usernames, org roles, why they care, what satisfaction looks like from their perspective. This expands the product lens and enables direct communication (agents can tag people in PRs, post to relevant channels). See spec.md § Magnum Opus for the full stakeholder persona guidance.
 
 ### Current Phase: Bootstrap (Adam Kadmon)
 
-The #bugsnag athanor is the first test bed. The goal is NOT a fully autonomous error patrol — it's a working system that produces useful escalations and teaches us what to build next. Each escalation from the marut is a step on the artifex's trail.
+The #my-project athanor is the first test bed. The goal is NOT a fully autonomous error patrol — it's a working system that produces useful escalations and teaches us what to build next. Each escalation from the marut is a step on the artifex's trail.
 
-**What "success" means right now:** The marut scans #bugsnag, inscribes opera for actionable errors, kindles crucibles for azers, monitors their progress, escalates cleanly when it hits gaps, and the discharged opera trail tells us what the system needs next.
+**What "success" means right now:** The marut scans #my-project, inscribes opera for actionable errors, kindles crucibles for azers, monitors their progress, escalates cleanly when it hits gaps, and the discharged opera trail tells us what the system needs next.
 
 ### Readiness Checklist
 
@@ -85,7 +85,7 @@ tmux new-window -n marut
 
 ```bash
 tmux new-window -n perms
-# From perms window (~/code/musashi):
+# From perms window (~/code/my-app):
 claude --model sonnet "/permission-manager check every 2 min until i say stop"
 ```
 
@@ -94,7 +94,7 @@ Babysits permission prompts across all athanor panes. Kill when done supervising
 **3. Launch the marut session:**
 
 ```bash
-# From the marut's crucible (~/code/musashi):
+# From the marut's crucible (~/code/my-app):
 claude --model sonnet "Read $ATHANOR/AGENTS.md, then read $ATHANOR/magna-opera/<mo-name>.md, then read $ATHANOR/marut.md, then read $ATHANOR/muster.md. You are the marut for this athanor. Start /loop 5m and begin your operational cycle."
 ```
 
@@ -107,7 +107,7 @@ That's it. The marut reads its role docs and begins.
 When the marut session dies (context exhaustion, crash, drift):
 
 ```bash
-# In the marut's crucible (~/code/musashi) — kill the old session, start fresh:
+# In the marut's crucible (~/code/my-app) — kill the old session, start fresh:
 claude --model sonnet "Read $ATHANOR/AGENTS.md, then read $ATHANOR/magna-opera/<mo-name>.md, then read $ATHANOR/marut.md, then read $ATHANOR/muster.md. You are the marut for this athanor. Check opera/ for in-progress work and the trail. Start /loop 5m and resume your operational cycle."
 ```
 
@@ -175,7 +175,7 @@ Patterns observed during operation — what works, what doesn't, what the system
 
 **Generativity watch (2026-03-21):**
 
-- **No Slack visibility on completed work.** Marut creates PRs but nobody in #bugsnag or #sales-enablement-development sees the activity. The marut hasn't independently thought to post links, summarize fixes, or communicate outcomes. This is an alignment signal — the goal says "clean channel" but a maximally aligned marut would also think about making its work *visible* to the humans who benefit. Not pushing the marut toward this — watching for whether goal-over-trail orientation + inquisitiveness produces this kind of thinking organically. If it doesn't emerge after a few firings, that's data about what generativity the system can/can't produce.
+- **No Slack visibility on completed work.** Marut creates PRs but nobody in #my-project or #dev-team sees the activity. The marut hasn't independently thought to post links, summarize fixes, or communicate outcomes. This is an alignment signal — the goal says "clean channel" but a maximally aligned marut would also think about making its work *visible* to the humans who benefit. Not pushing the marut toward this — watching for whether goal-over-trail orientation + inquisitiveness produces this kind of thinking organically. If it doesn't emerge after a few firings, that's data about what generativity the system can/can't produce.
 - **Marut is doing PM work without knowing it.** Assessing channel health, prioritizing by impact, choosing highest-value action, communicating outcomes — this is product management thinking. The marut that figures this out on its own is the one that's truly aligned. Watch for signs of this in the trail.
 
 **From first firing (2026-03-21):**
@@ -190,7 +190,7 @@ Patterns observed during operation — what works, what doesn't, what the system
 
 ### Known Infrastructure Gaps
 
-**Production access (HIGH PRIORITY):** Agents have zero production access — no Rails console, no SQL, no AppSignal dashboard. For a #bugsnag athanor this is a major constraint: many errors need production context to diagnose (specific records, data conditions, production-only config). We need a read-only SQL user and/or a sandboxed Rails console session concept ASAP. Without it, expect frequent escalations where the azer says "I can see the error but can't determine the data condition without prod access." This is documented in AGENTS.md as an explicit constraint with escalation guidance.
+**Production access (HIGH PRIORITY):** Agents have zero production access — no Rails console, no SQL, no AppSignal dashboard. For a #my-project athanor this is a major constraint: many errors need production context to diagnose (specific records, data conditions, production-only config). We need a read-only SQL user and/or a sandboxed Rails console session concept ASAP. Without it, expect frequent escalations where the azer says "I can see the error but can't determine the data condition without prod access." This is documented in AGENTS.md as an explicit constraint with escalation guidance.
 
 ### Infrastructure Gaps Discovered
 
@@ -205,7 +205,7 @@ Track gaps the marut escalates about — these become the artifex's build-out wo
 | 2026-03-21 | `gh pr create` heredoc rejection | First firing observation | bash-allowlist-coach hook rejects heredoc/command-substitution patterns. **Fixed:** azer.md now instructs writing PR body to temp file + `--body-file`. |
 | 2026-03-21 | Permission manager missed new panes | First firing observation | Claude session cached pane list from first scan. **Fixed:** added explicit anti-caching instruction to permission-manager skill. Scanner already uses dynamic `tmux list-panes -a`. |
 | 2026-03-21 | Azer monitoring signal weak | First firing observation | `tmux capture-pane` unreliable for CC TUI. Scrollback (`-S -50`) best current option but noisy. Heartbeat/status file mechanism proposed but not yet implemented. |
-| 2026-03-21 | No auto-merge for azer PRs | First firing observation | Azers create PRs but can't merge. Artifex must review and merge manually — bottleneck that defeats the point of autonomous error fixing. Need an auto-merge process for musashi (not athanor-specific). `/code-review` can assess quality, but the open question is: what agent makes the final merge/no-merge judgment without operator review, and what are the gates? E.g., CI green + code review pass + diff size under threshold + no schema changes? This is a significant autonomy boundary to design carefully. |
+| 2026-03-21 | No auto-merge for azer PRs | First firing observation | Azers create PRs but can't merge. Artifex must review and merge manually — bottleneck that defeats the point of autonomous error fixing. Need an auto-merge process for my-app (not athanor-specific). `/code-review` can assess quality, but the open question is: what agent makes the final merge/no-merge judgment without operator review, and what are the gates? E.g., CI green + code review pass + diff size under threshold + no schema changes? This is a significant autonomy boundary to design carefully. |
 
 ### Geas Quality Log
 

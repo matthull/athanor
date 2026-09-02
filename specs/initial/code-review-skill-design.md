@@ -17,7 +17,7 @@
 
 Also relevant:
 - `/task-review` command — reviews code against handoff checklist (good, keep separate)
-- `/pr-review` command (project) — Musashi-specific PR review (excellent, project-specific — should be loaded as domain context, not replaced)
+- `/pr-review` command (project) — project-specific PR review (excellent, project-specific — should be loaded as domain context, not replaced)
 - `/review` command — delegates to Gemini (good, keep as second-opinion tool)
 - `/spec-check` skill — spec compliance (cleanly scoped, not code quality)
 
