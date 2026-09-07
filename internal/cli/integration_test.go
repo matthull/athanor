@@ -1,0 +1,1564 @@
+package cli
+
+import (
+	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/matthull/athanor/internal/athanor"
+)
+
+// TestATHFullLifecycle exercises the complete ath CLI workflow:
+//
+//	init → kindle → status → muster → opera → whisper → cleanup → quiesce
+//
+// Requires a running tmux server (skips in -short mode).
+// Uses a temporary ATHANOR_HOME so it doesn't touch ~/athanor/.
+// Creates real tmux windows but uses 'bash' instead of 'claude' to avoid
+// launching actual agent sessions.
+func TestATHFullLifecycle(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test in short mode")
+	}
+
+	// Verify tmux is available
+	if _, err := exec.LookPath("tmux"); err != nil {
+		t.Skip("tmux not found, skipping")
+	}
+	// Verify ath binary is installed
+	athBin, err := exec.LookPath("ath")
+	if err != nil {
+		t.Skip("ath binary not found in PATH, run 'make install' first")
+	}
+
+	// Clean up any stale sessions from previous test runs
+	_ = exec.Command("tmux", "kill-session", "-t", athanor.SessionName("qa-test")).Run()
+	_ = exec.Command("tmux", "kill-session", "-t", athanor.SessionName("qa-warn-test")).Run()
+
+	// Set up temporary athanor home and repo
+	tmpHome := t.TempDir()
+	tmpRepo := t.TempDir()
+	t.Setenv("ATHANOR_HOME", tmpHome)
+	t.Setenv("ATHANOR_REPO", tmpRepo)
+
+	// Set up shared components in the repo
+	sharedDir := filepath.Join(tmpRepo, athanor.SharedDir)
+	if err := os.MkdirAll(sharedDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	for _, f := range athanor.SharedFiles {
+		content := fmt.Sprintf("# %s (test)\nTest shared component for QA.", f)
+		if err := os.WriteFile(filepath.Join(sharedDir, f), []byte(content), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	// Set up job definitions in the repo so --job validation passes.
+	// coder and qa-specialist get model: sonnet frontmatter to test job-level model resolution.
+	for _, job := range []string{"general", "qa-specialist", "coder", "assessor"} {
+		jobDir := filepath.Join(sharedDir, athanor.JobsDir, job)
+		if err := os.MkdirAll(jobDir, 0755); err != nil {
+			t.Fatal(err)
+		}
+		var content string
+		if job == "coder" || job == "qa-specialist" {
+			content = fmt.Sprintf("---\nmodel: sonnet\n---\n# %s (test)\nTest job definition.", job)
+		} else {
+			content = fmt.Sprintf("# %s (test)\nTest job definition.", job)
+		}
+		if err := os.WriteFile(filepath.Join(jobDir, "JOB.md"), []byte(content), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := os.MkdirAll(filepath.Join(tmpHome, athanor.AthanorsDir), 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	// Helper to run ath commands and capture output
+	runAth := func(args ...string) (string, error) {
+		cmd := exec.Command(athBin, args...)
+		cmd.Env = append(os.Environ(), "ATHANOR_HOME="+tmpHome, "ATHANOR_REPO="+tmpRepo)
+		out, err := cmd.CombinedOutput()
+		return string(out), err
+	}
+
+	// Helper for tmux cleanup — kill session-qualified targets
+	sessionsToCleanup := map[string]bool{}
+	windowsToCleanup := []string{}
+	defer func() {
+		for _, w := range windowsToCleanup {
+			_ = exec.Command("tmux", "kill-window", "-t", w).Run()
+		}
+		for s := range sessionsToCleanup {
+			_ = exec.Command("tmux", "kill-session", "-t", s).Run()
+		}
+	}()
+	trackWindow := func(session, name string) {
+		sessionsToCleanup[session] = true
+		windowsToCleanup = append(windowsToCleanup, session+":"+name)
+	}
+	// For non-session-scoped windows (e.g. whisper test target)
+	trackBareWindow := func(name string) {
+		windowsToCleanup = append(windowsToCleanup, name)
+	}
+
+	// ─── Phase 1: ath init ───────────────────────────────────────────
+
+	t.Run("init creates instance", func(t *testing.T) {
+		out, err := runAth("init", "qa-test", "--project", "/tmp/fake-project")
+		if err != nil {
+			t.Fatalf("ath init failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "qa-test") {
+			t.Errorf("expected output to mention instance name, got: %s", out)
+		}
+
+		instDir := athanor.InstanceDir(tmpHome, "qa-test")
+
+		// Verify directory structure
+		for _, path := range []string{
+			instDir,
+			filepath.Join(instDir, "athanor.yml"),
+			filepath.Join(instDir, "magna-opera"),
+		} {
+			if _, err := os.Stat(path); err != nil {
+				t.Errorf("expected %s to exist: %v", filepath.Base(path), err)
+			}
+		}
+
+		// Verify file symlinks
+		for _, f := range athanor.SharedFiles {
+			target, err := os.Readlink(filepath.Join(instDir, f))
+			if err != nil {
+				t.Errorf("expected symlink for %s: %v", f, err)
+			}
+			expectedTarget := filepath.Join(sharedDir, f)
+			if target != expectedTarget {
+				t.Errorf("symlink %s points to %q, want %q", f, target, expectedTarget)
+			}
+		}
+
+		// Verify per-file job symlinks (jobs/<name>/JOB.md)
+		for _, job := range []string{"general", "coder", "qa-specialist", "assessor"} {
+			jobDir := filepath.Join(instDir, athanor.JobsDir, job)
+			fi, err := os.Stat(jobDir)
+			if err != nil {
+				t.Errorf("expected job directory %s: %v", job, err)
+				continue
+			}
+			if !fi.IsDir() {
+				t.Errorf("expected %s to be a real directory", jobDir)
+			}
+			target, err := os.Readlink(filepath.Join(jobDir, athanor.JobFile))
+			if err != nil {
+				t.Errorf("expected JOB.md symlink for %s: %v", job, err)
+				continue
+			}
+			expectedTarget := filepath.Join(sharedDir, athanor.JobsDir, job, athanor.JobFile)
+			if target != expectedTarget {
+				t.Errorf("job %s JOB.md points to %q, want %q", job, target, expectedTarget)
+			}
+		}
+
+		// Verify config
+		cfg, err := athanor.ReadConfig(instDir)
+		if err != nil {
+			t.Fatalf("ReadConfig: %v", err)
+		}
+		if cfg.Name != "qa-test" {
+			t.Errorf("config Name = %q, want %q", cfg.Name, "qa-test")
+		}
+		if cfg.Project != "/tmp/fake-project" {
+			t.Errorf("config Project = %q", cfg.Project)
+		}
+	})
+
+	t.Run("init rejects duplicate", func(t *testing.T) {
+		out, err := runAth("init", "qa-test")
+		if err == nil {
+			t.Fatal("expected error on duplicate init")
+		}
+		if !strings.Contains(out, "already exists") {
+			t.Errorf("expected 'already exists' error, got: %s", out)
+		}
+	})
+
+	// ─── Phase 1b: ath sync ─────────────────────────────────────────
+
+	t.Run("sync is idempotent on existing instance", func(t *testing.T) {
+		out, err := runAth("sync", "qa-test")
+		if err != nil {
+			t.Fatalf("ath sync failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "Synced qa-test") {
+			t.Errorf("expected 'Synced qa-test' in output, got: %s", out)
+		}
+	})
+
+	t.Run("sync all instances", func(t *testing.T) {
+		out, err := runAth("sync")
+		if err != nil {
+			t.Fatalf("ath sync (all) failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "Synced qa-test") {
+			t.Errorf("expected 'Synced qa-test' in output, got: %s", out)
+		}
+	})
+
+	// ─── Phase 2: Create a magnum opus ──────────────────────────────
+
+	instDir := athanor.InstanceDir(tmpHome, "qa-test")
+	moDir := filepath.Join(instDir, "magna-opera", "qa-goal")
+	if err := os.MkdirAll(moDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(moDir, "opera"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	moPath := filepath.Join(moDir, "qa-goal.md")
+	moContent := `# qa-goal — Magnum Opus
+
+## Goal
+
+QA testing athanor — verify all CLI commands work correctly.
+
+## Abundant Satisfaction
+
+All ath commands produce correct output and manage tmux windows properly.
+
+## Witnesses
+
+The test harness is the witness.
+
+## Pre-loaded Context
+
+This is an automated test. No prior context needed.
+`
+	if err := os.WriteFile(moPath, []byte(moContent), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	// ─── Phase 3: ath status (before kindle) ─────────────────────────
+
+	t.Run("status shows instance with no marut", func(t *testing.T) {
+		out, err := runAth("status")
+		if err != nil {
+			t.Fatalf("ath status failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "qa-test") {
+			t.Errorf("expected status to list qa-test, got: %s", out)
+		}
+		// Marut should show as "-" (not running)
+		if strings.Contains(out, "active") {
+			t.Errorf("expected no active marut, got: %s", out)
+		}
+	})
+
+	t.Run("status detail view", func(t *testing.T) {
+		out, err := runAth("status", "qa-test")
+		if err != nil {
+			t.Fatalf("ath status qa-test failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "Athanor: qa-test") {
+			t.Errorf("expected detail header, got: %s", out)
+		}
+		if !strings.Contains(out, "marut: -") {
+			t.Errorf("expected marut: -, got: %s", out)
+		}
+	})
+
+	// ─── Phase 4: Create test opus ───────────────────────────────────
+
+	opusPath := filepath.Join(instDir, "magna-opera", "qa-goal", "opera", "2026-03-25-qa-fix-something.md")
+	opusContent := `---
+status: charged
+inscribed: 2026-03-25
+magnum_opus: qa-goal
+job: coder
+---
+# Fix Something for QA
+
+## Intent
+
+Test that opera management works correctly.
+
+## Boundary
+
+Agent: verify the opus lifecycle.
+Operator: nothing.
+
+## Context
+
+This is a test opus created by the QA harness.
+`
+	if err := os.WriteFile(opusPath, []byte(opusContent), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	// ─── Phase 5: ath opera ──────────────────────────────────────────
+
+	t.Run("opera lists charged opus", func(t *testing.T) {
+		out, err := runAth("opera", "qa-test")
+		if err != nil {
+			t.Fatalf("ath opera failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "charged") {
+			t.Errorf("expected charged status, got: %s", out)
+		}
+		if !strings.Contains(out, "qa-fix-something") {
+			t.Errorf("expected opus name, got: %s", out)
+		}
+		if !strings.Contains(out, "2026-03-25") {
+			t.Errorf("expected date, got: %s", out)
+		}
+	})
+
+	// ─── Phase 5b: ath dashboard ────────────────────────────────────
+
+	t.Run("dashboard shows overview with charged opus", func(t *testing.T) {
+		out, err := runAth("dashboard")
+		if err != nil {
+			t.Fatalf("ath dashboard failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "ATH DASHBOARD") {
+			t.Errorf("expected dashboard header, got: %s", out)
+		}
+		if !strings.Contains(out, "qa-test") || !strings.Contains(out, "qa-goal") {
+			t.Errorf("expected instance and MO name, got: %s", out)
+		}
+		if !strings.Contains(out, "QA testing athanor") {
+			t.Errorf("expected MO goal in dashboard, got: %s", out)
+		}
+	})
+
+	t.Run("dashboard json output", func(t *testing.T) {
+		out, err := runAth("dashboard", "--json")
+		if err != nil {
+			t.Fatalf("ath dashboard --json failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "\"timestamp\"") {
+			t.Errorf("expected JSON with timestamp, got: %s", out)
+		}
+		if !strings.Contains(out, "\"qa-test\"") {
+			t.Errorf("expected instance name in JSON, got: %s", out)
+		}
+	})
+
+	// ─── Phase 5c: ath services ────────────────────────────────────────
+
+	t.Run("services lists service dependencies", func(t *testing.T) {
+		out, err := runAth("services")
+		// Exit code 1 is expected in test env (services aren't running)
+		_ = err
+		if !strings.Contains(out, "ATH SERVICES") {
+			t.Errorf("expected ATH SERVICES header, got: %s", out)
+		}
+		if !strings.Contains(out, "athanor-liveness.timer") {
+			t.Errorf("expected athanor-liveness.timer in output, got: %s", out)
+		}
+		if !strings.Contains(out, "attunement-intake.timer") {
+			t.Errorf("expected attunement-intake.timer in output, got: %s", out)
+		}
+		if !strings.Contains(out, "voice-notes-process.timer") {
+			t.Errorf("expected voice-notes-process.timer in output, got: %s", out)
+		}
+	})
+
+	t.Run("services json output", func(t *testing.T) {
+		out, err := runAth("services", "--json")
+		_ = err // exit 1 expected
+		if !strings.Contains(out, "\"timestamp\"") {
+			t.Errorf("expected JSON with timestamp, got: %s", out)
+		}
+		if !strings.Contains(out, "\"all_healthy\"") {
+			t.Errorf("expected all_healthy field in JSON, got: %s", out)
+		}
+		if !strings.Contains(out, "\"athanor-liveness.timer\"") {
+			t.Errorf("expected unit name in JSON, got: %s", out)
+		}
+	})
+
+	// ─── Phase 5d: ath trail ────────────────────────────────────────
+
+	// Add a discharged opus with collaboration signals for trail analysis
+	trailOpusPath := filepath.Join(instDir, "magna-opera", "qa-goal", "opera", "2026-03-24-collab-test.md")
+	trailOpusContent := `---
+status: discharged
+inscribed: 2026-03-24
+discharged: 2026-03-24
+magnum_opus: qa-goal
+job: coder
+---
+# Collaboration test opus
+
+## Outcome
+Inscribed a qa-specialist for independent review. Used whisper to coordinate with peer.
+`
+	if err := os.WriteFile(trailOpusPath, []byte(trailOpusContent), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run("trail shows collaboration topology", func(t *testing.T) {
+		out, err := runAth("trail", "qa-test")
+		if err != nil {
+			t.Fatalf("ath trail failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "ATH TRAIL") {
+			t.Errorf("expected ATH TRAIL header, got: %s", out)
+		}
+		if !strings.Contains(out, "Job Diversity") {
+			t.Errorf("expected Job Diversity section, got: %s", out)
+		}
+		if !strings.Contains(out, "coder") {
+			t.Errorf("expected coder job in output, got: %s", out)
+		}
+		if !strings.Contains(out, "Dyad Coverage") {
+			t.Errorf("expected Dyad Coverage section, got: %s", out)
+		}
+	})
+
+	t.Run("trail with mo filter", func(t *testing.T) {
+		out, err := runAth("trail", "qa-test", "--mo", "qa-goal")
+		if err != nil {
+			t.Fatalf("ath trail --mo failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "qa-test/qa-goal") {
+			t.Errorf("expected scoped header, got: %s", out)
+		}
+	})
+
+	t.Run("trail json output", func(t *testing.T) {
+		out, err := runAth("trail", "qa-test", "--json")
+		if err != nil {
+			t.Fatalf("ath trail --json failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "\"total_opera\"") {
+			t.Errorf("expected total_opera in JSON, got: %s", out)
+		}
+		if !strings.Contains(out, "\"dyad_coverage_pct\"") {
+			t.Errorf("expected dyad_coverage_pct in JSON, got: %s", out)
+		}
+		if !strings.Contains(out, "\"coder\"") {
+			t.Errorf("expected coder job in JSON, got: %s", out)
+		}
+	})
+
+	t.Run("trail empty athanor", func(t *testing.T) {
+		// qa-warn-test doesn't exist yet at this point in the test,
+		// but a nonexistent athanor should return empty gracefully
+		out, err := runAth("trail", "nonexistent-ath")
+		if err != nil {
+			t.Fatalf("ath trail nonexistent should succeed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "No opera found") {
+			t.Errorf("expected 'No opera found' for empty athanor, got: %s", out)
+		}
+	})
+
+	// ─── Phase 6: ath kindle (creates tmux window) ───────────────────
+	// kindle will try to launch 'claude' which may not be interactive here.
+	// We test that the tmux window is created with the right name.
+	// The claude command will either start (and sit at prompt) or fail — either
+	// way, the window existing proves kindle worked.
+
+	qaSession := athanor.SessionName("qa-test")
+
+	t.Run("kindle creates marut crucible", func(t *testing.T) {
+		// Override project to /tmp so cd works
+		cfg, _ := athanor.ReadConfig(instDir)
+		cfg.Project = "/tmp"
+		if err := athanor.WriteConfig(instDir, cfg); err != nil {
+			t.Fatalf("writing config: %v", err)
+		}
+
+		out, err := runAth("kindle", "qa-test", "qa-goal")
+		if err != nil {
+			t.Fatalf("ath kindle failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "marut-qa-test-qa-goal")
+
+		if !strings.Contains(out, "marut-qa-test-qa-goal") {
+			t.Errorf("expected crucible name in output, got: %s", out)
+		}
+
+		// Give tmux a moment to create the window
+		time.Sleep(500 * time.Millisecond)
+
+		// Verify window exists in the athanor's session
+		windows := listSessionWindows(t, qaSession)
+		if !containsExact(windows, "marut-qa-test-qa-goal") {
+			t.Errorf("expected tmux window 'marut-qa-test-qa-goal' in session %s, got windows: %v", qaSession, windows)
+		}
+
+		// Verify the command sent to the window contains claude and the boot prompt
+		paneContent := capturePaneContent(t, qaSession+":marut-qa-test-qa-goal", 20)
+		if !strings.Contains(paneContent, "claude") || !strings.Contains(paneContent, "AGENTS.md") {
+			t.Logf("pane content: %s", paneContent)
+			// Not a hard failure — pane capture can be timing-sensitive
+			t.Log("warning: could not verify boot command in pane (timing-sensitive)")
+		}
+
+		// Verify model parameter is quoted (brackets in model names need quoting for zsh)
+		expectedModel := athanor.DefaultMarutModel
+		if strings.Contains(paneContent, "--model "+expectedModel) {
+			t.Errorf("model parameter is unquoted in pane command — zsh will glob-expand brackets.\npane content: %s", paneContent)
+		}
+	})
+
+	// ─── Phase 7: ath status (after kindle) ──────────────────────────
+
+	t.Run("status shows active marut after kindle", func(t *testing.T) {
+		out, err := runAth("status")
+		if err != nil {
+			t.Fatalf("ath status failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "active") {
+			t.Errorf("expected active marut, got: %s", out)
+		}
+	})
+
+	// ─── Phase 7b: ath check ────────────────────────────────────────
+
+	t.Run("check displays crucible content", func(t *testing.T) {
+		out, err := runAth("check", qaSession+":marut-qa-test-qa-goal")
+		if err != nil {
+			t.Fatalf("ath check failed: %v\n%s", err, out)
+		}
+		if out == "" {
+			t.Error("expected non-empty output from check")
+		}
+	})
+
+	t.Run("check reports not found for nonexistent crucible", func(t *testing.T) {
+		out, err := runAth("check", "nonexistent-crucible-xyz")
+		if err == nil {
+			t.Fatal("expected non-zero exit for dead crucible")
+		}
+		exitErr, ok := err.(*exec.ExitError)
+		if !ok {
+			t.Fatalf("expected ExitError, got: %v", err)
+		}
+		if exitErr.ExitCode() != 2 {
+			t.Errorf("expected exit code 2, got %d", exitErr.ExitCode())
+		}
+		if !strings.Contains(out, "not found") {
+			t.Errorf("expected 'not found' in output, got: %s", out)
+		}
+	})
+
+	t.Run("check without args returns exit 2", func(t *testing.T) {
+		_, err := runAth("check")
+		if err == nil {
+			t.Fatal("expected error when no crucible name given")
+		}
+	})
+
+	// ─── Phase 8: ath muster (creates azer window) ───────────────────
+
+	t.Run("muster creates azer crucible", func(t *testing.T) {
+		out, err := runAth("muster", "2026-03-25-qa-fix-something.md",
+			"--athanor", "qa-test", "--worktree-path", "/tmp")
+		if err != nil {
+			t.Fatalf("ath muster failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-qa-fix-something")
+
+		if !strings.Contains(out, "azer-qa-fix-something") {
+			t.Errorf("expected crucible name in output, got: %s", out)
+		}
+
+		time.Sleep(500 * time.Millisecond)
+
+		windows := listSessionWindows(t, qaSession)
+		if !containsExact(windows, "azer-qa-fix-something") {
+			t.Errorf("expected tmux window 'azer-qa-fix-something' in session %s, got: %v", qaSession, windows)
+		}
+
+		// Verify the boot prompt contains the job definition path
+		paneContent := capturePaneContent(t, qaSession+":azer-qa-fix-something", 20)
+		expectedJobPath := filepath.Join(instDir, "jobs", "coder", "JOB.md")
+		if !strings.Contains(paneContent, expectedJobPath) {
+			t.Logf("pane content: %s", paneContent)
+			t.Log("warning: could not verify job path in pane (timing-sensitive)")
+		}
+	})
+
+	// ─── Phase 8b: ath muster --intent (autonomous azer from intent) ─
+
+	t.Run("muster intent creates azer crucible", func(t *testing.T) {
+		out, err := runAth("muster", "qa-goal", "intent-test",
+			"--intent", "fix the widget loader",
+			"--athanor", "qa-test", "--worktree-path", "/tmp")
+		if err != nil {
+			t.Fatalf("ath muster --intent failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-intent-test")
+
+		if !strings.Contains(out, "azer-intent-test") {
+			t.Errorf("expected crucible name in output, got: %s", out)
+		}
+		if !strings.Contains(out, "fix the widget loader") {
+			t.Errorf("expected intent in output, got: %s", out)
+		}
+
+		time.Sleep(500 * time.Millisecond)
+
+		windows := listSessionWindows(t, qaSession)
+		if !containsExact(windows, "azer-intent-test") {
+			t.Errorf("expected tmux window 'azer-intent-test' in session %s, got: %v", qaSession, windows)
+		}
+	})
+
+	t.Run("muster intent with job injects job definition", func(t *testing.T) {
+		out, err := runAth("muster", "qa-goal", "intent-job-test",
+			"--intent", "audit the auth module",
+			"--job", "qa-specialist",
+			"--athanor", "qa-test", "--worktree-path", "/tmp")
+		if err != nil {
+			t.Fatalf("ath muster --intent --job failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-intent-job-test")
+
+		if !strings.Contains(out, "azer-intent-job-test") {
+			t.Errorf("expected crucible name in output, got: %s", out)
+		}
+
+		time.Sleep(500 * time.Millisecond)
+
+		// Verify the boot prompt contains the job definition path
+		paneContent := capturePaneContent(t, qaSession+":azer-intent-job-test", 20)
+		expectedJobPath := filepath.Join(instDir, "jobs", "qa-specialist", "JOB.md")
+		if !strings.Contains(paneContent, expectedJobPath) {
+			t.Logf("pane content: %s", paneContent)
+			t.Log("warning: could not verify job path in intent pane (timing-sensitive)")
+		}
+	})
+
+	// ─── Phase 8b2: job-level model resolution ──────────────────────
+
+	t.Run("muster uses job model when no --model flag", func(t *testing.T) {
+		// The coder job has model: sonnet in its frontmatter.
+		// When mustering an opus with job: coder and no --model flag,
+		// the output should show Model: sonnet (not the default opus model).
+		out, err := runAth("muster", "2026-03-25-qa-fix-something.md",
+			"--athanor", "qa-test", "--worktree-path", "/tmp",
+			"--name", "azer-job-model-test")
+		if err != nil {
+			t.Fatalf("ath muster (job model) failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-job-model-test")
+
+		if !strings.Contains(out, "Model: sonnet") {
+			t.Errorf("expected Model: sonnet from job frontmatter, got: %s", out)
+		}
+	})
+
+	t.Run("muster --model flag overrides job model", func(t *testing.T) {
+		out, err := runAth("muster", "2026-03-25-qa-fix-something.md",
+			"--athanor", "qa-test", "--worktree-path", "/tmp",
+			"--model", "custom-model",
+			"--name", "azer-model-override-test")
+		if err != nil {
+			t.Fatalf("ath muster (model override) failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-model-override-test")
+
+		if !strings.Contains(out, "Model: custom-model") {
+			t.Errorf("expected Model: custom-model (flag override), got: %s", out)
+		}
+	})
+
+	// ─── Phase 8b3: JOB.local.md layer in boot prompt ──────────────
+
+	t.Run("muster includes JOB.local.md in boot prompt when present", func(t *testing.T) {
+		// Write a JOB.local.md layer for the coder job in this athanor
+		localContent := "# Coder layer for qa-test\nFocus on test coverage."
+		localPath := filepath.Join(instDir, athanor.JobsDir, "coder", athanor.JobLocalFile)
+		if err := os.WriteFile(localPath, []byte(localContent), 0644); err != nil {
+			t.Fatal(err)
+		}
+		defer os.Remove(localPath)
+
+		out, err := runAth("muster", "2026-03-25-qa-fix-something.md",
+			"--athanor", "qa-test", "--worktree-path", "/tmp",
+			"--name", "azer-local-layer-test")
+		if err != nil {
+			t.Fatalf("ath muster (local layer) failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-local-layer-test")
+
+		time.Sleep(500 * time.Millisecond)
+
+		// Verify the boot prompt contains the JOB.local.md path
+		paneContent := capturePaneContent(t, qaSession+":azer-local-layer-test", 20)
+		expectedLocalPath := filepath.Join(instDir, athanor.JobsDir, "coder", athanor.JobLocalFile)
+		if !strings.Contains(paneContent, expectedLocalPath) {
+			t.Logf("pane content: %s", paneContent)
+			t.Log("warning: could not verify JOB.local.md path in pane (timing-sensitive)")
+		}
+	})
+
+	// ─── Phase 8b4: .env.local sourcing ─────────────────────────────
+
+	t.Run("muster includes env.local source in launch command", func(t *testing.T) {
+		time.Sleep(500 * time.Millisecond)
+		paneContent := capturePaneContent(t, qaSession+":azer-job-model-test", 20)
+		envPath := filepath.Join(instDir, ".env.local")
+		if !strings.Contains(paneContent, envPath) {
+			t.Logf("pane content: %s", paneContent)
+			t.Log("warning: could not verify .env.local sourcing in pane (timing-sensitive)")
+		}
+	})
+
+	// ─── Phase 8b4: init creates .env.local.template ────────────────
+
+	t.Run("init creates env.local.template", func(t *testing.T) {
+		templatePath := filepath.Join(instDir, ".env.local.template")
+		data, err := os.ReadFile(templatePath)
+		if err != nil {
+			t.Fatalf("expected .env.local.template at %s: %v", templatePath, err)
+		}
+		if !strings.Contains(string(data), "CLAUDE_CODE_OAUTH_TOKEN") {
+			t.Error("expected CLAUDE_CODE_OAUTH_TOKEN in template")
+		}
+	})
+
+	t.Run("muster intent without name errors", func(t *testing.T) {
+		cmd := exec.Command(athBin, "muster", "qa-goal",
+			"--intent", "do something", "--athanor", "qa-test")
+		cmd.Env = append(os.Environ(), "ATHANOR_HOME="+tmpHome, "ATHANOR_REPO="+tmpRepo)
+		out, err := cmd.CombinedOutput()
+		if err == nil {
+			t.Fatal("expected error when name not provided with --intent")
+		}
+		if !strings.Contains(string(out), "crucible name required") {
+			t.Errorf("expected 'crucible name required' error, got: %s", out)
+		}
+	})
+
+	// ─── Phase 8c: ath inscribe ─────────────────────────────────────
+
+	t.Run("inscribe creates opus file", func(t *testing.T) {
+		out, err := runAth("inscribe", "qa-test", "qa-goal",
+			"--intent", "Fix the widget loader", "--job", "general")
+		if err != nil {
+			t.Fatalf("ath inscribe failed: %v\n%s", err, out)
+		}
+		// Output should be the opus path
+		opusOut := strings.TrimSpace(out)
+		if !strings.Contains(opusOut, "fix-the-widget-loader") {
+			t.Errorf("expected slugified name in output, got: %s", opusOut)
+		}
+		if !strings.HasSuffix(opusOut, ".md") {
+			t.Errorf("expected .md extension in output, got: %s", opusOut)
+		}
+		// Verify the file exists and has correct content
+		data, err := os.ReadFile(opusOut)
+		if err != nil {
+			t.Fatalf("opus file not readable: %v", err)
+		}
+		content := string(data)
+		if !strings.Contains(content, "status: charged") {
+			t.Error("missing 'status: charged' in frontmatter")
+		}
+		if !strings.Contains(content, "magnum_opus: qa-goal") {
+			t.Error("missing magnum_opus in frontmatter")
+		}
+		if !strings.Contains(content, "Fix the widget loader") {
+			t.Error("missing intent text in opus body")
+		}
+	})
+
+	t.Run("inscribe with job includes job in frontmatter", func(t *testing.T) {
+		out, err := runAth("inscribe", "qa-test", "qa-goal",
+			"--intent", "Verify auth flow", "--job", "qa-specialist")
+		if err != nil {
+			t.Fatalf("ath inscribe --job failed: %v\n%s", err, out)
+		}
+		opusOut := strings.TrimSpace(out)
+		data, err := os.ReadFile(opusOut)
+		if err != nil {
+			t.Fatalf("opus file not readable: %v", err)
+		}
+		if !strings.Contains(string(data), "job: qa-specialist") {
+			t.Error("missing job field in frontmatter")
+		}
+	})
+
+	t.Run("inscribe with muster creates crucible", func(t *testing.T) {
+		out, err := runAth("inscribe", "qa-test", "qa-goal",
+			"--intent", "Run smoke tests", "--job", "general", "--muster")
+		if err != nil {
+			t.Fatalf("ath inscribe --muster failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-run-smoke-tests")
+
+		if !strings.Contains(out, "azer-run-smoke-tests") {
+			t.Errorf("expected crucible name in output, got: %s", out)
+		}
+
+		time.Sleep(500 * time.Millisecond)
+		windows := listSessionWindows(t, qaSession)
+		if !containsExact(windows, "azer-run-smoke-tests") {
+			t.Errorf("expected tmux window 'azer-run-smoke-tests' in session %s, got: %v", qaSession, windows)
+		}
+	})
+
+	t.Run("inscribe missing intent errors", func(t *testing.T) {
+		_, err := runAth("inscribe", "qa-test", "qa-goal")
+		if err == nil {
+			t.Fatal("expected error when --intent not provided")
+		}
+	})
+
+	t.Run("inscribe missing MO errors", func(t *testing.T) {
+		_, err := runAth("inscribe", "qa-test", "nonexistent-mo",
+			"--intent", "Do something")
+		if err == nil {
+			t.Fatal("expected error for nonexistent MO")
+		}
+	})
+
+	// ─── Phase 8d: ath collaborate ──────────────────────────────────
+
+	t.Run("collaborate creates opus and musters", func(t *testing.T) {
+		// collaborate needs $ATHANOR set (normally set in crucibles)
+		cmd := exec.Command(athBin, "collaborate", "qa-goal",
+			"--intent", "Review auth module", "--job", "general")
+		cmd.Env = append(os.Environ(),
+			"ATHANOR_HOME="+tmpHome,
+			"ATHANOR_REPO="+tmpRepo,
+			"ATHANOR="+instDir)
+		outBytes, err := cmd.CombinedOutput()
+		out := string(outBytes)
+		if err != nil {
+			t.Fatalf("ath collaborate failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-review-auth-module")
+
+		if !strings.Contains(out, "azer-review-auth-module") {
+			t.Errorf("expected crucible name in output, got: %s", out)
+		}
+
+		time.Sleep(500 * time.Millisecond)
+		windows := listSessionWindows(t, qaSession)
+		if !containsExact(windows, "azer-review-auth-module") {
+			t.Errorf("expected tmux window 'azer-review-auth-module' in session %s, got: %v", qaSession, windows)
+		}
+
+		// Verify the opus file was created in the opera dir
+		entries, err := os.ReadDir(filepath.Join(instDir, "magna-opera", "qa-goal", "opera"))
+		if err != nil {
+			t.Fatalf("reading opera dir: %v", err)
+		}
+		found := false
+		for _, e := range entries {
+			if strings.Contains(e.Name(), "review-auth-module") {
+				found = true
+				// Read and verify collaboration context
+				data, _ := os.ReadFile(filepath.Join(instDir, "magna-opera", "qa-goal", "opera", e.Name()))
+				content := string(data)
+				if !strings.Contains(content, "magnum_opus: qa-goal") {
+					t.Error("missing magnum_opus in collaborate opus")
+				}
+				break
+			}
+		}
+		if !found {
+			t.Error("collaborate opus file not found in opera dir")
+		}
+	})
+
+	t.Run("collaborate without ATHANOR errors", func(t *testing.T) {
+		cmd := exec.Command(athBin, "collaborate", "qa-goal",
+			"--intent", "Do something", "--job", "general")
+		cmd.Env = []string{"PATH=" + os.Getenv("PATH"), "HOME=" + os.Getenv("HOME")}
+		out, err := cmd.CombinedOutput()
+		if err == nil {
+			t.Fatal("expected error when $ATHANOR not set")
+		}
+		if !strings.Contains(string(out), "ATHANOR") {
+			t.Errorf("expected error about $ATHANOR, got: %s", out)
+		}
+	})
+
+	t.Run("collaborate missing intent errors", func(t *testing.T) {
+		cmd := exec.Command(athBin, "collaborate", "qa-goal")
+		cmd.Env = append(os.Environ(),
+			"ATHANOR_HOME="+tmpHome,
+			"ATHANOR_REPO="+tmpRepo,
+			"ATHANOR="+instDir)
+		_, err := cmd.CombinedOutput()
+		if err == nil {
+			t.Fatal("expected error when --intent not provided")
+		}
+	})
+
+	// ─── Phase 8e: ath formulae system ─────────────────────────────
+
+	// Set up a test formula in the qa-test instance for the formula scenarios.
+	formulaName := "coding-dyad"
+	formulaDir := filepath.Join(instDir, athanor.FormulaeDir, formulaName)
+	if err := os.MkdirAll(formulaDir, 0755); err != nil {
+		t.Fatalf("creating formula dir: %v", err)
+	}
+	formulaContent := `---
+summary: Implementation with independent code review
+when:
+  - "code needs to be written or modified"
+  - "any implementation work that will ship to production"
+---
+# Coding Dyad
+
+Test formula for the QA harness — pairs implementer with reviewer.
+`
+	formulaPath := filepath.Join(formulaDir, athanor.FormulaFile)
+	if err := os.WriteFile(formulaPath, []byte(formulaContent), 0644); err != nil {
+		t.Fatalf("writing formula: %v", err)
+	}
+
+	t.Run("inscribe with formula writes formula to frontmatter", func(t *testing.T) {
+		out, err := runAth("inscribe", "qa-test", "qa-goal",
+			"--intent", "Implement formula widget", "--job", "coder",
+			"--formula", "coding-dyad")
+		if err != nil {
+			t.Fatalf("ath inscribe --formula failed: %v\n%s", err, out)
+		}
+		opusOut := strings.TrimSpace(out)
+		data, err := os.ReadFile(opusOut)
+		if err != nil {
+			t.Fatalf("opus file not readable: %v", err)
+		}
+		content := string(data)
+		if !strings.Contains(content, "formula: coding-dyad") {
+			t.Errorf("missing formula field in frontmatter:\n%s", content)
+		}
+		// Verify formula appears after job in frontmatter
+		jobIdx := strings.Index(content, "job: coder")
+		formulaIdx := strings.Index(content, "formula: coding-dyad")
+		if formulaIdx < jobIdx {
+			t.Errorf("formula field should come after job field in frontmatter")
+		}
+	})
+
+	t.Run("inscribe with unknown formula errors", func(t *testing.T) {
+		out, err := runAth("inscribe", "qa-test", "qa-goal",
+			"--intent", "Bad formula", "--job", "coder",
+			"--formula", "nonexistent-formula")
+		if err == nil {
+			t.Fatal("expected error for unknown formula")
+		}
+		if !strings.Contains(out, "unknown formula") {
+			t.Errorf("expected 'unknown formula' in output, got: %s", out)
+		}
+	})
+
+	t.Run("muster with formula opus includes formula clause", func(t *testing.T) {
+		// Inscribe an opus with formula, then muster it and verify the boot
+		// prompt contains the formula path.
+		out, err := runAth("inscribe", "qa-test", "qa-goal",
+			"--intent", "Implement with dyad", "--job", "coder",
+			"--formula", "coding-dyad")
+		if err != nil {
+			t.Fatalf("inscribe failed: %v\n%s", err, out)
+		}
+		opusFile := filepath.Base(strings.TrimSpace(out))
+
+		out, err = runAth("muster", opusFile,
+			"--athanor", "qa-test", "--worktree-path", "/tmp",
+			"--name", "azer-formula-opus-test")
+		if err != nil {
+			t.Fatalf("muster failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-formula-opus-test")
+
+		time.Sleep(500 * time.Millisecond)
+
+		paneContent := capturePaneContent(t, qaSession+":azer-formula-opus-test", 20)
+		if !strings.Contains(paneContent, formulaPath) {
+			t.Logf("pane content: %s", paneContent)
+			t.Log("warning: could not verify formula path in pane (timing-sensitive)")
+		}
+	})
+
+	t.Run("muster with --formula flag overrides opus frontmatter", func(t *testing.T) {
+		// Muster the existing fix-something opus (no formula in frontmatter)
+		// with --formula override.
+		out, err := runAth("muster", "2026-03-25-qa-fix-something.md",
+			"--athanor", "qa-test", "--worktree-path", "/tmp",
+			"--formula", "coding-dyad",
+			"--name", "azer-formula-override-test")
+		if err != nil {
+			t.Fatalf("muster --formula failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-formula-override-test")
+
+		time.Sleep(500 * time.Millisecond)
+		paneContent := capturePaneContent(t, qaSession+":azer-formula-override-test", 20)
+		if !strings.Contains(paneContent, formulaPath) {
+			t.Logf("pane content: %s", paneContent)
+			t.Log("warning: could not verify formula path in pane (timing-sensitive)")
+		}
+	})
+
+	t.Run("muster --intent with --formula injects formula", func(t *testing.T) {
+		out, err := runAth("muster", "qa-goal", "intent-formula-test",
+			"--intent", "rebuild the auth flow",
+			"--job", "coder",
+			"--formula", "coding-dyad",
+			"--athanor", "qa-test", "--worktree-path", "/tmp")
+		if err != nil {
+			t.Fatalf("muster --intent --formula failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-intent-formula-test")
+
+		time.Sleep(500 * time.Millisecond)
+		paneContent := capturePaneContent(t, qaSession+":azer-intent-formula-test", 20)
+		if !strings.Contains(paneContent, formulaPath) {
+			t.Logf("pane content: %s", paneContent)
+			t.Log("warning: could not verify formula path in intent pane (timing-sensitive)")
+		}
+	})
+
+	t.Run("muster errors when formula opus references missing formula", func(t *testing.T) {
+		// Manually craft an opus with formula: ghost-formula and verify
+		// muster refuses to launch.
+		ghostOpusPath := filepath.Join(instDir, "magna-opera", "qa-goal", "opera",
+			"2026-03-26-ghost-formula.md")
+		ghostContent := `---
+status: charged
+inscribed: 2026-03-26
+magnum_opus: qa-goal
+job: coder
+formula: ghost-formula
+---
+# Ghost formula opus
+`
+		if err := os.WriteFile(ghostOpusPath, []byte(ghostContent), 0644); err != nil {
+			t.Fatal(err)
+		}
+		out, err := runAth("muster", "2026-03-26-ghost-formula.md",
+			"--athanor", "qa-test", "--worktree-path", "/tmp",
+			"--name", "azer-ghost-formula-test")
+		if err == nil {
+			t.Fatal("expected error for missing formula")
+		}
+		if !strings.Contains(out, "formula definition not found") {
+			t.Errorf("expected 'formula definition not found' in output, got: %s", out)
+		}
+	})
+
+	t.Run("collaborate with formula writes formula to frontmatter", func(t *testing.T) {
+		cmd := exec.Command(athBin, "collaborate", "qa-goal",
+			"--intent", "Implement frontend tab",
+			"--job", "coder",
+			"--formula", "coding-dyad")
+		cmd.Env = append(os.Environ(),
+			"ATHANOR_HOME="+tmpHome,
+			"ATHANOR_REPO="+tmpRepo,
+			"ATHANOR="+instDir)
+		outBytes, err := cmd.CombinedOutput()
+		out := string(outBytes)
+		if err != nil {
+			t.Fatalf("ath collaborate --formula failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "azer-implement-frontend-tab")
+
+		// Find the opus file and verify it has the formula
+		entries, err := os.ReadDir(filepath.Join(instDir, "magna-opera", "qa-goal", "opera"))
+		if err != nil {
+			t.Fatalf("reading opera dir: %v", err)
+		}
+		found := false
+		for _, e := range entries {
+			if strings.Contains(e.Name(), "implement-frontend-tab") {
+				data, _ := os.ReadFile(filepath.Join(instDir, "magna-opera", "qa-goal", "opera", e.Name()))
+				if !strings.Contains(string(data), "formula: coding-dyad") {
+					t.Errorf("collaborate opus missing formula field:\n%s", string(data))
+				}
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Error("collaborate opus file not found in opera dir")
+		}
+	})
+
+	t.Run("ath tzurot lists jobs and formulae", func(t *testing.T) {
+		// Run with ATHANOR set so formulae section appears
+		cmd := exec.Command(athBin, "tzurot")
+		cmd.Env = append(os.Environ(),
+			"ATHANOR_HOME="+tmpHome,
+			"ATHANOR_REPO="+tmpRepo,
+			"ATHANOR="+instDir)
+		outBytes, err := cmd.CombinedOutput()
+		out := string(outBytes)
+		if err != nil {
+			t.Fatalf("ath tzurot failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "Jobs (global):") {
+			t.Errorf("expected 'Jobs (global):' header, got: %s", out)
+		}
+		if !strings.Contains(out, "coder") {
+			t.Errorf("expected 'coder' in jobs list, got: %s", out)
+		}
+		if !strings.Contains(out, "Formulae (qa-test):") {
+			t.Errorf("expected 'Formulae (qa-test):' header, got: %s", out)
+		}
+		if !strings.Contains(out, "coding-dyad") {
+			t.Errorf("expected 'coding-dyad' in formulae list, got: %s", out)
+		}
+	})
+
+	t.Run("ath tzurot omits formulae section when no athanor context", func(t *testing.T) {
+		cmd := exec.Command(athBin, "tzurot")
+		// Explicit minimal env — no ATHANOR
+		cmd.Env = []string{
+			"PATH=" + os.Getenv("PATH"),
+			"HOME=" + os.Getenv("HOME"),
+			"ATHANOR_HOME=" + tmpHome,
+			"ATHANOR_REPO=" + tmpRepo,
+		}
+		outBytes, err := cmd.CombinedOutput()
+		out := string(outBytes)
+		if err != nil {
+			t.Fatalf("ath tzurot (no athanor) failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "Jobs (global):") {
+			t.Errorf("expected jobs header, got: %s", out)
+		}
+		if strings.Contains(out, "Formulae") {
+			t.Errorf("expected no formulae section without athanor, got: %s", out)
+		}
+	})
+
+	t.Run("ath formulae lists formulae", func(t *testing.T) {
+		cmd := exec.Command(athBin, "formulae")
+		cmd.Env = append(os.Environ(),
+			"ATHANOR_HOME="+tmpHome,
+			"ATHANOR_REPO="+tmpRepo,
+			"ATHANOR="+instDir)
+		outBytes, err := cmd.CombinedOutput()
+		out := string(outBytes)
+		if err != nil {
+			t.Fatalf("ath formulae failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "coding-dyad") {
+			t.Errorf("expected 'coding-dyad' in output, got: %s", out)
+		}
+		if !strings.Contains(out, "Implementation with independent code review") {
+			t.Errorf("expected formula summary, got: %s", out)
+		}
+		if !strings.Contains(out, "code needs to be written or modified") {
+			t.Errorf("expected when entry, got: %s", out)
+		}
+	})
+
+	t.Run("ath formulae <name> shows detail", func(t *testing.T) {
+		out, err := runAth("formulae", "coding-dyad", "--athanor", "qa-test")
+		if err != nil {
+			t.Fatalf("ath formulae coding-dyad failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "Formula: coding-dyad") {
+			t.Errorf("expected 'Formula: coding-dyad' header, got: %s", out)
+		}
+		if !strings.Contains(out, "Test formula for the QA harness") {
+			t.Errorf("expected formula body, got: %s", out)
+		}
+		// Frontmatter should be stripped from the body
+		if strings.Contains(out, "summary:") {
+			t.Errorf("frontmatter should be stripped from body, got: %s", out)
+		}
+	})
+
+	t.Run("ath formulae <unknown> errors", func(t *testing.T) {
+		out, err := runAth("formulae", "no-such-formula", "--athanor", "qa-test")
+		if err == nil {
+			t.Fatal("expected error for unknown formula")
+		}
+		if !strings.Contains(out, "unknown formula") {
+			t.Errorf("expected 'unknown formula' in output, got: %s", out)
+		}
+	})
+
+	t.Run("cleanup formula test crucibles", func(t *testing.T) {
+		for _, name := range []string{
+			"azer-formula-opus-test",
+			"azer-formula-override-test",
+			"azer-intent-formula-test",
+			"azer-implement-frontend-tab",
+		} {
+			out, err := runAth("cleanup", name, "--athanor", "qa-test")
+			if err != nil {
+				t.Fatalf("cleanup %s failed: %v\n%s", name, err, out)
+			}
+		}
+	})
+
+	// ─── Phase 8f: cleanup job-model and inscribe/collaborate windows ─
+
+	t.Run("cleanup job model test crucibles", func(t *testing.T) {
+		for _, name := range []string{"azer-job-model-test", "azer-model-override-test", "azer-local-layer-test"} {
+			out, err := runAth("cleanup", name, "--athanor", "qa-test")
+			if err != nil {
+				t.Fatalf("cleanup %s failed: %v\n%s", name, err, out)
+			}
+		}
+	})
+
+	t.Run("cleanup inscribe muster crucible", func(t *testing.T) {
+		out, err := runAth("cleanup", "azer-run-smoke-tests", "--athanor", "qa-test")
+		if err != nil {
+			t.Fatalf("cleanup inscribe crucible failed: %v\n%s", err, out)
+		}
+	})
+
+	t.Run("cleanup collaborate crucible", func(t *testing.T) {
+		out, err := runAth("cleanup", "azer-review-auth-module", "--athanor", "qa-test")
+		if err != nil {
+			t.Fatalf("cleanup collaborate crucible failed: %v\n%s", err, out)
+		}
+	})
+
+	// ─── Phase 9: ath whisper between windows ────────────────────────
+	// Create a plain bash window to whisper to (easier to verify than
+	// a claude session which has its own TUI)
+
+	t.Run("whisper send delivers message", func(t *testing.T) {
+		// Create a test target window (in current session, not athanor-scoped)
+		_ = exec.Command("tmux", "new-window", "-n", "qa-whisper-target").Run()
+		trackBareWindow("qa-whisper-target")
+		time.Sleep(300 * time.Millisecond)
+
+		out, err := runAth("whisper", "send", "qa-whisper-target", "hello from QA test")
+		if err != nil {
+			t.Fatalf("ath whisper send failed: %v\n%s", err, out)
+		}
+
+		// Verify the message arrived in the target pane
+		time.Sleep(500 * time.Millisecond)
+		pane := capturePaneContent(t, "qa-whisper-target", 10)
+		if !strings.Contains(pane, "hello from QA test") {
+			t.Errorf("expected message in target pane, got: %s", pane)
+		}
+	})
+
+	t.Run("whisper idle detects idle shell", func(t *testing.T) {
+		// The qa-whisper-target has a bash shell which should show a prompt
+		out, err := runAth("whisper", "idle", "qa-whisper-target", "--timeout", "5s")
+		if err != nil {
+			t.Logf("whisper idle output: %s", out)
+			// A plain bash prompt might not match Claude's prompt pattern
+			// so this may fail — that's expected and informative
+			t.Log("note: whisper idle may not detect plain bash as idle (expected — it looks for Claude prompts)")
+		}
+	})
+
+	// ─── Phase 10: ath cleanup ───────────────────────────────────────
+
+	t.Run("cleanup kills azer crucible", func(t *testing.T) {
+		out, err := runAth("cleanup", "azer-qa-fix-something", "--athanor", "qa-test")
+		if err != nil {
+			t.Fatalf("ath cleanup failed: %v\n%s", err, out)
+		}
+
+		time.Sleep(300 * time.Millisecond)
+		windows := listSessionWindows(t, qaSession)
+		if containsExact(windows, "azer-qa-fix-something") {
+			t.Error("expected azer window to be killed after cleanup")
+		}
+	})
+
+	t.Run("cleanup is idempotent", func(t *testing.T) {
+		out, err := runAth("cleanup", "azer-qa-fix-something", "--athanor", "qa-test")
+		if err != nil {
+			t.Fatalf("second cleanup should succeed (idempotent): %v\n%s", err, out)
+		}
+	})
+
+	t.Run("cleanup intent azer crucible", func(t *testing.T) {
+		out, err := runAth("cleanup", "azer-intent-test", "--athanor", "qa-test")
+		if err != nil {
+			t.Fatalf("ath cleanup intent azer failed: %v\n%s", err, out)
+		}
+	})
+
+	t.Run("cleanup intent-job azer crucible", func(t *testing.T) {
+		out, err := runAth("cleanup", "azer-intent-job-test", "--athanor", "qa-test")
+		if err != nil {
+			t.Fatalf("ath cleanup intent-job azer failed: %v\n%s", err, out)
+		}
+	})
+
+	// ─── Phase 11: ath reforge ───────────────────────────────────────
+
+	t.Run("reforge kills and recreates marut", func(t *testing.T) {
+		out, err := runAth("reforge", "qa-test", "qa-goal")
+		if err != nil {
+			t.Fatalf("ath reforge failed: %v\n%s", err, out)
+		}
+
+		if !strings.Contains(out, "reforged") {
+			t.Errorf("expected 'reforged' in output, got: %s", out)
+		}
+
+		time.Sleep(500 * time.Millisecond)
+		windows := listSessionWindows(t, qaSession)
+		if !containsExact(windows, "marut-qa-test-qa-goal") {
+			t.Errorf("expected marut window to exist after reforge in session %s, got: %v", qaSession, windows)
+		}
+	})
+
+	t.Run("reforge is reliable over 5 consecutive runs", func(t *testing.T) {
+		for i := 1; i <= 5; i++ {
+			out, err := runAth("reforge", "qa-test", "qa-goal")
+			if err != nil {
+				t.Fatalf("reforge iteration %d failed: %v\n%s", i, err, out)
+			}
+			if !strings.Contains(out, "reforged") {
+				t.Fatalf("reforge iteration %d: expected 'reforged' in output, got: %s", i, out)
+			}
+
+			time.Sleep(500 * time.Millisecond)
+			windows := listSessionWindows(t, qaSession)
+			if !containsExact(windows, "marut-qa-test-qa-goal") {
+				t.Fatalf("reforge iteration %d: marut window missing after reforge, got: %v", i, windows)
+			}
+
+			// Verify no stale -dying windows leaked
+			for _, w := range windows {
+				if strings.HasSuffix(w, "-dying") {
+					t.Errorf("reforge iteration %d: stale dying window %q not cleaned up", i, w)
+				}
+			}
+		}
+	})
+
+	// ─── Phase 12: Discharge opus and verify opera ───────────────────
+
+	t.Run("opera reflects discharged status", func(t *testing.T) {
+		// Update opus to discharged
+		discharged := strings.Replace(string(opusContent), "status: charged", "status: discharged", 1)
+		if err := os.WriteFile(opusPath, []byte(discharged), 0644); err != nil {
+			t.Fatal(err)
+		}
+
+		out, err := runAth("opera", "qa-test")
+		if err != nil {
+			t.Fatalf("ath opera failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "discharged") {
+			t.Errorf("expected discharged status, got: %s", out)
+		}
+	})
+
+	// ─── Phase 13: ath quiesce ───────────────────────────────────────
+
+	t.Run("quiesce shuts down athanor", func(t *testing.T) {
+		out, err := runAth("quiesce", "qa-test", "qa-goal")
+		if err != nil {
+			t.Fatalf("ath quiesce failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "quiesced") {
+			t.Errorf("expected 'quiesced' in output, got: %s", out)
+		}
+
+		time.Sleep(300 * time.Millisecond)
+		windows := listSessionWindows(t, qaSession)
+		if containsExact(windows, "marut-qa-test-qa-goal") {
+			t.Error("expected marut window to be killed after quiesce")
+		}
+	})
+
+	// ─── Phase 14: Error cases ───────────────────────────────────────
+
+	t.Run("kindle warns on TODO magnum-opus", func(t *testing.T) {
+		// Create another instance and add a template MO with TODOs
+		_, _ = runAth("init", "qa-warn-test")
+		warnDir := athanor.InstanceDir(tmpHome, "qa-warn-test")
+		if err := athanor.WriteMOTemplate(warnDir, "warn-goal"); err != nil {
+			t.Fatal(err)
+		}
+		out, err := runAth("kindle", "qa-warn-test", "warn-goal")
+		// Should warn but not necessarily fail hard
+		_ = err
+		trackWindow(athanor.SessionName("qa-warn-test"), "marut-qa-warn-test-warn-goal")
+		if !strings.Contains(out, "TODO") && !strings.Contains(out, "warning") {
+			t.Logf("expected warning about TODO placeholders, got: %s", out)
+		}
+	})
+
+	t.Run("kindle without mo-name on multi-MO errors", func(t *testing.T) {
+		// qa-warn-test is a multi-MO instance (has magna-opera/ dir)
+		out, err := runAth("kindle", "qa-warn-test")
+		if err == nil {
+			t.Fatal("expected error when mo-name not provided for multi-MO instance")
+		}
+		if !strings.Contains(out, "mo-name required") {
+			t.Errorf("expected 'mo-name required' error, got: %s", out)
+		}
+	})
+
+	t.Run("muster without ATHANOR errors", func(t *testing.T) {
+		// Unset ATHANOR and don't provide --athanor
+		cmd := exec.Command(athBin, "muster", "nonexistent.md")
+		cmd.Env = []string{"PATH=" + os.Getenv("PATH"), "HOME=" + os.Getenv("HOME")}
+		out, err := cmd.CombinedOutput()
+		if err == nil {
+			t.Fatal("expected error when $ATHANOR not set")
+		}
+		if !strings.Contains(string(out), "ATHANOR") {
+			t.Errorf("expected error about $ATHANOR, got: %s", out)
+		}
+	})
+
+	// ─── Phase 14b-e: --role flag on kindle and quiesce ──────────────
+	// Phase 13 quiesced marut-qa-test-qa-goal, so this slot is clean.
+	// perceiver.md is now in SharedFiles, so init symlinked it already.
+
+	t.Run("kindle perceiver creates role crucible", func(t *testing.T) {
+		out, err := runAth("kindle", "qa-test", "--role", "perceiver", "--mo", "qa-goal")
+		if err != nil {
+			t.Fatalf("ath kindle --role perceiver failed: %v\n%s", err, out)
+		}
+		trackWindow(qaSession, "perceiver-qa-test-qa-goal")
+
+		if !strings.Contains(out, "perceiver-qa-test-qa-goal") {
+			t.Errorf("expected crucible name in output, got: %s", out)
+		}
+
+		time.Sleep(500 * time.Millisecond)
+		windows := listSessionWindows(t, qaSession)
+		if !containsExact(windows, "perceiver-qa-test-qa-goal") {
+			t.Errorf("expected perceiver window, got: %v", windows)
+		}
+
+		kindledPath := filepath.Join(instDir, "magna-opera", "qa-goal", "kindled", "perceiver")
+		if _, err := os.Stat(kindledPath); err != nil {
+			t.Errorf("expected kindled state file at %s: %v", kindledPath, err)
+		}
+	})
+
+	t.Run("kindle perceiver is idempotent", func(t *testing.T) {
+		out, err := runAth("kindle", "qa-test", "--role", "perceiver", "--mo", "qa-goal")
+		if err != nil {
+			t.Fatalf("idempotent kindle failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "already running") {
+			t.Errorf("expected 'already running' message, got: %s", out)
+		}
+	})
+
+	t.Run("quiesce single role", func(t *testing.T) {
+		out, err := runAth("quiesce", "qa-test", "qa-goal", "--role", "perceiver")
+		if err != nil {
+			t.Fatalf("quiesce --role perceiver failed: %v\n%s", err, out)
+		}
+		if !strings.Contains(out, "Perceiver") && !strings.Contains(out, "quiesced") {
+			t.Errorf("expected role quiesce message, got: %s", out)
+		}
+
+		time.Sleep(300 * time.Millisecond)
+		windows := listSessionWindows(t, qaSession)
+		if containsExact(windows, "perceiver-qa-test-qa-goal") {
+			t.Error("expected perceiver window to be killed after quiesce")
+		}
+
+		kindledPath := filepath.Join(instDir, "magna-opera", "qa-goal", "kindled", "perceiver")
+		if _, err := os.Stat(kindledPath); !os.IsNotExist(err) {
+			t.Errorf("expected kindled state file to be removed")
+		}
+	})
+
+	t.Run("kindle nonexistent role errors", func(t *testing.T) {
+		out, err := runAth("kindle", "qa-test", "--role", "nonexistent", "--mo", "qa-goal")
+		if err == nil {
+			t.Fatal("expected error for nonexistent role")
+		}
+		if !strings.Contains(out, "role file") {
+			t.Errorf("expected 'role file' error, got: %s", out)
+		}
+	})
+
+	// ─── Phase 15: Version and help ──────────────────────────────────
+
+	t.Run("version prints info", func(t *testing.T) {
+		out, err := runAth("version")
+		if err != nil {
+			t.Fatalf("ath version failed: %v", err)
+		}
+		if !strings.Contains(out, "ath") {
+			t.Errorf("expected 'ath' in version output, got: %s", out)
+		}
+	})
+
+	t.Run("help prints usage", func(t *testing.T) {
+		out, err := runAth("help")
+		if err != nil {
+			t.Fatalf("ath help failed: %v", err)
+		}
+		if !strings.Contains(out, "kindle") {
+			t.Errorf("expected 'kindle' in help output, got: %s", out)
+		}
+		if !strings.Contains(out, "whisper") {
+			t.Errorf("expected 'whisper' in help output, got: %s", out)
+		}
+	})
+
+	t.Run("whisper help prints subcommand usage", func(t *testing.T) {
+		out, err := runAth("whisper", "help")
+		if err != nil {
+			t.Fatalf("ath whisper help failed: %v", err)
+		}
+		if !strings.Contains(out, "send") {
+			t.Errorf("expected 'send' in whisper help, got: %s", out)
+		}
+	})
+
+	t.Run("unknown command returns exit 2", func(t *testing.T) {
+		_, err := runAth("foobar")
+		if err == nil {
+			t.Fatal("expected error for unknown command")
+		}
+	})
+}
+
+// ── Test Helpers ─────────────────────────────────────────────────────
+
+func listSessionWindows(t *testing.T, session string) []string {
+	t.Helper()
+	out, err := exec.Command("tmux", "list-windows", "-t", session, "-F", "#{window_name}").CombinedOutput()
+	if err != nil {
+		t.Logf("tmux list-windows -t %s: %v", session, err)
+		return nil
+	}
+	result := strings.TrimSpace(string(out))
+	if result == "" {
+		return nil
+	}
+	return strings.Split(result, "\n")
+}
+
+func containsExact(slice []string, target string) bool {
+	for _, s := range slice {
+		if s == target {
+			return true
+		}
+	}
+	return false
+}
+
+func capturePaneContent(t *testing.T, target string, lines int) string {
+	t.Helper()
+	out, err := exec.Command("tmux", "capture-pane", "-p", "-t", target,
+		"-S", fmt.Sprintf("-%d", lines)).CombinedOutput()
+	if err != nil {
+		t.Logf("capture-pane %s: %v", target, err)
+		return ""
+	}
+	return string(out)
+}

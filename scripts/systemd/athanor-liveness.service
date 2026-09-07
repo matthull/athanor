@@ -1,0 +1,10 @@
+[Unit]
+Description=Athanor liveness check — ensure kindled roles have active sessions
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/athanor-liveness-check
+Environment=PATH=%h/.local/bin:%h/go/bin:/usr/local/bin:/usr/bin
+StandardOutput=journal
+StandardError=journal
+TimeoutStartSec=120

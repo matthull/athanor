@@ -1,0 +1,22 @@
+# Binaries (only root-level compiled binaries, not source)
+/ath
+/whisper
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+coverage.out
+coverage.html
+
+# Claude Code local state (per-machine, not part of the tool)
+.claude/settings.local.json
+.claude/scheduled_tasks.lock

@@ -1,0 +1,566 @@
+package athanor
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"gopkg.in/yaml.v3"
+)
+
+// Config is the per-instance athanor.yml configuration.
+type Config struct {
+	Name       string `yaml:"name"`
+	Project    string `yaml:"project,omitempty"`
+	MarutModel string `yaml:"marut_model,omitempty"`
+	AzerModel  string `yaml:"azer_model,omitempty"`
+}
+
+// Defaults for agent models.
+const (
+	DefaultMarutModel = "claude-opus-4-6[1m]"
+	DefaultAzerModel  = "claude-opus-4-6[1m]"
+)
+
+// EffectiveMarutModel returns the marut model, falling back to default.
+func (c *Config) EffectiveMarutModel() string {
+	if c.MarutModel != "" {
+		return c.MarutModel
+	}
+	return DefaultMarutModel
+}
+
+// EffectiveAzerModel returns the azer model, falling back to default.
+func (c *Config) EffectiveAzerModel() string {
+	if c.AzerModel != "" {
+		return c.AzerModel
+	}
+	return DefaultAzerModel
+}
+
+// ReadConfig reads the athanor.yml for an instance.
+func ReadConfig(instanceDir string) (*Config, error) {
+	data, err := os.ReadFile(filepath.Join(instanceDir, "athanor.yml"))
+	if err != nil {
+		return nil, fmt.Errorf("reading athanor.yml: %w", err)
+	}
+	var cfg Config
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
+		return nil, fmt.Errorf("parsing athanor.yml: %w", err)
+	}
+	return &cfg, nil
+}
+
+// WriteConfig writes the athanor.yml for an instance.
+func WriteConfig(instanceDir string, cfg *Config) error {
+	data, err := yaml.Marshal(cfg)
+	if err != nil {
+		return fmt.Errorf("marshaling config: %w", err)
+	}
+	return os.WriteFile(filepath.Join(instanceDir, "athanor.yml"), data, 0644)
+}
+
+// InitInstance creates a new athanor instance with symlinked shared components.
+func InitInstance(home, name, project string) error {
+	instDir := InstanceDir(home, name)
+
+	// Check if instance already exists
+	if _, err := os.Stat(instDir); err == nil {
+		return fmt.Errorf("athanor %q already exists at %s", name, instDir)
+	}
+
+	// Create instance directory
+	if err := os.MkdirAll(instDir, 0755); err != nil {
+		return fmt.Errorf("creating instance directory: %w", err)
+	}
+
+	// Write athanor.yml
+	cfg := &Config{
+		Name:    name,
+		Project: project,
+	}
+	if err := WriteConfig(instDir, cfg); err != nil {
+		return fmt.Errorf("writing config: %w", err)
+	}
+
+	// Create magna-opera directory
+	if err := os.MkdirAll(filepath.Join(instDir, MagnaOperaDir), 0755); err != nil {
+		return fmt.Errorf("creating magna-opera directory: %w", err)
+	}
+
+	// Create .env.local.template showing expected env vars
+	if err := WriteEnvTemplate(instDir); err != nil {
+		return fmt.Errorf("writing env template: %w", err)
+	}
+
+	// Symlink shared components via SyncInstance
+	if err := SyncInstance(home, name); err != nil {
+		return fmt.Errorf("syncing shared components: %w", err)
+	}
+
+	return nil
+}
+
+// EnvLocalPath returns the path to the per-instance .env.local secrets file.
+func EnvLocalPath(instDir string) string {
+	return filepath.Join(instDir, ".env.local")
+}
+
+// WriteEnvTemplate creates the .env.local.template file showing expected vars.
+// Idempotent — overwrites if already present.
+func WriteEnvTemplate(instDir string) error {
+	content := `# Per-athanor secrets — sourced before launching claude sessions.
+# Copy this to .env.local and fill in values. .env.local is gitignored.
+#
+# CLAUDE_CODE_OAUTH_TOKEN=sk-ant-oat01-...
+`
+	return os.WriteFile(filepath.Join(instDir, ".env.local.template"), []byte(content), 0644)
+}
+
+// EnsureEnvGitignore adds the .env.local gitignore pattern to the athanor home
+// .gitignore if not already present. Idempotent.
+func EnsureEnvGitignore(home string) error {
+	gitignorePath := filepath.Join(home, ".gitignore")
+	pattern := "athanors/*/.env.local"
+
+	existing, err := os.ReadFile(gitignorePath)
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("reading .gitignore: %w", err)
+	}
+
+	if strings.Contains(string(existing), pattern) {
+		return nil // already present
+	}
+
+	entry := "\n# Per-athanor secrets (OAuth tokens, API keys)\n" + pattern + "\n"
+	f, err := os.OpenFile(gitignorePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return fmt.Errorf("opening .gitignore: %w", err)
+	}
+	defer f.Close()
+	if _, err := f.WriteString(entry); err != nil {
+		return fmt.Errorf("writing .gitignore: %w", err)
+	}
+	return nil
+}
+
+// SyncInstance reconciles symlinks for an existing instance, making it idempotent.
+// For each SharedFile and SharedDir: creates missing symlinks, fixes symlinks that
+// point to wrong targets, and leaves correct symlinks untouched.
+func SyncInstance(home, name string) error {
+	instDir := InstanceDir(home, name)
+
+	if _, err := os.Stat(instDir); os.IsNotExist(err) {
+		return fmt.Errorf("athanor %q does not exist at %s", name, instDir)
+	}
+
+	sharedDir, err := SharedPath()
+	if err != nil {
+		return fmt.Errorf("resolving shared path: %w", err)
+	}
+
+	// Sync individual files
+	for _, f := range SharedFiles {
+		src := filepath.Join(sharedDir, f)
+		if _, err := os.Stat(src); err != nil {
+			return fmt.Errorf("shared component %q not found at %s (is the athanor repo checked out?)", f, src)
+		}
+		dst := filepath.Join(instDir, f)
+		if err := ensureSymlink(src, dst); err != nil {
+			return fmt.Errorf("syncing %s: %w", f, err)
+		}
+	}
+
+	// Sync directories
+	for _, d := range SharedDirs {
+		src := filepath.Join(sharedDir, d)
+		if _, err := os.Stat(src); err != nil {
+			return fmt.Errorf("shared directory %q not found at %s (is the athanor repo checked out?)", d, src)
+		}
+		dst := filepath.Join(instDir, d)
+		if err := ensureSymlink(src, dst); err != nil {
+			return fmt.Errorf("syncing directory %s: %w", d, err)
+		}
+	}
+
+	// Sync jobs with per-file symlinks (allows athanor-specific JOB.local.md layers)
+	if err := syncJobs(instDir, sharedDir); err != nil {
+		return fmt.Errorf("syncing jobs: %w", err)
+	}
+
+	return nil
+}
+
+// syncJobs creates per-file symlinks for each job definition.
+// For each job in shared/jobs/<name>/, it creates <instDir>/jobs/<name>/ as a
+// real directory and symlinks JOB.md inside it. This allows athanor-specific
+// JOB.local.md files to coexist alongside the shared definition.
+//
+// Migration: if <instDir>/jobs is an old-style directory symlink (pointing to
+// shared/jobs), it is removed and replaced with the per-file structure.
+func syncJobs(instDir, sharedDir string) error {
+	instJobs := filepath.Join(instDir, JobsDir)
+	sharedJobs := filepath.Join(sharedDir, JobsDir)
+
+	// Check if shared/jobs exists
+	if _, err := os.Stat(sharedJobs); err != nil {
+		if os.IsNotExist(err) {
+			return nil // no jobs to sync
+		}
+		return fmt.Errorf("checking shared jobs: %w", err)
+	}
+
+	// Migration: remove old-style directory symlink
+	if target, err := os.Readlink(instJobs); err == nil {
+		// instJobs is a symlink — check if it points to a directory (old style)
+		if fi, statErr := os.Stat(target); statErr == nil && fi.IsDir() {
+			if err := os.Remove(instJobs); err != nil {
+				return fmt.Errorf("removing old jobs directory symlink: %w", err)
+			}
+		}
+	}
+
+	// Ensure <instDir>/jobs/ exists as a real directory
+	if err := os.MkdirAll(instJobs, 0755); err != nil {
+		return fmt.Errorf("creating jobs directory: %w", err)
+	}
+
+	// List jobs from shared
+	entries, err := os.ReadDir(sharedJobs)
+	if err != nil {
+		return fmt.Errorf("listing shared jobs: %w", err)
+	}
+
+	for _, e := range entries {
+		if !e.IsDir() {
+			continue
+		}
+		jobName := e.Name()
+		srcFile := filepath.Join(sharedJobs, jobName, JobFile)
+		if _, err := os.Stat(srcFile); err != nil {
+			continue // skip dirs without JOB.md
+		}
+
+		// Create <instDir>/jobs/<name>/ as a real directory
+		jobDir := filepath.Join(instJobs, jobName)
+		if err := os.MkdirAll(jobDir, 0755); err != nil {
+			return fmt.Errorf("creating job directory %s: %w", jobName, err)
+		}
+
+		// Symlink JOB.md
+		dstFile := filepath.Join(jobDir, JobFile)
+		if err := ensureSymlink(srcFile, dstFile); err != nil {
+			return fmt.Errorf("syncing job %s: %w", jobName, err)
+		}
+	}
+
+	return nil
+}
+
+// ensureSymlink creates or fixes a symlink at dst pointing to src.
+// If dst already exists and is a correct symlink, it's a no-op.
+// If dst is a symlink pointing elsewhere, it's replaced.
+// If dst exists but is not a symlink (e.g. a regular file), it's left alone and an error is returned.
+func ensureSymlink(src, dst string) error {
+	target, err := os.Readlink(dst)
+	if err == nil {
+		// dst is a symlink — check if it points to the right place
+		if target == src {
+			return nil // already correct
+		}
+		// Wrong target — remove and recreate
+		if err := os.Remove(dst); err != nil {
+			return fmt.Errorf("removing stale symlink: %w", err)
+		}
+		return os.Symlink(src, dst)
+	}
+
+	if os.IsNotExist(err) {
+		// dst doesn't exist — create symlink
+		return os.Symlink(src, dst)
+	}
+
+	// dst exists but is not a symlink (Readlink failed for non-ENOENT reason)
+	// Check if it's a regular file/dir that we shouldn't overwrite
+	if _, statErr := os.Lstat(dst); statErr == nil {
+		return fmt.Errorf("%s exists but is not a symlink — not overwriting", dst)
+	}
+
+	return fmt.Errorf("checking %s: %w", dst, err)
+}
+
+// ValidateMagnumOpus checks the legacy magnum-opus.md. Deprecated: use ValidateMO.
+func ValidateMagnumOpus(instanceDir string) error {
+	return ValidateMO(instanceDir, filepath.Base(instanceDir))
+}
+
+// ValidateMO checks that a specific magnum opus exists and has real content.
+func ValidateMO(instanceDir, moName string) error {
+	path := MagnumOpusPath(instanceDir, moName)
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return fmt.Errorf("magnum opus %q not found at %s", moName, path)
+		}
+		return fmt.Errorf("reading magnum opus %q: %w", moName, err)
+	}
+
+	content := string(data)
+	if strings.Contains(content, "[TODO]") {
+		return fmt.Errorf("magnum opus %q still has [TODO] placeholders — fill them in before kindling", moName)
+	}
+
+	return nil
+}
+
+// HasLegacyMagnumOpus returns true if the instance uses the old single-file format.
+func HasLegacyMagnumOpus(instanceDir string) bool {
+	moDir := filepath.Join(instanceDir, MagnaOperaDir)
+	if _, err := os.Stat(moDir); err == nil {
+		return false // magna-opera/ exists, not legacy
+	}
+	legacyPath := filepath.Join(instanceDir, "magnum-opus.md")
+	_, err := os.Stat(legacyPath)
+	return err == nil
+}
+
+// MagnumOpusPath returns the filesystem path to a specific MO file.
+// For legacy instances (no magna-opera/ dir), returns magnum-opus.md.
+// For multi-MO instances, returns magna-opera/<moName>/<moName>.md.
+func MagnumOpusPath(instanceDir, moName string) string {
+	if HasLegacyMagnumOpus(instanceDir) {
+		return filepath.Join(instanceDir, "magnum-opus.md")
+	}
+	return filepath.Join(instanceDir, MagnaOperaDir, moName, moName+".md")
+}
+
+// OperaPath returns the filesystem path to a specific MO's opera directory.
+// Returns magna-opera/<moName>/opera.
+func OperaPath(instanceDir, moName string) string {
+	return filepath.Join(instanceDir, MagnaOperaDir, moName, "opera")
+}
+
+// ListMagnaOpera returns the names of all magna opera in an instance.
+// For legacy instances, returns a single-element list with the instance name.
+func ListMagnaOpera(instanceDir string) ([]string, error) {
+	moDir := filepath.Join(instanceDir, MagnaOperaDir)
+	entries, err := os.ReadDir(moDir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			// Check for legacy magnum-opus.md
+			if HasLegacyMagnumOpus(instanceDir) {
+				return []string{filepath.Base(instanceDir)}, nil
+			}
+			return nil, nil
+		}
+		return nil, fmt.Errorf("listing magna opera: %w", err)
+	}
+
+	var names []string
+	for _, e := range entries {
+		if e.IsDir() {
+			names = append(names, e.Name())
+		}
+	}
+	return names, nil
+}
+
+// ReadOpusMO reads the magnum_opus field from an opus file's YAML frontmatter.
+func ReadOpusMO(path string) string {
+	return readFrontmatterField(path, "magnum_opus:")
+}
+
+// ReadOpusJob reads the job field from an opus file's YAML frontmatter.
+func ReadOpusJob(path string) string {
+	return readFrontmatterField(path, "job:")
+}
+
+// ReadOpusFormula reads the formula field from an opus file's YAML frontmatter.
+// Returns empty string when the field is absent or the file can't be read.
+func ReadOpusFormula(path string) string {
+	return readFrontmatterField(path, "formula:")
+}
+
+// ReadJobModel reads the model field from a JOB.md file's YAML frontmatter.
+// Returns empty string if the job has no model specified or the file doesn't exist.
+func ReadJobModel(instDir, jobName string) string {
+	if jobName == "" {
+		return ""
+	}
+	jobPath := filepath.Join(instDir, "jobs", jobName, JobFile)
+	return readFrontmatterField(jobPath, "model:")
+}
+
+// readFrontmatterField reads a single field from YAML frontmatter.
+func readFrontmatterField(path, prefix string) string {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return ""
+	}
+	content := string(data)
+	if !strings.HasPrefix(content, "---") {
+		return ""
+	}
+	end := strings.Index(content[3:], "---")
+	if end < 0 {
+		return ""
+	}
+	frontmatter := content[3 : 3+end]
+	for _, line := range strings.Split(frontmatter, "\n") {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, prefix) {
+			return strings.TrimSpace(strings.TrimPrefix(line, prefix))
+		}
+	}
+	return ""
+}
+
+// WriteMOTemplate writes a template magnum opus file to magna-opera/<moName>/<moName>.md.
+func WriteMOTemplate(instanceDir, moName string) error {
+	content := fmt.Sprintf(`# %s — Magnum Opus
+
+## Goal
+
+[TODO] What is this magnum opus pursuing? Be specific about the desired end state.
+
+## Abundant Satisfaction
+
+[TODO] What does abundant satisfaction look like? How will you know the goal is met?
+
+## Witnesses
+
+[TODO] Who are the stakeholders? What does success look like from their perspective?
+
+## Marut Directives
+
+(Leave empty for default behavior — the marut pursues the goal without constraints. Add directives to scope what the marut focuses on, avoids, or stops at.)
+
+## Tempering
+
+(Empty by default. Transient guidance — "the weather today." Updated by the marut during artifex conversation. Always timestamped.)
+
+## Pre-loaded Context
+
+[TODO] What does the first azer need to not start from scratch? Discovery findings, references, known open questions, relevant services/files.
+`, moName)
+
+	moDir := filepath.Join(instanceDir, MagnaOperaDir, moName)
+	if err := os.MkdirAll(moDir, 0755); err != nil {
+		return fmt.Errorf("creating MO directory: %w", err)
+	}
+	// Create opera subdirectory for this MO
+	if err := os.MkdirAll(filepath.Join(moDir, "opera"), 0755); err != nil {
+		return fmt.Errorf("creating MO opera directory: %w", err)
+	}
+	return os.WriteFile(filepath.Join(moDir, moName+".md"), []byte(content), 0644)
+}
+
+// MarutCrucibleName returns the crucible name for a marut.
+// For legacy (single MO), pass empty moName to get "marut-<athanor>".
+// For multi-MO, pass the MO name to get "marut-<athanor>-<mo>".
+func MarutCrucibleName(athanorName, moName string) string {
+	if moName == "" {
+		return fmt.Sprintf("marut-%s", athanorName)
+	}
+	return fmt.Sprintf("marut-%s-%s", athanorName, moName)
+}
+
+// RoleCrucibleName returns the crucible name for any presence-driven role.
+// For legacy (single MO), pass empty moName to get "<role>-<athanor>".
+// For multi-MO, pass the MO name to get "<role>-<athanor>-<mo>".
+func RoleCrucibleName(role, athanorName, moName string) string {
+	if moName == "" {
+		return fmt.Sprintf("%s-%s", role, athanorName)
+	}
+	return fmt.Sprintf("%s-%s-%s", role, athanorName, moName)
+}
+
+// KindledDir returns the kindled-state sidecar directory for an MO.
+// Presence of <role> file inside IS the kindled state for that role.
+func KindledDir(instanceDir, moName string) string {
+	return filepath.Join(instanceDir, MagnaOperaDir, moName, "kindled")
+}
+
+// SetKindled marks a role as kindled for an MO by creating an empty sidecar file.
+// Idempotent: no error if the role was already kindled.
+func SetKindled(instanceDir, moName, role string) error {
+	dir := KindledDir(instanceDir, moName)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("creating kindled dir: %w", err)
+	}
+	path := filepath.Join(dir, role)
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return fmt.Errorf("creating kindled file %s: %w", path, err)
+	}
+	return f.Close()
+}
+
+// ClearKindled removes the kindled sidecar for a role.
+// Idempotent: no error if the role was not kindled.
+func ClearKindled(instanceDir, moName, role string) error {
+	path := filepath.Join(KindledDir(instanceDir, moName), role)
+	if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("removing kindled file %s: %w", path, err)
+	}
+	return nil
+}
+
+// ClearAllKindled removes every kindled sidecar for an MO.
+// Idempotent: no error if the kindled dir does not exist.
+func ClearAllKindled(instanceDir, moName string) error {
+	dir := KindledDir(instanceDir, moName)
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return fmt.Errorf("reading kindled dir: %w", err)
+	}
+	for _, e := range entries {
+		path := filepath.Join(dir, e.Name())
+		if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+			return fmt.Errorf("removing kindled file %s: %w", path, err)
+		}
+	}
+	return nil
+}
+
+// ListKindled returns the role names currently marked kindled for an MO.
+// Returns an empty slice (not nil error) when the kindled dir does not exist.
+func ListKindled(instanceDir, moName string) ([]string, error) {
+	dir := KindledDir(instanceDir, moName)
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return []string{}, nil
+		}
+		return nil, fmt.Errorf("reading kindled dir: %w", err)
+	}
+	names := make([]string, 0, len(entries))
+	for _, e := range entries {
+		if !e.IsDir() {
+			names = append(names, e.Name())
+		}
+	}
+	return names, nil
+}
+
+// IsKindled returns true if the role's kindled sidecar exists for an MO.
+func IsKindled(instanceDir, moName, role string) bool {
+	path := filepath.Join(KindledDir(instanceDir, moName), role)
+	_, err := os.Stat(path)
+	return err == nil
+}
+
+// SessionName returns the tmux session name for an athanor.
+// Convention: athanor-<name>. All crucibles for this athanor live in this session.
+func SessionName(athanorName string) string {
+	return "athanor-" + athanorName
+}
+
+// AthanorName extracts the athanor name from an instance directory path.
+func AthanorName(instDir string) string {
+	return filepath.Base(instDir)
+}
